@@ -40,6 +40,9 @@ android {
 }
 
 dependencies {
+    // This is for icons in the app
+    val composeVersion = "1.0.5"
+    implementation("androidx.compose.material:material-icons-extended:$composeVersion")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -56,4 +59,6 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    // For Navigation
+    implementation("androidx.navigation:navigation-compose:2.8.9") // Use the latest version
 }
