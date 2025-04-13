@@ -6,6 +6,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
 import com.lra.kalanikethencic.R
 
@@ -106,6 +107,7 @@ val Typography = Typography(
         fontWeight = FontWeight.Normal,
         fontSize = 10.sp,
         lineHeight = 14.sp, // Recommended: ~1.4 * fontSize
-        letterSpacing = 0.sp
+        letterSpacing = 0.sp,
+        textDecoration = TextDecoration.Underline,
     )
 )

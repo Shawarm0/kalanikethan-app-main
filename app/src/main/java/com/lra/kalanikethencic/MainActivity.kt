@@ -1,6 +1,7 @@
 package com.lra.kalanikethencic
 
 
+import android.os.Build
 import com.lra.kalanikethencic.ui.screens.Home
 
 
@@ -8,6 +9,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -40,6 +42,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.lra.kalanikethencic.ui.components.KalanikethanAppDrawer
 import com.lra.kalanikethencic.ui.components.TopAppBar
+import com.lra.kalanikethencic.ui.screens.Payments
 import com.lra.kalanikethencic.ui.screens.SignIn
 import com.lra.kalanikethencic.ui.theme.KalanikethenCICTheme
 import kotlinx.coroutines.launch
@@ -47,6 +50,7 @@ import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -113,12 +117,10 @@ class MainActivity : ComponentActivity() {
                                 composable("Add") {  }
                                 composable("Who's In") {  }
                                 composable("History") {  }
-                                composable("Payments") {  }
+                                composable("Payments") { Payments() }
                                 composable("Account") {  }
                             }
-
                     }
-
                 }
             }
         }

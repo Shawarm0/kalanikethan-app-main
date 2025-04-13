@@ -38,6 +38,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lra.kalanikethencic.ui.theme.ButtonColor
 import com.lra.kalanikethencic.ui.theme.ButtonHighlight
+import com.lra.kalanikethencic.ui.theme.Typography
 import com.lra.kalanikethencic.ui.theme.UnselectedButtonText
 
 @Composable
@@ -58,7 +59,7 @@ fun Button(text: String, symbol: ImageVector? = null, onClick: () -> Unit = {}){
             if(symbol != null){
                 Icon(symbol, contentDescription = "Symbol", modifier = Modifier.size(20.dp), tint = Color.White)
             }
-            Text(text = text, style = MaterialTheme.typography.titleSmall, color = Color(0xFFFFFFFF))
+            Text(text = text, style = Typography.titleSmall, color = Color(0xFFFFFFFF))
         }
     }
 }
@@ -85,7 +86,7 @@ fun SelectionButton(text: String,  onClick: () -> Unit = {}){
         )
     ) {
         Row (verticalAlignment = Alignment.CenterVertically){
-            Text(text = text, style = MaterialTheme.typography.titleSmall, color = if(state) Color(0xFFFFFFFF) else UnselectedButtonText)
+            Text(text = text, style = Typography.titleSmall, color = if(state) Color(0xFFFFFFFF) else UnselectedButtonText)
         }
     }
 }
