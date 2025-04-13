@@ -40,6 +40,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.lra.kalanikethencic.ui.components.KalanikethanAppDrawer
 import com.lra.kalanikethencic.ui.components.TopAppBar
+import com.lra.kalanikethencic.ui.screens.SignIn
 import com.lra.kalanikethencic.ui.theme.KalanikethenCICTheme
 import kotlinx.coroutines.launch
 
@@ -108,7 +109,7 @@ class MainActivity : ComponentActivity() {
                     ) { innerpadding ->
                             NavHost(navController, startDestination = "Home", modifier = Modifier.fillMaxSize().padding(innerpadding)) {
                                 composable("Home") { Home() }
-                                composable("Sign In") {  }
+                                composable("Sign In") { SignIn() }
                                 composable("Add") {  }
                                 composable("Who's In") {  }
                                 composable("History") {  }

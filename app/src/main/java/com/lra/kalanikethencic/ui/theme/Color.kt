@@ -16,6 +16,7 @@ val LightBoxBackground = Color(0xFFFFFFFF) // Pure white for contrast
 // Button Colors
 val ButtonColor = Color(0xFF1769AA) // Rich blue for buttons
 val ButtonHighlight = Color(0xFF2A7EC5) // Slightly lighter blue for selected buttons
+val UnselectedButtonText = Color(0xFF3D4D5C) // Text color when select button is unselected (obviously)
 
 // Additional Accents
 val AccentColor = Color(0xFF20A4F3) // Bright pop color for highlights
