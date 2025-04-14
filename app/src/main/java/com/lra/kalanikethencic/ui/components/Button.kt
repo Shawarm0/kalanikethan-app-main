@@ -42,10 +42,10 @@ import com.lra.kalanikethencic.ui.theme.Typography
 import com.lra.kalanikethencic.ui.theme.UnselectedButtonText
 
 @Composable
-fun Button(text: String, symbol: ImageVector? = null, onClick: () -> Unit = {}){
+fun Button(text: String, symbol: ImageVector? = null, onClick: () -> Unit = {}, color: Color = ButtonColor){
     Box (modifier = Modifier
         .clip(RoundedCornerShape(15.dp))
-        .background(color = ButtonColor)
+        .background(color = color)
         .height(30.dp)
         .padding(horizontal = 15.dp)
         .wrapContentSize(Alignment.Center)
