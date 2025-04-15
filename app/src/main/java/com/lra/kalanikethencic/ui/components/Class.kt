@@ -22,14 +22,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun Class() {
+fun Class(teacher: String = "Teacher", timeFrom: String = "HH:mm", timeTo: String = "HH:mm", className: String = "Class") {
     val darkTheme = isSystemInDarkTheme()
     Box(
         modifier = Modifier
+            .shadow(
+                elevation = 4.dp, // Figma blur roughly maps to elevation
+                shape = RoundedCornerShape(0.dp), // or your desired shape
+                ambientColor = Color.Black.copy(alpha = 0.1f),
+                spotColor = Color.Black.copy(alpha = 0.1f)
+            )
             .clip(RoundedCornerShape(12.dp)).height(277.dp).width(404.dp)
             .background(color = if (darkTheme) Color.Black else Color.White),
     ) {
@@ -40,17 +47,23 @@ fun Class() {
             Column(
                 modifier = Modifier.wrapContentSize().padding(12.dp)
             ) {
-                Text(text = "Teacher", color = if (darkTheme) Color.White else Color.Black, style = MaterialTheme.typography.titleLarge)
+                Text(text = teacher, color = if (darkTheme) Color.White else Color.Black, style = MaterialTheme.typography.titleLarge)
                 Spacer(modifier = Modifier.height(6.dp))
-                Text(text = "HH:mm - HH:mm", color = if (darkTheme) Color.LightGray else Color(0xFF3D4D5C), style = MaterialTheme.typography.bodyMedium)
+                Text(text = "$timeFrom - $timeTo", color = if (darkTheme) Color.LightGray else Color(0xFF3D4D5C), style = MaterialTheme.typography.bodyMedium)
                 Spacer(modifier = Modifier.height(6.dp))
-                Text(text = "Class", color = if (darkTheme) Color.LightGray else Color(0xFF3D4D5C), style = MaterialTheme.typography.titleSmall )
+                Text(text = className, color = if (darkTheme) Color.LightGray else Color(0xFF3D4D5C), style = MaterialTheme.typography.titleSmall )
             }
         }
 
-        // This needs to be a button, make the button composable first
-        Text("Go to Students", style = MaterialTheme.typography.titleSmall, color = if (darkTheme) Color.White else Color.Black, modifier = Modifier.align(
-            Alignment.BottomEnd).padding(12.dp))
+
+        Button(
+            text = "Go to Students",
+            color = MaterialTheme.colorScheme.onPrimary,
+            onClick = { /* Do something */ },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(12.dp)
+        )
     }
 }
 

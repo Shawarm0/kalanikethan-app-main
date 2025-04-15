@@ -46,8 +46,15 @@ import com.lra.kalanikethencic.ui.theme.Typography
 import com.lra.kalanikethencic.ui.theme.UnselectedButtonText
 
 @Composable
-fun Button(text: String, symbol: ImageVector? = null, onClick: () -> Unit = {}, color: Color = ButtonColor){
-    Box (modifier = Modifier
+fun Button(
+    text: String,
+    symbol: ImageVector? = null,
+    onClick: () -> Unit = {},
+    color: Color = ButtonColor,
+    modifier: Modifier = Modifier
+){
+    Box (
+        modifier = modifier
         .clip(RoundedCornerShape(15.dp))
         .background(color = color)
         .height(30.dp)
@@ -59,22 +66,32 @@ fun Button(text: String, symbol: ImageVector? = null, onClick: () -> Unit = {}, 
             onClick = onClick
         )
     ) {
-        Row (verticalAlignment = Alignment.CenterVertically){
+        Row (
+            verticalAlignment = Alignment.CenterVertically
+        ){
             if(symbol != null){
                 Icon(symbol, contentDescription = "Symbol", modifier = Modifier.size(20.dp), tint = Color.White)
             }
-            Text(text = text, style = Typography.titleSmall, color = Color(0xFFFFFFFF))
+            Text(
+                text = text,
+                style = Typography.titleSmall,
+                color = Color(0xFFFFFFFF)
+            )
         }
     }
 }
 
 @Composable
-fun SelectionButton(text: String,  onClick: () -> Unit = {}){
+fun SelectionButton(
+    text: String,
+    onClick: () -> Unit = {}
+) {
     var state by remember { mutableStateOf(false) }
     var onStateChange : (Boolean) -> Unit = {
         value -> state = value
     }
-    Box (modifier = Modifier
+    Box (
+        modifier = Modifier
         .clip(RoundedCornerShape(20.dp))
         .background(color = if(state) AccentColor else Color(0xFFE7EEF5))
         .height(36.dp)
@@ -89,7 +106,9 @@ fun SelectionButton(text: String,  onClick: () -> Unit = {}){
             }
         )
     ) {
-        Row (verticalAlignment = Alignment.CenterVertically){
+        Row (
+            verticalAlignment = Alignment.CenterVertically
+        ){
             Text(text = text, style = Typography.titleSmall, color = if(state) Color(0xFFFFFFFF) else UnselectedButtonText)
         }
     }

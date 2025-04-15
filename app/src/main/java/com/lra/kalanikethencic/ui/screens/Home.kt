@@ -55,7 +55,12 @@ fun Home() {
         }
         Spacer(modifier = Modifier.height(23.dp))
 
-        Class()
+        Class(
+            teacher = "Dr Neelima",
+            timeFrom = "15:30",
+            timeTo = "16:40",
+            className = "Dance",
+        )
 
 
 
