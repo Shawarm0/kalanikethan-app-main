@@ -4,19 +4,13 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.lra.kalanikethencic.ui.components.Button
 import com.lra.kalanikethencic.ui.components.Payment
-import com.lra.kalanikethencic.ui.components.SelectionButton
 import java.time.LocalDate
 
 @RequiresApi(Build.VERSION_CODES.O)

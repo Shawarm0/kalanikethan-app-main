@@ -12,9 +12,15 @@ import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -38,14 +44,17 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.lra.kalanikethencic.ui.components.KalanikethanAppDrawer
 import com.lra.kalanikethencic.ui.components.TopAppBar
 import com.lra.kalanikethencic.ui.screens.Payments
 import com.lra.kalanikethencic.ui.screens.SignIn
 import com.lra.kalanikethencic.ui.theme.KalanikethenCICTheme
+import com.lra.kalanikethencic.util.imePaddingFraction
 import kotlinx.coroutines.launch
 
 
@@ -59,16 +68,21 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             KalanikethenCICTheme {
+
                 // All for the Modal Navigation Drawer
                 val drawerState = rememberDrawerState(DrawerValue.Closed)
                 val scope = rememberCoroutineScope()
-                var selectedScreen by rememberSaveable { mutableStateOf("Dashboard") }
 
                 // For the top bar
                 var icon by remember { mutableStateOf(Icons.Default.Home) }
 
                 // For switching screens
                 val navController = rememberNavController()
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                var selectedScreen = navBackStackEntry?.destination?.route ?: "Dashboard"
+
+                // This is to clear focus
+                val focusManager = LocalFocusManager.current
 
                 when (selectedScreen) {
                     "Dashboard" -> { icon = Icons.Outlined.Home }
@@ -87,32 +101,53 @@ class MainActivity : ComponentActivity() {
                         KalanikethanAppDrawer(
                             selectedScreen = selectedScreen,
                             onScreenSelected = { screenName ->
-                                selectedScreen = screenName
                                 scope.launch {
                                     drawerState.animateTo(DrawerValue.Closed, tween(500)) // Close the drawer
                                 }
-                                navController.navigate(screenName)
+                                navController.navigate(screenName) {
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
                             }
                         )
                     }
                 ) {
-                    Scaffold(topBar = {
-                        TopAppBar(
-                            icon = icon,
-                            selectedScreen = selectedScreen,
-                            title = selectedScreen,
-                            scope = scope,
-                            drawerState = drawerState,
-                            onScreenSelected = { screenName ->
-                                navController.navigate("Account")
-                                selectedScreen = screenName
-                            }
-                        )
-                    },
+                    Scaffold(
+                        topBar = {
+                            TopAppBar(
+                                icon = icon,
+                                selectedScreen = selectedScreen,
+                                title = selectedScreen,
+                                scope = scope,
+                                drawerState = drawerState,
+                                onScreenSelected = { screenName ->
+                                    scope.launch {
+                                        navController.navigate("Account") {
+                                            launchSingleTop = true
+                                            restoreState = true
+                                        }
+                                    }
+                                }
+                            )
+                        },
                         modifier = Modifier
-                        .fillMaxSize().background(color = MaterialTheme.colorScheme.background)
+                            .fillMaxSize()
+                            .background(color = MaterialTheme.colorScheme.background)
+                            .clickable(
+                                onClick = { focusManager.clearFocus() },
+                                indication = null,
+                                interactionSource = remember { MutableInteractionSource() }
+                            )
+
+
                     ) { innerpadding ->
-                            NavHost(navController, startDestination = "Dashboard", modifier = Modifier.padding(innerpadding)) {
+
+                            NavHost(navController,
+                                startDestination = "Dashboard",
+                                modifier = Modifier
+                                    .padding(innerpadding)
+                                    .imePaddingFraction(0.9f) // Apply reduced bottom padding
+                                ) {
                                 composable("Dashboard") { Home() }
                                 composable("Sign In") { SignIn() }
                                 composable("Add") {  }

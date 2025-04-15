@@ -1,5 +1,6 @@
 package com.lra.kalanikethencic.ui.components
 
+import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -19,7 +20,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -30,7 +30,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,6 +42,7 @@ import com.lra.kalanikethencic.ui.theme.Typography
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+@SuppressLint("WeekBasedYear")
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Payment(
@@ -69,7 +69,7 @@ fun Payment(
         .background(color = LightBoxBackground)
         .size(1075.dp, 108.dp)
         .padding(12.dp)
-    ){
+    ) {
         // This is the Content Column
         Column {
             // Top Row
@@ -141,7 +141,9 @@ fun Payment(
                     )
                 }
             }
+
             Spacer(modifier = Modifier.weight(1f))
+
             Row(
                 modifier = Modifier
                     .height(38.dp)
@@ -161,7 +163,7 @@ fun Payment(
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview(widthDp = 1075, heightDp = 108)
 @Composable
-fun PaymentInfo(){
+fun PaymentInfo() {
     Payment(
         "Alberry",
         date = LocalDate.of(2025, 4, 13)
