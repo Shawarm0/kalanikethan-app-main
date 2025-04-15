@@ -16,11 +16,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -36,6 +39,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.lra.kalanikethencic.ui.theme.AccentColor
 import com.lra.kalanikethencic.ui.theme.ButtonColor
 import com.lra.kalanikethencic.ui.theme.ButtonHighlight
 import com.lra.kalanikethencic.ui.theme.Typography
@@ -72,7 +76,7 @@ fun SelectionButton(text: String,  onClick: () -> Unit = {}){
     }
     Box (modifier = Modifier
         .clip(RoundedCornerShape(20.dp))
-        .background(color = if(state) ButtonHighlight else Color(0xFFE7EEF5))
+        .background(color = if(state) AccentColor else Color(0xFFE7EEF5))
         .height(36.dp)
         .padding(horizontal = 8.dp)
         .wrapContentSize(Alignment.Center)

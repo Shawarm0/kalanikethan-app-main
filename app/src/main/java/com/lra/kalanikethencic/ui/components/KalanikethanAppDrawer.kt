@@ -5,7 +5,11 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -39,6 +43,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,11 +57,11 @@ import com.lra.kalanikethencic.R
 
 @Composable
 fun KalanikethanAppDrawer(selectedScreen: String, onScreenSelected: (String) -> Unit) {
-
+    val darkTheme = isSystemInDarkTheme()
     Column( // This is purely for the background
         modifier = Modifier
             .fillMaxHeight().width(400.dp)
-            .background(Color.White, shape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp))
+            .background(if (darkTheme) Color(0xFF2A2630) else Color.White, shape = RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp))
             .windowInsetsPadding(WindowInsets.statusBars),
     ) {
         Column( // This is the content Frame
@@ -82,18 +87,18 @@ fun KalanikethanAppDrawer(selectedScreen: String, onScreenSelected: (String) -> 
                 Spacer(modifier = Modifier.width(12.dp)) // Gap between elements
 
                 Column { // This is the title text
-                    Text(text = "Kalanikethan App", style = MaterialTheme.typography.bodyLarge, fontSize = 16.sp) // overwrite default size
-                    Text(text = "Welcome!", style = MaterialTheme.typography.bodyLarge, color = Color(0xFF3D4D5C))
+                    Text(text = "Kalanikethan App", style = MaterialTheme.typography.bodyLarge, fontSize = 16.sp, color = if (darkTheme) Color.White else Color.Black) // overwrite default size
+                    Text(text = "Welcome!", style = MaterialTheme.typography.bodyLarge, color = if (darkTheme) Color.LightGray else Color(0xFF3D4D5C))
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             AppDrawerItem(
-                icon = if (selectedScreen == "Home") Icons.Filled.Home else Icons.Outlined.Home,
-                text = "Home",
-                isSelected = if (selectedScreen == "Home") true else false,
-                onClick = { onScreenSelected("Home") }
+                icon = if (selectedScreen == "Dashboard") Icons.Filled.Home else Icons.Outlined.Home,
+                text = "Dashboard",
+                isSelected = if (selectedScreen == "Dashboard") true else false,
+                onClick = { onScreenSelected("Dashboard") }
             )
             AppDrawerItem(
                 icon = if (selectedScreen == "Sign In") Icons.Filled.PersonAdd else Icons.Outlined.PersonAdd,
@@ -133,17 +138,18 @@ fun KalanikethanAppDrawer(selectedScreen: String, onScreenSelected: (String) -> 
 
 @Composable
 fun AppDrawerItem(icon: ImageVector, text: String, isSelected: Boolean, onClick: () -> Unit) {
-    val background = if (isSelected) MaterialTheme.colorScheme.background else Color.Transparent
-    Button(
-        onClick = onClick,
+    val background = if (isSelected && !isSystemInDarkTheme()) MaterialTheme.colorScheme.background else if (isSelected && isSystemInDarkTheme()) Color(0xFF3E345C) else Color.Transparent
+    val darkTheme = isSystemInDarkTheme()
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .background(color = background, shape = RoundedCornerShape(51.dp))
-            .clip(RoundedCornerShape(51.dp)),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = background,
-            contentColor = Color.Black
-        ),
+            .clip(RoundedCornerShape(51.dp))
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() }, // Track the interaction
+                indication = null, // Removes the ripple effect
+                onClick = onClick
+            )
     ) {
         Row(
             modifier = Modifier
@@ -155,15 +161,15 @@ fun AppDrawerItem(icon: ImageVector, text: String, isSelected: Boolean, onClick:
             Icon(
                 imageVector = icon,
                 contentDescription = text,
-                tint = Color.Black,
+                tint = if (darkTheme) Color.White else Color.Black,
                 modifier = Modifier.padding(0.dp)
             )
             Spacer(modifier = Modifier.width(10.dp))
             Text(
                 text = text,
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
+                color = if (darkTheme) Color.White else Color.Black
             )
-
         }
     }
 }

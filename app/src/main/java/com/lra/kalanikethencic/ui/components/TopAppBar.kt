@@ -109,9 +109,7 @@ fun TopAppBar(
                     ) {
                         Icon(Icons.Default.AccountCircle, contentDescription = "Account")
                     }
-                    Spacer(modifier = Modifier.width(5.dp))
                     if (!isPortrait) {
-                        Spacer(modifier = Modifier.width(5.dp))
                         Text(
                             "FirstName",
                             style = MaterialTheme.typography.displaySmall,
