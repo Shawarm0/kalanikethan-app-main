@@ -73,25 +73,29 @@ fun StudentBox(
     val bringIntoViewRequester = remember { BringIntoViewRequester() }
     val coroutineScope = rememberCoroutineScope()
 
+    var editableState by remember { mutableStateOf(editable) }
+
     //For interaction by buttons and textfields while editing
-    var editable by remember { mutableStateOf(editable) }
-    var fname = remember { mutableStateOf(firstName) }
-    var lname = remember { mutableStateOf(lastName) }
-    var bday = remember { mutableStateOf(birthday.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))}
-    var walkAlone = remember { mutableStateOf(canWalkAlone) }
-    var danceSelect = remember { mutableStateOf(dance) }
-    var singSelect = remember { mutableStateOf(sing) }
-    var musicSelect = remember { mutableStateOf(music) }
+    var currentFirstName by remember { mutableStateOf(firstName) }
+    var currentLastName by remember { mutableStateOf(lastName) }
+    var currentBirthday by remember { mutableStateOf(birthday.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))) }
+    var currentWalkAlone by remember { mutableStateOf(canWalkAlone) }
+    var currentDanceSelection by remember { mutableStateOf(dance) }
+    var currentSingSelection by remember { mutableStateOf(sing) }
+    var currentMusicSelection by remember { mutableStateOf(music) }
 
     //Stores new data inputted while editing into here (basically these variables are the final values of the student boxes)
-    var currentFirstName = fname.value
-    var currentLastName = lname.value
-    var currentBirthday = bday.value
-    var currentWalkAlone = walkAlone.value
-    var currentDanceSelection = danceSelect.value
-    var currentSingSelection = singSelect.value
-    var currentMusicSelection = musicSelect.value
+    var tempFirstName by remember { mutableStateOf(currentFirstName) }
+    var tempLastName by remember { mutableStateOf(currentLastName) }
+    var tempBirthday by remember { mutableStateOf(currentBirthday) }
+    var tempWalkAlone by remember { mutableStateOf(currentWalkAlone) }
+    var tempDanceSelection by remember { mutableStateOf(currentDanceSelection) }
+    var tempSingSelection by remember { mutableStateOf(currentSingSelection) }
+    var tempMusicSelection by remember { mutableStateOf(currentMusicSelection) }
 
+    var textFieldFirstName = remember { mutableStateOf(tempFirstName) }
+    var textFieldLastName = remember { mutableStateOf(tempLastName) }
+    var textFieldBirthday = remember { mutableStateOf(tempBirthday) }
 
     Box(modifier = Modifier
         .width(1075.dp)
@@ -108,18 +112,18 @@ fun StudentBox(
                 horizontalArrangement = Arrangement.SpaceBetween
             ){
                 Text("Student", style = Typography.titleLarge)
-                if(editable){
+                if(editableState){
                     Button("Delete", Icons.Default.Delete, color = ErrorColor)
                 }
             }
 
             HorizontalDivider(color = Color.Gray, modifier = Modifier.fillMaxWidth())
 
-            if(editable){
+            if(editableState){
                 Row(horizontalArrangement = Arrangement.spacedBy(30.dp)) { // Typing in data
                     SimpleDecoratedTextField(
                         placeholder = "Text",
-                        text = fname,
+                        text = textFieldFirstName,
                         label = "First Name",
                         bringIntoViewRequester = bringIntoViewRequester,
                         coroutineScope = coroutineScope
@@ -127,7 +131,7 @@ fun StudentBox(
 
                     SimpleDecoratedTextField(
                         placeholder = "Text",
-                        text = lname,
+                        text = textFieldLastName,
                         label = "Last Name",
                         bringIntoViewRequester = bringIntoViewRequester,
                         coroutineScope = coroutineScope
@@ -135,7 +139,7 @@ fun StudentBox(
 
                     SimpleDecoratedTextField(
                         placeholder = "Text",
-                        text = bday,
+                        text = textFieldBirthday,
                         label = "Birthday",
                         bringIntoViewRequester = bringIntoViewRequester,
                         coroutineScope = coroutineScope
@@ -144,9 +148,9 @@ fun StudentBox(
 
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     Text("Classes: ", style = Typography.titleSmall)
-                    SelectionButton("Dance", selected = danceSelect)
-                    SelectionButton("Singing", selected = singSelect)
-                    SelectionButton("Music", selected = musicSelect)
+                    SelectionButton("Dance", selected = remember { mutableStateOf(tempDanceSelection) }, onClick = {tempDanceSelection = it})
+                    SelectionButton("Singing", selected = remember { mutableStateOf(tempSingSelection) }, onClick = {tempSingSelection = it})
+                    SelectionButton("Music", selected = remember { mutableStateOf(tempMusicSelection) }, onClick = {tempMusicSelection = it})
                 }
 
                 Row(
@@ -160,9 +164,9 @@ fun StudentBox(
                     ){ //Walk Alone switch
                         Text("Can student walk alone?", style = Typography.titleSmall)
                         Switch(
-                            checked = walkAlone.value,
+                            checked = tempWalkAlone,
                             onCheckedChange = {
-                                walkAlone.value = it
+                                tempWalkAlone = it
                             },
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = Color.White,
@@ -171,7 +175,7 @@ fun StudentBox(
                                 uncheckedTrackColor = Color(0xFFe7e0ec),
                                 uncheckedBorderColor = Color(0xFF79747E)
                             ),
-                            thumbContent = if (walkAlone.value) {
+                            thumbContent = if (tempWalkAlone) {
                                 {
                                     Icon(
                                         imageVector = Icons.Filled.Check,
@@ -190,11 +194,27 @@ fun StudentBox(
                     ) {
                         Button("Cancel",
                             Icons.Default.Clear,
-                            onClick = {editable = false},
+                            onClick = {
+                                textFieldFirstName.value = currentFirstName
+                                textFieldLastName.value = currentLastName
+                                textFieldBirthday.value = currentBirthday
+                                tempWalkAlone = currentWalkAlone
+                                tempDanceSelection = currentDanceSelection
+                                tempSingSelection = currentSingSelection
+                                tempMusicSelection = currentMusicSelection
+                                editableState = false
+                                      },
                             ButtonColor)
                         Button("Confirm", Icons.Default.Check,
                             onClick = {
-                                editable = false
+                                currentFirstName = textFieldFirstName.value
+                                currentLastName = textFieldLastName.value
+                                currentBirthday = textFieldBirthday.value
+                                currentWalkAlone = tempWalkAlone
+                                currentDanceSelection = tempDanceSelection
+                                currentSingSelection = tempSingSelection
+                                currentMusicSelection = tempMusicSelection
+                                editableState = false
                                 //Saving data if edit is confirmed (idk what to put here)
                             },
                             SuccessColor
@@ -224,7 +244,7 @@ fun StudentBox(
                     Text("Can walk alone: ${if(currentWalkAlone) "Yes" else "No"}", style = Typography.bodyMedium)
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)){
                         Button("View History", color = ButtonColor)
-                        Button("Edit Details", color = ButtonColor, onClick = {editable = true})
+                        Button("Edit Details", color = ButtonColor, onClick = {editableState = true})
                     }
                 }
 

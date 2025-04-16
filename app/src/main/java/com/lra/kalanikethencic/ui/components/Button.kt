@@ -78,7 +78,7 @@ fun Button(
 @Composable
 fun SelectionButton(
     text: String,
-    onClick: () -> Unit = {},
+    onClick: (Boolean) -> Unit = {},
     selected: MutableState<Boolean> = mutableStateOf(false),
     width: Dp = 164.dp
 ) {
@@ -97,7 +97,7 @@ fun SelectionButton(
             indication = null,
             interactionSource = remember { MutableInteractionSource() },
             onClick = {
-                onClick
+                onClick(!state)
                 onStateChange(!state)
             }
         )
