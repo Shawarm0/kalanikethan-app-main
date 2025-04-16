@@ -78,19 +78,19 @@ fun StudentBox(
     var fname = remember { mutableStateOf(firstName) }
     var lname = remember { mutableStateOf(lastName) }
     var bday = remember { mutableStateOf(birthday.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))}
-    var walkAlone by remember { mutableStateOf(canWalkAlone) }
+    var walkAlone = remember { mutableStateOf(canWalkAlone) }
     var danceSelect = remember { mutableStateOf(dance) }
     var singSelect = remember { mutableStateOf(sing) }
     var musicSelect = remember { mutableStateOf(music) }
 
     //Stores new data inputted while editing into here (basically these variables are the final values of the student boxes)
-    var currentFirstName = fname
-    var currentLastName = lname
-    var currentBirthday = bday
-    var currentWalkAlone = walkAlone
-    var currentDanceSelection = danceSelect
-    var currentSingSelection = singSelect
-    var currentMusicSelection = musicSelect
+    var currentFirstName = fname.value
+    var currentLastName = lname.value
+    var currentBirthday = bday.value
+    var currentWalkAlone = walkAlone.value
+    var currentDanceSelection = danceSelect.value
+    var currentSingSelection = singSelect.value
+    var currentMusicSelection = musicSelect.value
 
 
     Box(modifier = Modifier
@@ -160,9 +160,9 @@ fun StudentBox(
                     ){ //Walk Alone switch
                         Text("Can student walk alone?", style = Typography.titleSmall)
                         Switch(
-                            checked = walkAlone,
+                            checked = walkAlone.value,
                             onCheckedChange = {
-                                walkAlone = it
+                                walkAlone.value = it
                             },
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = Color.White,
@@ -171,7 +171,7 @@ fun StudentBox(
                                 uncheckedTrackColor = Color(0xFFe7e0ec),
                                 uncheckedBorderColor = Color(0xFF79747E)
                             ),
-                            thumbContent = if (walkAlone) {
+                            thumbContent = if (walkAlone.value) {
                                 {
                                     Icon(
                                         imageVector = Icons.Filled.Check,
@@ -195,14 +195,7 @@ fun StudentBox(
                         Button("Confirm", Icons.Default.Check,
                             onClick = {
                                 editable = false
-                                //Saving data if edit is confirmed
-                                currentFirstName = fname
-                                currentLastName = lname
-                                currentBirthday = bday
-                                currentWalkAlone = walkAlone
-                                currentDanceSelection = danceSelect
-                                currentSingSelection = singSelect
-                                currentMusicSelection = musicSelect
+                                //Saving data if edit is confirmed (idk what to put here)
                             },
                             SuccessColor
                         )
@@ -210,17 +203,17 @@ fun StudentBox(
                 }
             } else {
                 Text("Student details", style = Typography.bodyMedium)
-                Text("Name: ${currentFirstName.value} ${currentLastName.value}", style = Typography.bodyMedium)
-                Text("Birthdate: ${currentBirthday.value}", style = Typography.bodyMedium)
+                Text("Name: ${currentFirstName} ${currentLastName}", style = Typography.bodyMedium)
+                Text("Birthdate: ${currentBirthday}", style = Typography.bodyMedium)
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)){
                     Text("Classes: ")
-                    if (currentDanceSelection.value) {
+                    if (currentDanceSelection) {
                         ClassBox("Dance")
                     }
-                    if (currentSingSelection.value) {
+                    if (currentSingSelection) {
                         ClassBox("Singing")
                     }
-                    if (currentMusicSelection.value) {
+                    if (currentMusicSelection) {
                         ClassBox("Music")
                     }
                 }
@@ -228,7 +221,7 @@ fun StudentBox(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ){
-                    Text("Can walk alone: ${if(canWalkAlone) "Yes" else "No"}", style = Typography.bodyMedium)
+                    Text("Can walk alone: ${if(currentWalkAlone) "Yes" else "No"}", style = Typography.bodyMedium)
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)){
                         Button("View History", color = ButtonColor)
                         Button("Edit Details", color = ButtonColor, onClick = {editable = true})
