@@ -52,7 +52,7 @@ fun Payment(
     date: LocalDate?
 ){
     // Put the date into british format
-    val formattedDate = date?.format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))
+    val formattedDate = date?.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
 
     // Background Box
     Box(

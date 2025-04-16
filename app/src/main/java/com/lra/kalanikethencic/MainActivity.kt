@@ -51,6 +51,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.lra.kalanikethencic.ui.components.KalanikethanAppDrawer
 import com.lra.kalanikethencic.ui.components.TopAppBar
+import com.lra.kalanikethencic.ui.screens.Add
 import com.lra.kalanikethencic.ui.screens.Payments
 import com.lra.kalanikethencic.ui.screens.SignIn
 import com.lra.kalanikethencic.ui.theme.KalanikethenCICTheme
@@ -150,7 +151,7 @@ class MainActivity : ComponentActivity() {
                                 ) {
                                 composable("Dashboard") { Home() }
                                 composable("Sign In") { SignIn() }
-                                composable("Add") {  }
+                                composable("Add") { Add() }
                                 composable("Who's In") {  }
                                 composable("History") {  }
                                 composable("Payments") { Payments() }

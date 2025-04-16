@@ -3,13 +3,17 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,6 +34,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.lra.kalanikethencic.ui.theme.AccentColor
 import com.lra.kalanikethencic.ui.theme.ButtonColor
@@ -72,9 +78,11 @@ fun Button(
 @Composable
 fun SelectionButton(
     text: String,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
+    selected: MutableState<Boolean> = mutableStateOf(false),
+    width: Dp = 164.dp
 ) {
-    var state by remember { mutableStateOf(false) }
+    var state by remember { selected }
     var onStateChange : (Boolean) -> Unit = {
         value -> state = value
     }
@@ -83,7 +91,7 @@ fun SelectionButton(
         .clip(RoundedCornerShape(20.dp))
         .background(color = if(state) AccentColor else Color(0xFFE7EEF5))
         .height(36.dp)
-        .padding(horizontal = 8.dp)
+        .width(width)
         .wrapContentSize(Alignment.Center)
         .clickable(
             indication = null,
@@ -93,9 +101,12 @@ fun SelectionButton(
                 onStateChange(!state)
             }
         )
+        .padding(horizontal = 8.dp)
     ) {
         Row (
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
         ){
             Text(text = text, style = Typography.titleSmall, color = if(state) Color(0xFFFFFFFF) else UnselectedButtonText)
         }
