@@ -24,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,18 +45,22 @@ import kotlinx.coroutines.launch
 @Composable
 fun SimpleDecoratedTextField(
     modifier: Modifier = Modifier,
-    text: MutableState<String>,
+    text: String,
     placeholder: String = "Text",
     label: String? = null,
+    onValueChange: (String) -> Unit = {},
     leadingIcon:  ImageVector? = null,
     trailingIcon: ImageVector? = null,
     bringIntoViewRequester: BringIntoViewRequester,
     coroutineScope: CoroutineScope,
 ) {
+    val text = remember { mutableStateOf(text) }
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused = interactionSource.collectIsFocusedAsState().value
     val borderColor = if (isFocused) Color.Black.copy(alpha=0.7f) else Color(0xFFDCDEDD)
     val iconColor = if (isFocused) Color.Black.copy(alpha=0.7f) else Color.Gray
+
+
 
     Column(
         modifier = modifier
@@ -90,7 +95,10 @@ fun SimpleDecoratedTextField(
                     }
                 }
                 .focusTarget(),
-            onValueChange = { text.value = it },
+            onValueChange = {
+                            text.value = it
+                            onValueChange(it)
+                            },
             singleLine = true,
             interactionSource = interactionSource,
             textStyle = MaterialTheme.typography.bodyLarge.copy(

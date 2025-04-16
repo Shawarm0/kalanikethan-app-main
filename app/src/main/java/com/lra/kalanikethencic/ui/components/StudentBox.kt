@@ -57,18 +57,25 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.math.sin
 
+@OptIn(ExperimentalFoundationApi::class)
+@RequiresApi(Build.VERSION_CODES.O)
+data class StudentData(
+    var firstName: String = "",
+    var lastName: String = "",
+    var birthday: String = LocalDate.of(1900, 1, 1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+    var canWalkAlone: Boolean = false,
+    var dance: Boolean = false,
+    var sing: Boolean = false,
+    var music: Boolean = false
+)
+
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun StudentBox(
-    firstName: String = "",
-    lastName: String = "",
-    birthday: LocalDate = LocalDate.of(1900, 1, 1),
-    canWalkAlone: Boolean = false,
-    dance: Boolean = false,
-    sing: Boolean = false,
-    music: Boolean = false,
+    initialData: StudentData = StudentData(),
     editable: Boolean = false
 ){
     // For the text boxes
@@ -77,27 +84,10 @@ fun StudentBox(
 
     var editableState by remember { mutableStateOf(editable) }
 
-    //For interaction by buttons and textfields while editing
-    var currentFirstName by remember { mutableStateOf(firstName) }
-    var currentLastName by remember { mutableStateOf(lastName) }
-    var currentBirthday by remember { mutableStateOf(birthday.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))) }
-    var currentWalkAlone by remember { mutableStateOf(canWalkAlone) }
-    var currentDanceSelection by remember { mutableStateOf(dance) }
-    var currentSingSelection by remember { mutableStateOf(sing) }
-    var currentMusicSelection by remember { mutableStateOf(music) }
+    var currentData by remember { mutableStateOf(initialData) }
+    var tempData by remember { mutableStateOf(initialData.copy()) }
 
-    //Stores new data inputted while editing into here (basically these variables are the final values of the student boxes)
-    var tempFirstName by remember { mutableStateOf(currentFirstName) }
-    var tempLastName by remember { mutableStateOf(currentLastName) }
-    var tempBirthday by remember { mutableStateOf(currentBirthday) }
-    var tempWalkAlone by remember { mutableStateOf(currentWalkAlone) }
-    var tempDanceSelection by remember { mutableStateOf(currentDanceSelection) }
-    var tempSingSelection by remember { mutableStateOf(currentSingSelection) }
-    var tempMusicSelection by remember { mutableStateOf(currentMusicSelection) }
 
-    var textFieldFirstName = remember { mutableStateOf(tempFirstName) }
-    var textFieldLastName = remember { mutableStateOf(tempLastName) }
-    var textFieldBirthday = remember { mutableStateOf(tempBirthday) }
 
     Box(modifier = Modifier
         .shadow(
@@ -131,7 +121,10 @@ fun StudentBox(
                 Row(horizontalArrangement = Arrangement.spacedBy(30.dp)) { // Typing in data
                     SimpleDecoratedTextField(
                         placeholder = "Text",
-                        text = textFieldFirstName,
+                        text = tempData.firstName,
+                        onValueChange = {
+                            tempData.firstName = it
+                        },
                         label = "First Name",
                         bringIntoViewRequester = bringIntoViewRequester,
                         coroutineScope = coroutineScope
@@ -139,7 +132,10 @@ fun StudentBox(
 
                     SimpleDecoratedTextField(
                         placeholder = "Text",
-                        text = textFieldLastName,
+                        text = tempData.lastName,
+                        onValueChange = {
+                            tempData.lastName = it
+                        },
                         label = "Last Name",
                         bringIntoViewRequester = bringIntoViewRequester,
                         coroutineScope = coroutineScope
@@ -147,7 +143,10 @@ fun StudentBox(
 
                     SimpleDecoratedTextField(
                         placeholder = "Text",
-                        text = textFieldBirthday,
+                        text = tempData.birthday,
+                        onValueChange = {
+                            tempData.birthday = it
+                        },
                         label = "Birthday",
                         bringIntoViewRequester = bringIntoViewRequester,
                         coroutineScope = coroutineScope
@@ -156,9 +155,9 @@ fun StudentBox(
 
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     Text("Classes: ", style = Typography.titleSmall)
-                    SelectionButton("Dance", selected = remember { mutableStateOf(tempDanceSelection) }, onClick = {tempDanceSelection = it})
-                    SelectionButton("Singing", selected = remember { mutableStateOf(tempSingSelection) }, onClick = {tempSingSelection = it})
-                    SelectionButton("Music", selected = remember { mutableStateOf(tempMusicSelection) }, onClick = {tempMusicSelection = it})
+                    SelectionButton("Dance", selected = remember { mutableStateOf(tempData.dance) }, onClick = {tempData.dance = it})
+                    SelectionButton("Singing", selected = remember { mutableStateOf(tempData.sing) }, onClick = {tempData.sing = it})
+                    SelectionButton("Music", selected = remember { mutableStateOf(tempData.music) }, onClick = {tempData.music = it})
                 }
 
                 Row(
@@ -172,9 +171,9 @@ fun StudentBox(
                     ){ //Walk Alone switch
                         Text("Can student walk alone?", style = Typography.titleSmall)
                         Switch(
-                            checked = tempWalkAlone,
+                            checked = tempData.canWalkAlone,
                             onCheckedChange = {
-                                tempWalkAlone = it
+                                tempData = tempData.copy(canWalkAlone = it)
                             },
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = Color.White,
@@ -183,7 +182,7 @@ fun StudentBox(
                                 uncheckedTrackColor = Color(0xFFe7e0ec),
                                 uncheckedBorderColor = Color(0xFF79747E)
                             ),
-                            thumbContent = if (tempWalkAlone) {
+                            thumbContent = if (tempData.canWalkAlone) {
                                 {
                                     Icon(
                                         imageVector = Icons.Filled.Check,
@@ -203,25 +202,13 @@ fun StudentBox(
                         Button("Cancel",
                             Icons.Default.Clear,
                             onClick = {
-                                textFieldFirstName.value = currentFirstName
-                                textFieldLastName.value = currentLastName
-                                textFieldBirthday.value = currentBirthday
-                                tempWalkAlone = currentWalkAlone
-                                tempDanceSelection = currentDanceSelection
-                                tempSingSelection = currentSingSelection
-                                tempMusicSelection = currentMusicSelection
+                                tempData = currentData.copy()
                                 editableState = false
                                       },
                             ButtonColor)
                         Button("Confirm", Icons.Default.Check,
                             onClick = {
-                                currentFirstName = textFieldFirstName.value
-                                currentLastName = textFieldLastName.value
-                                currentBirthday = textFieldBirthday.value
-                                currentWalkAlone = tempWalkAlone
-                                currentDanceSelection = tempDanceSelection
-                                currentSingSelection = tempSingSelection
-                                currentMusicSelection = tempMusicSelection
+                                currentData = tempData.copy()
                                 editableState = false
                                 //Saving data if edit is confirmed (idk what to put here)
                             },
@@ -231,17 +218,17 @@ fun StudentBox(
                 }
             } else {
                 Text("Student details", style = Typography.bodyMedium)
-                Text("Name: ${currentFirstName} ${currentLastName}", style = Typography.bodyMedium)
-                Text("Birthdate: ${currentBirthday}", style = Typography.bodyMedium)
+                Text("Name: ${currentData.firstName} ${currentData.lastName}", style = Typography.bodyMedium)
+                Text("Birthdate: ${currentData.birthday}", style = Typography.bodyMedium)
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)){
                     Text("Classes: ")
-                    if (currentDanceSelection) {
+                    if (currentData.dance) {
                         ClassBox("Dance")
                     }
-                    if (currentSingSelection) {
+                    if (currentData.sing) {
                         ClassBox("Singing")
                     }
-                    if (currentMusicSelection) {
+                    if (currentData.music) {
                         ClassBox("Music")
                     }
                 }
@@ -249,7 +236,7 @@ fun StudentBox(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ){
-                    Text("Can walk alone: ${if(currentWalkAlone) "Yes" else "No"}", style = Typography.bodyMedium)
+                    Text("Can walk alone: ${if(currentData.canWalkAlone) "Yes" else "No"}", style = Typography.bodyMedium)
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)){
                         Button("View History", color = ButtonColor)
                         Button("Edit Details", color = ButtonColor, onClick = {editableState = true})

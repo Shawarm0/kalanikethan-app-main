@@ -73,14 +73,14 @@ fun Home() {
 
         Spacer(modifier = Modifier.height(5.dp))
         SimpleDecoratedTextField(
-            text = name,
+            text = name.value,
             placeholder = "e.g. John",
             bringIntoViewRequester = bringIntoViewRequester,
             coroutineScope = coroutineScope
         )
         Spacer(modifier = Modifier.height(5.dp))
         SimpleDecoratedTextField(
-            text = name,
+            text = name.value,
             placeholder = "e.g. John",
             leadingIcon = Icons.Default.Home,
             bringIntoViewRequester = bringIntoViewRequester,
@@ -88,7 +88,7 @@ fun Home() {
         )
         Spacer(modifier = Modifier.height(5.dp))
         SimpleDecoratedTextField(
-            text = name,
+            text = name.value,
             placeholder = "e.g. John",
             trailingIcon = Icons.Default.Home,
             bringIntoViewRequester = bringIntoViewRequester,
@@ -96,7 +96,7 @@ fun Home() {
         )
         Spacer(modifier = Modifier.height(5.dp))
         SimpleDecoratedTextField(
-            text = name,
+            text = name.value,
             placeholder = "e.g. John",
             leadingIcon = Icons.Default.Home,
             trailingIcon = Icons.Default.Home,
@@ -105,7 +105,7 @@ fun Home() {
         )
         Spacer(modifier = Modifier.height(5.dp))
         SimpleDecoratedTextField(
-            text = name,
+            text = name.value,
             placeholder = "e.g. John",
             label = "First Name",
             bringIntoViewRequester = bringIntoViewRequester,
@@ -113,7 +113,7 @@ fun Home() {
         )
         Spacer(modifier = Modifier.height(5.dp))
         SimpleDecoratedTextField(
-            text = name,
+            text = name.value,
             placeholder = "e.g. John",
             label = "First Name",
             leadingIcon = Icons.Default.Home,
@@ -122,7 +122,7 @@ fun Home() {
         )
         Spacer(modifier = Modifier.height(5.dp))
         SimpleDecoratedTextField(
-            text = name,
+            text = name.value,
             placeholder = "e.g. John",
             label = "First Name",
             trailingIcon = Icons.Default.Home,
@@ -131,7 +131,7 @@ fun Home() {
         )
         Spacer(modifier = Modifier.height(5.dp))
         SimpleDecoratedTextField(
-            text = name,
+            text = name.value,
             placeholder = "e.g. John",
             label = "First Name",
             leadingIcon = Icons.Default.Home,
