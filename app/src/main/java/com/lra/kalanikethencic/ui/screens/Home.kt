@@ -71,13 +71,14 @@ fun Home() {
             className = "Dance",
         )
 
-
+        Spacer(modifier = Modifier.height(5.dp))
         SimpleDecoratedTextField(
             text = name,
             placeholder = "e.g. John",
             bringIntoViewRequester = bringIntoViewRequester,
             coroutineScope = coroutineScope
         )
+        Spacer(modifier = Modifier.height(5.dp))
         SimpleDecoratedTextField(
             text = name,
             placeholder = "e.g. John",
@@ -85,6 +86,7 @@ fun Home() {
             bringIntoViewRequester = bringIntoViewRequester,
             coroutineScope = coroutineScope
         )
+        Spacer(modifier = Modifier.height(5.dp))
         SimpleDecoratedTextField(
             text = name,
             placeholder = "e.g. John",
@@ -92,6 +94,7 @@ fun Home() {
             bringIntoViewRequester = bringIntoViewRequester,
             coroutineScope = coroutineScope
         )
+        Spacer(modifier = Modifier.height(5.dp))
         SimpleDecoratedTextField(
             text = name,
             placeholder = "e.g. John",
@@ -100,6 +103,7 @@ fun Home() {
             bringIntoViewRequester = bringIntoViewRequester,
             coroutineScope = coroutineScope
         )
+        Spacer(modifier = Modifier.height(5.dp))
         SimpleDecoratedTextField(
             text = name,
             placeholder = "e.g. John",
@@ -107,6 +111,7 @@ fun Home() {
             bringIntoViewRequester = bringIntoViewRequester,
             coroutineScope = coroutineScope
         )
+        Spacer(modifier = Modifier.height(5.dp))
         SimpleDecoratedTextField(
             text = name,
             placeholder = "e.g. John",
@@ -115,6 +120,7 @@ fun Home() {
             bringIntoViewRequester = bringIntoViewRequester,
             coroutineScope = coroutineScope
         )
+        Spacer(modifier = Modifier.height(5.dp))
         SimpleDecoratedTextField(
             text = name,
             placeholder = "e.g. John",
@@ -123,6 +129,7 @@ fun Home() {
             bringIntoViewRequester = bringIntoViewRequester,
             coroutineScope = coroutineScope
         )
+        Spacer(modifier = Modifier.height(5.dp))
         SimpleDecoratedTextField(
             text = name,
             placeholder = "e.g. John",

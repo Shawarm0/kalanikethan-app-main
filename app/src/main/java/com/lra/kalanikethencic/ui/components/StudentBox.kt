@@ -40,6 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -70,6 +71,7 @@ fun StudentBox(
     music: Boolean = false,
     editable: Boolean = false
 ){
+    // For the text boxes
     val bringIntoViewRequester = remember { BringIntoViewRequester() }
     val coroutineScope = rememberCoroutineScope()
 
@@ -98,6 +100,12 @@ fun StudentBox(
     var textFieldBirthday = remember { mutableStateOf(tempBirthday) }
 
     Box(modifier = Modifier
+        .shadow(
+            elevation = 4.dp, // Figma blur roughly maps to elevation
+            shape = RoundedCornerShape(0.dp), // or your desired shape
+            ambientColor = Color.Black.copy(alpha = 0.1f),
+            spotColor = Color.Black.copy(alpha = 0.1f)
+        )
         .width(1075.dp)
         .clip(RoundedCornerShape(12.dp))
         .background(color = LightBoxBackground)
