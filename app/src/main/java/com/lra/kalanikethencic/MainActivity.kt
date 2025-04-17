@@ -9,25 +9,19 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Payment
-import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.outlined.AddCircleOutline
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.PersonAdd
@@ -41,7 +35,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
@@ -53,14 +46,16 @@ import com.lra.kalanikethencic.ui.components.KalanikethanAppDrawer
 import com.lra.kalanikethencic.ui.components.TopAppBar
 import com.lra.kalanikethencic.ui.screens.Add
 import com.lra.kalanikethencic.ui.screens.Payments
-import com.lra.kalanikethencic.ui.screens.SignIn
+import com.lra.kalanikethencic.ui.screens.SignIn.SignIn
 import com.lra.kalanikethencic.ui.theme.KalanikethenCICTheme
 import com.lra.kalanikethencic.util.imePaddingFraction
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 
-
+@AndroidEntryPoint // Required for hilt
 class MainActivity : ComponentActivity() {
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -162,4 +157,37 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+
+    // So we know what's happening to the lifecycle of MainActivity.
+    override fun onStart() {
+        super.onStart()
+        println("MainActivity: onStart() called")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        println("MainActivity: onResume() called")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        println("MainActivity: onPause() called")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        println("MainActivity: onStop() called")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        println("MainActivity: onDestroy() called")
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        println("MainActivity: onRestart() called")
+    }
+
 }

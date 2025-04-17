@@ -2,6 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("dagger.hilt.android.plugin")
+    id("com.google.dagger.hilt.android")
+    id("kotlin-kapt")
 }
 
 android {
@@ -44,6 +47,8 @@ dependencies {
     val composeVersion = "1.0.5"
     implementation("androidx.compose.material:material-icons-extended:$composeVersion")
 
+    implementation("androidx.compose.runtime:runtime-livedata:1.5.4")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -61,4 +66,11 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     // For Navigation
     implementation("androidx.navigation:navigation-compose:2.8.9") // Use the latest version
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+
+    implementation("androidx.hilt:hilt-navigation-fragment:1.0.0")
+    implementation("com.google.dagger:hilt-android:2.50")
+    kapt("com.google.dagger:hilt-compiler:2.50")
+
 }

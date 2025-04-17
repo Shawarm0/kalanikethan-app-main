@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -66,7 +67,8 @@ data class StudentData(
     var canWalkAlone: Boolean = false,
     var dance: Boolean = false,
     var sing: Boolean = false,
-    var music: Boolean = false
+    var music: Boolean = false,
+    var signedIn: Boolean = false
 )
 
 
@@ -251,11 +253,12 @@ fun StudentBox(
 @Composable
 fun ClassBox(text: String){
     Box(modifier = Modifier
-        .clip(RoundedCornerShape(20.dp))
+        .clip(RoundedCornerShape(8.dp))
         .background(color = Color(0xFFE7EEF5))
-        .height(20.dp)
-        .padding(horizontal = 8.dp)
-        .wrapContentSize(Alignment.Center)
+        .height(30.dp)
+        .padding(horizontal = 10.dp)
+        .wrapContentWidth(),
+        contentAlignment = Alignment.Center
         ){
         Text(text = text, style = Typography.titleSmall, color = UnselectedButtonText)
     }

@@ -1,5 +1,7 @@
 package com.lra.kalanikethencic.ui.screens
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -28,7 +30,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.lra.kalanikethencic.ui.components.Class
 import com.lra.kalanikethencic.ui.components.SimpleDecoratedTextField
+import com.lra.kalanikethencic.ui.components.StudentData
+import com.lra.kalanikethencic.ui.components.StudentInfoCard
+import java.time.LocalDate
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Home() {

@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.lra.kalanikethencic.ui.components.Payment
 import com.lra.kalanikethencic.ui.components.StudentBox
 import com.lra.kalanikethencic.ui.components.StudentData
+import com.lra.kalanikethencic.ui.components.StudentInfoCard
 import java.time.LocalDate
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -47,6 +48,5 @@ fun Add(){
                 music = true,
             )
         )
-
     }
 }
