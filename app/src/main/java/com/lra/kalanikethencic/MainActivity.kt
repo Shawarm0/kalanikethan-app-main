@@ -31,6 +31,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +39,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -47,6 +49,7 @@ import com.lra.kalanikethencic.ui.components.TopAppBar
 import com.lra.kalanikethencic.ui.screens.Add
 import com.lra.kalanikethencic.ui.screens.Payments
 import com.lra.kalanikethencic.ui.screens.SignIn.SignIn
+import com.lra.kalanikethencic.ui.screens.SignIn.SignInViewModel
 import com.lra.kalanikethencic.ui.theme.KalanikethenCICTheme
 import com.lra.kalanikethencic.util.imePaddingFraction
 import dagger.hilt.android.AndroidEntryPoint
@@ -55,7 +58,6 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint // Required for hilt
 class MainActivity : ComponentActivity() {
-
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -80,6 +82,12 @@ class MainActivity : ComponentActivity() {
                 // This is to clear focus
                 val focusManager = LocalFocusManager.current
 
+                val signInViewModel: SignInViewModel = hiltViewModel()
+                LaunchedEffect(Unit) {
+                    signInViewModel.preloadStudents()
+                }
+
+
                 when (selectedScreen) {
                     "Dashboard" -> { icon = Icons.Outlined.Home }
                     "Sign In" -> { icon = Icons.Outlined.PersonAdd }
@@ -89,6 +97,7 @@ class MainActivity : ComponentActivity() {
                     "Payments" -> { icon = Icons.Default.Payment }
                     "Account" -> { icon = Icons.Default.AccountCircle }
                 }
+
 
                 // The Modal Navigation Drawer
                 ModalNavigationDrawer(

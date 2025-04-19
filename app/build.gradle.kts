@@ -1,11 +1,16 @@
+import java.util.Properties
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("dagger.hilt.android.plugin")
+    id("org.jetbrains.kotlin.kapt")
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.23"
     id("com.google.dagger.hilt.android")
-    id("kotlin-kapt")
 }
+
+
 
 android {
     namespace = "com.lra.kalanikethencic"
@@ -19,6 +24,21 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+
+        buildConfigField(
+            "String",
+            "BASE_URL",
+            "\"${project.findProperty("baseUrl")}\""
+        )
+
+        buildConfigField(
+            "String",
+            "API_KEY",
+            "\"${project.findProperty("apiKey")}\""
+        )
+
+
     }
 
     buildTypes {
@@ -39,6 +59,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -48,6 +69,14 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:$composeVersion")
 
     implementation("androidx.compose.runtime:runtime-livedata:1.5.4")
+
+    // Supabase
+    val ktor_version = "3.1.2"
+    val supabase_version = "3.1.4"
+
+    implementation(platform("io.github.jan-tennert.supabase:bom:$supabase_version"))
+    implementation("io.github.jan-tennert.supabase:postgrest-kt")
+    implementation("io.ktor:ktor-client-android:$ktor_version")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -66,6 +95,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     // For Navigation
     implementation("androidx.navigation:navigation-compose:2.8.9") // Use the latest version
+
+    // This is all for the dependancy injection hilt.
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
