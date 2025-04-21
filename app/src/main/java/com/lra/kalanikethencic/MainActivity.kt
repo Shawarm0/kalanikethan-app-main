@@ -83,9 +83,9 @@ class MainActivity : ComponentActivity() {
                 val focusManager = LocalFocusManager.current
 
                 val signInViewModel: SignInViewModel = hiltViewModel()
-                LaunchedEffect(Unit) {
-                    signInViewModel.preloadStudents()
-                }
+//                LaunchedEffect(Unit) {
+//                    signInViewModel.preloadStudents()
+//                }
 
 
                 when (selectedScreen) {

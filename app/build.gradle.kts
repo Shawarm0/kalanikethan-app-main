@@ -75,8 +75,10 @@ dependencies {
     val supabase_version = "3.1.4"
 
     implementation(platform("io.github.jan-tennert.supabase:bom:$supabase_version"))
+    implementation("io.github.jan-tennert.supabase:realtime-kt")
     implementation("io.github.jan-tennert.supabase:postgrest-kt")
     implementation("io.ktor:ktor-client-android:$ktor_version")
+    implementation("io.ktor:ktor-client-cio:$ktor_version") // Or use -cio if you prefer
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
