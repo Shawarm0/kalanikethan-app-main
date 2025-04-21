@@ -46,6 +46,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import com.lra.kalanikethencic.data.model.Student
 import com.lra.kalanikethencic.ui.theme.AccentColor
 import com.lra.kalanikethencic.ui.theme.ButtonColor
 import com.lra.kalanikethencic.ui.theme.ErrorColor
@@ -58,18 +59,6 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.math.sin
 
-@OptIn(ExperimentalFoundationApi::class)
-@RequiresApi(Build.VERSION_CODES.O)
-data class StudentData(
-    var firstName: String = "",
-    var lastName: String = "",
-    var birthday: String = LocalDate.of(1900, 1, 1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-    var canWalkAlone: Boolean = false,
-    var dance: Boolean = false,
-    var sing: Boolean = false,
-    var music: Boolean = false,
-    var signedIn: Boolean = false
-)
 
 
 
@@ -77,7 +66,8 @@ data class StudentData(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun StudentBox(
-    initialData: StudentData = StudentData(),
+    initialData: Student,
+    onConfirm: (Student) -> Unit = {},
     editable: Boolean = false
 ){
     // For the text boxes
@@ -125,7 +115,7 @@ fun StudentBox(
                         placeholder = "Text",
                         text = tempData.firstName,
                         onValueChange = {
-                            tempData.firstName = it
+                            tempData = tempData.copy(firstName = it)
                         },
                         label = "First Name",
                         bringIntoViewRequester = bringIntoViewRequester,
@@ -136,7 +126,7 @@ fun StudentBox(
                         placeholder = "Text",
                         text = tempData.lastName,
                         onValueChange = {
-                            tempData.lastName = it
+                            tempData = tempData.copy(lastName = it)
                         },
                         label = "Last Name",
                         bringIntoViewRequester = bringIntoViewRequester,
@@ -145,9 +135,9 @@ fun StudentBox(
 
                     SimpleDecoratedTextField(
                         placeholder = "Text",
-                        text = tempData.birthday,
+                        text = tempData.birthdate.toString(),
                         onValueChange = {
-                            tempData.birthday = it
+                            // Figure out how to change date
                         },
                         label = "Birthday",
                         bringIntoViewRequester = bringIntoViewRequester,
@@ -157,9 +147,18 @@ fun StudentBox(
 
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     Text("Classes: ", style = Typography.titleSmall)
-                    SelectionButton("Dance", selected = remember { mutableStateOf(tempData.dance) }, onClick = {tempData.dance = it})
-                    SelectionButton("Singing", selected = remember { mutableStateOf(tempData.sing) }, onClick = {tempData.sing = it})
-                    SelectionButton("Music", selected = remember { mutableStateOf(tempData.music) }, onClick = {tempData.music = it})
+                    SelectionButton(
+                        "Dance",
+                        selected = remember { mutableStateOf(tempData.dance) },
+                        onClick = { tempData = tempData.copy(dance = it) })
+                    SelectionButton(
+                        "Singing",
+                        selected = remember { mutableStateOf(tempData.singing) },
+                        onClick = { tempData = tempData.copy(singing = it) })
+                    SelectionButton(
+                        "Music",
+                        selected = remember { mutableStateOf(tempData.music) },
+                        onClick = { tempData = tempData.copy(music = it)})
                 }
 
                 Row(
@@ -212,7 +211,7 @@ fun StudentBox(
                             onClick = {
                                 currentData = tempData.copy()
                                 editableState = false
-                                //Saving data if edit is confirmed (idk what to put here)
+                                onConfirm(tempData)
                             },
                             SuccessColor
                         )
@@ -221,13 +220,13 @@ fun StudentBox(
             } else {
                 Text("Student details", style = Typography.bodyMedium)
                 Text("Name: ${currentData.firstName} ${currentData.lastName}", style = Typography.bodyMedium)
-                Text("Birthdate: ${currentData.birthday}", style = Typography.bodyMedium)
+                Text("Birthdate: ${currentData.birthdate}", style = Typography.bodyMedium)
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)){
                     Text("Classes: ")
                     if (currentData.dance) {
                         ClassBox("Dance")
                     }
-                    if (currentData.sing) {
+                    if (currentData.singing) {
                         ClassBox("Singing")
                     }
                     if (currentData.music) {
@@ -262,11 +261,4 @@ fun ClassBox(text: String){
         ){
         Text(text = text, style = Typography.titleSmall, color = UnselectedButtonText)
     }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview
-@Composable
-fun StudentInfo(){
-    StudentBox()
 }

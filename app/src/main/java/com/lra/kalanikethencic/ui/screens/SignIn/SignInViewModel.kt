@@ -3,15 +3,21 @@ package com.lra.kalanikethencic.ui.screens.SignIn
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.lifecycle.viewModelScope
 import com.lra.kalanikethencic.data.model.Student
 import com.lra.kalanikethencic.data.repository.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,65 +25,79 @@ class SignInViewModel @Inject constructor(
     private val repository: Repository
 ) : ViewModel() {
 
-    private val _students = MutableStateFlow<List<Student>>(emptyList())
-    val students: StateFlow<List<Student>> = _students
+    private val _allStudents = MutableStateFlow<List<Student>>(emptyList())
+    private val _filteredStudents = MutableStateFlow<List<Student>>(emptyList())
+    val filteredStudents: StateFlow<List<Student>> = _filteredStudents
 
     private val _searchQuery = mutableStateOf("")
     val searchQuery: State<String> = _searchQuery
 
     private var studentsJob: Job? = null
+    private val pendingUpdates = mutableMapOf<Int, Student>()
+    private var debounceJob: Job? = null
 
-    init {
-        loadStudents()
-    }
 
     fun preloadStudents() {
-        if (_students.value.isEmpty()) {
+        if (_allStudents.value.isEmpty()) {
             loadStudents()
         }
     }
 
-
     private fun loadStudents() {
-        // Cancel any existing collection
         studentsJob?.cancel()
 
         studentsJob = viewModelScope.launch {
             repository.getAllStudents()
                 .catch { e ->
-                    // Handle errors
                     println("Error in student flow: ${e.message}")
                 }
                 .collect { studentList ->
-                    _students.value = studentList
+                    _allStudents.value = studentList
+                    filterStudents() // Filter when new data arrives
                 }
         }
     }
-//
-//    fun onSearchQueryChanged(query: String) {
-//        _searchQuery.value = query
-//        val originalList = _students.value
-//        _students.value = originalList.filter {
-//            it.firstName.contains(query, ignoreCase = true) ||
-//                    it.lastName.contains(query, ignoreCase = true)
-//        }
-//    }
-//
-//    fun toggleSignedIn(studentId: Int) {
-//        val updatedList = _students.value.map { student ->
-//            if (student.studentId == studentId) {
-//                println("Changed sign-in status for student: ${student.firstName} ${student.lastName}")
-//                student.copy(signedIn = !student.signedIn)
-//            } else student
-//        }
-//
-//        _students.value = updatedList
-//
-//        viewModelScope.launch {
-//            val updatedStudent = updatedList.find { it.studentId == studentId }
-//            if (updatedStudent != null) {
-//                repository.updateStudent(updatedStudent)
-//            }
-//        }
-//    }
+
+    fun updateSearchQuery(query: String) {
+        _searchQuery.value = query
+        viewModelScope.launch {
+            withContext(Dispatchers.Unconfined) {
+                filterStudents()
+            }
+        }
+    }
+
+    fun filterStudents() {
+        val query = _searchQuery.value.lowercase().trim()
+        if (query.isEmpty()) {
+            _filteredStudents.value = _allStudents.value.sortedBy { it.firstName.lowercase() }
+        } else {
+            _filteredStudents.value = _allStudents.value.filter { student ->
+                student.firstName.lowercase().contains(query) == true ||
+                        student.lastName.lowercase().contains(query) == true
+            }.sortedBy { it.firstName.lowercase() }
+        }
+    }
+
+    fun updateStudent(updatedStudent: Student) {
+        // Optimistically update both lists
+        _allStudents.update { list ->
+            list.map { if (it.studentId == updatedStudent.studentId) updatedStudent else it }
+        }
+        _filteredStudents.update { list ->
+            list.map { if (it.studentId == updatedStudent.studentId) updatedStudent else it }
+        }
+
+        pendingUpdates[updatedStudent.studentId] = updatedStudent
+
+        debounceJob?.cancel()
+        debounceJob = viewModelScope.launch {
+            delay(1000)
+            val updatesToSend = pendingUpdates.values.toList()
+            pendingUpdates.clear()
+            updatesToSend.forEach {
+                repository.updateStudent(it)
+            }
+        }
+    }
 }

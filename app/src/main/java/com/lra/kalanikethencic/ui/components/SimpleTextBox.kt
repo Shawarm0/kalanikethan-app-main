@@ -3,6 +3,7 @@ package com.lra.kalanikethencic.ui.components
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -19,7 +21,10 @@ import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,13 +49,14 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SimpleDecoratedTextField(
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier.width(328.dp),
     text: String,
     placeholder: String = "Text",
     label: String? = null,
     onValueChange: (String) -> Unit = {},
     leadingIcon:  ImageVector? = null,
     trailingIcon: ImageVector? = null,
+    clearbutton: Boolean = false,
     bringIntoViewRequester: BringIntoViewRequester,
     coroutineScope: CoroutineScope,
 ) {
@@ -82,8 +88,7 @@ fun SimpleDecoratedTextField(
 
         BasicTextField(
             value = text.value,
-            modifier = Modifier.wrapContentWidth()
-                .width(328.dp).wrapContentHeight()
+            modifier = modifier.wrapContentWidth().wrapContentHeight()
                 .padding(0.dp)
                 .clip(RoundedCornerShape(12.dp))
                 .bringIntoViewRequester(bringIntoViewRequester)
@@ -141,6 +146,27 @@ fun SimpleDecoratedTextField(
                         innerTextField()
                     }
                     Spacer(modifier = Modifier.weight(1f))
+                    if (clearbutton && text.value.isNotEmpty()) {
+                        IconButton(
+                            onClick = {
+                                text.value = ""
+                                onValueChange("")
+                            },
+                            modifier = Modifier.padding(0.dp)
+                            .width(30.dp)
+                            .height(20.dp),
+                            interactionSource = remember { MutableInteractionSource() },
+                            content = {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "Clear Text",
+                                    tint = iconColor
+                                )
+                            }
+                        )
+                    }
+
+
                     if (trailingIcon != null) {
                         Icon(
                             imageVector = trailingIcon,

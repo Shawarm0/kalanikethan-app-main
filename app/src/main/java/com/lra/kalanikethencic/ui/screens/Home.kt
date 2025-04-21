@@ -30,7 +30,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.lra.kalanikethencic.ui.components.Class
 import com.lra.kalanikethencic.ui.components.SimpleDecoratedTextField
-import com.lra.kalanikethencic.ui.components.StudentData
 import com.lra.kalanikethencic.ui.components.StudentInfoCard
 import java.time.LocalDate
 

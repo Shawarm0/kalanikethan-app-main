@@ -83,9 +83,9 @@ class MainActivity : ComponentActivity() {
                 val focusManager = LocalFocusManager.current
 
                 val signInViewModel: SignInViewModel = hiltViewModel()
-//                LaunchedEffect(Unit) {
-//                    signInViewModel.preloadStudents()
-//                }
+                LaunchedEffect(Unit) {
+                    signInViewModel.preloadStudents()
+                }
 
 
                 when (selectedScreen) {
@@ -154,8 +154,8 @@ class MainActivity : ComponentActivity() {
                                     .imePaddingFraction(0.9f) // Apply reduced bottom padding
                                 ) {
                                 composable("Dashboard") { Home() }
-                                composable("Sign In") { SignIn() }
-                                composable("Add") { Add() }
+                                composable("Sign In") { SignIn(signInViewModel) }
+                                composable("Add") { Add(signInViewModel) }
                                 composable("Who's In") {  }
                                 composable("History") {  }
                                 composable("Payments") { Payments() }
