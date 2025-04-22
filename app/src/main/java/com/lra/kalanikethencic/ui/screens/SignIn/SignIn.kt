@@ -64,8 +64,8 @@ fun SignIn(viewModel: SignInViewModel = hiltViewModel()) {
 
         LazyColumn(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(14.dp),
+                .fillMaxSize()
+                .padding(top = 14.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {

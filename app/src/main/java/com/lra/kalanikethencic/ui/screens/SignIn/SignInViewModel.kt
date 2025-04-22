@@ -74,7 +74,8 @@ class SignInViewModel @Inject constructor(
         } else {
             _filteredStudents.value = _allStudents.value.filter { student ->
                 student.firstName.lowercase().contains(query) == true ||
-                        student.lastName.lowercase().contains(query) == true
+                        student.lastName.lowercase().contains(query) == true ||
+                        student.studentId.toString().contains(query) == true
             }.sortedBy { it.firstName.lowercase() }
         }
     }
