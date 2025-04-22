@@ -1,12 +1,13 @@
 package com.lra.kalanikethencic.data.model
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerialName
 
 @Serializable
 data class Class(
-    val classId: Int,
-    val teacherName: String,
-    val type: String,
-    val startTime: Long,
-    val endTime: Long
+    @SerialName("class_id") val classId: Int,
+    @SerialName("teacher_name") val teacherName: String,
+    @SerialName("type") val type: String,
+    @SerialName("start_time") val startTime: Long,
+    @SerialName("end_time") val endTime: Long
 )

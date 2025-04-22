@@ -68,6 +68,8 @@ dependencies {
     val composeVersion = "1.0.5"
     implementation("androidx.compose.material:material-icons-extended:$composeVersion")
 
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
+
     implementation("androidx.compose.runtime:runtime-livedata:1.5.4")
 
     // Supabase

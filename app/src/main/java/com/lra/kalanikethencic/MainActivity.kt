@@ -2,14 +2,13 @@ package com.lra.kalanikethencic
 
 
 import android.os.Build
-import com.lra.kalanikethencic.ui.screens.Home
+import com.lra.kalanikethencic.ui.screens.Home.Home
 
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -47,6 +46,7 @@ import androidx.navigation.compose.rememberNavController
 import com.lra.kalanikethencic.ui.components.KalanikethanAppDrawer
 import com.lra.kalanikethencic.ui.components.TopAppBar
 import com.lra.kalanikethencic.ui.screens.Add
+import com.lra.kalanikethencic.ui.screens.Home.HomeViewModel
 import com.lra.kalanikethencic.ui.screens.Payments
 import com.lra.kalanikethencic.ui.screens.SignIn.SignIn
 import com.lra.kalanikethencic.ui.screens.SignIn.SignInViewModel
@@ -83,7 +83,9 @@ class MainActivity : ComponentActivity() {
                 val focusManager = LocalFocusManager.current
 
                 val signInViewModel: SignInViewModel = hiltViewModel()
+                val homeViewModel: HomeViewModel = hiltViewModel()
                 LaunchedEffect(Unit) {
+                    homeViewModel.preloadClasses()
                     signInViewModel.preloadStudents()
                 }
 
@@ -153,7 +155,7 @@ class MainActivity : ComponentActivity() {
                                     .padding(innerpadding)
                                     .imePaddingFraction(0.9f) // Apply reduced bottom padding
                                 ) {
-                                composable("Dashboard") { Home() }
+                                composable("Dashboard") { Home(homeViewModel) }
                                 composable("Sign In") { SignIn(signInViewModel) }
                                 composable("Add") { Add(signInViewModel) }
                                 composable("Who's In") {  }

@@ -23,47 +23,74 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.lra.kalanikethencic.data.model.Class
+import com.lra.kalanikethencic.util.convertLongToTime
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun Class(teacher: String = "Teacher", timeFrom: String = "HH:mm", timeTo: String = "HH:mm", className: String = "Class") {
+fun ClassBox(
+    classData: Class,
+    onClassClick: (Class) -> Unit = {},
+    modifier: Modifier = Modifier
+) {
     val darkTheme = isSystemInDarkTheme()
+
+    // Convert Long timestamps to formatted time strings
+    val startTime = convertLongToTime(classData.startTime) // You'll need the extension function we discussed
+    val endTime = convertLongToTime(classData.endTime)
+
     Box(
-        modifier = Modifier
+        modifier = modifier
             .shadow(
-                elevation = 4.dp, // Figma blur roughly maps to elevation
-                shape = RoundedCornerShape(0.dp), // or your desired shape
+                elevation = 4.dp,
+                shape = RoundedCornerShape(12.dp),
                 ambientColor = Color.Black.copy(alpha = 0.1f),
                 spotColor = Color.Black.copy(alpha = 0.1f)
             )
-            .clip(RoundedCornerShape(12.dp)).height(277.dp).width(404.dp)
-            .background(color = if (darkTheme) Color.Black else Color.White),
+            .clip(RoundedCornerShape(12.dp))
+            .height(277.dp)
+            .width(404.dp)
+            .background(color = if (darkTheme) Color.Black else Color.White)
     ) {
-        Column( // At the top of the composable
-            modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Column(
-                modifier = Modifier.wrapContentSize().padding(12.dp)
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(12.dp)
             ) {
-                Text(text = teacher, color = if (darkTheme) Color.White else Color.Black, style = MaterialTheme.typography.titleLarge)
+                Text(
+                    text = classData.teacherName,
+                    color = if (darkTheme) Color.White else Color.Black,
+                    style = MaterialTheme.typography.titleLarge
+                )
                 Spacer(modifier = Modifier.height(6.dp))
-                Text(text = "$timeFrom - $timeTo", color = if (darkTheme) Color.LightGray else Color(0xFF3D4D5C), style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    text = "$startTime - $endTime",
+                    color = if (darkTheme) Color.LightGray else Color(0xFF3D4D5C),
+                    style = MaterialTheme.typography.bodyMedium
+                )
                 Spacer(modifier = Modifier.height(6.dp))
-                Text(text = className, color = if (darkTheme) Color.LightGray else Color(0xFF3D4D5C), style = MaterialTheme.typography.titleSmall )
+                Text(
+                    text = classData.type,
+                    color = if (darkTheme) Color.LightGray else Color(0xFF3D4D5C),
+                    style = MaterialTheme.typography.titleSmall
+                )
             }
         }
-
 
         Button(
             text = "Go to Students",
             color = MaterialTheme.colorScheme.onPrimary,
-            onClick = { /* Do something */ },
+            onClick = { onClassClick(classData) } ,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(12.dp)
         )
-
     }
 }
 
