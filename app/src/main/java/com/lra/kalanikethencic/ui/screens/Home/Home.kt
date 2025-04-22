@@ -38,6 +38,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.lra.kalanikethencic.ui.components.ClassBox
 import com.lra.kalanikethencic.ui.components.SimpleDecoratedTextField
 import com.lra.kalanikethencic.util.convertLongToTime
@@ -45,14 +46,10 @@ import com.lra.kalanikethencic.util.convertLongToTime
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun Home(viewModel: HomeViewModel = hiltViewModel()) {
+fun Home(viewModel: HomeViewModel = hiltViewModel(), navController: NavController) {
     val classes = viewModel.allClasses.collectAsState(emptyList())
     var textWidth by remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
-    val name = remember { mutableStateOf(String()) }
-    val scrollState = rememberScrollState() // Remember the scroll state
-    val bringIntoViewRequester = remember { BringIntoViewRequester() }
-    val coroutineScope = rememberCoroutineScope()
 
 
     Column( // This is the Title
@@ -81,7 +78,8 @@ fun Home(viewModel: HomeViewModel = hiltViewModel()) {
                 ClassBox(
                     classData = thisclass,
                     onClassClick = { thisclass ->
-                        viewModel.getStudentsById(thisclass.classId)
+                        viewModel.getClassById(thisclass)
+                        navController.navigate("Class")
                     },
                 )
                 Spacer(modifier = Modifier.width(16.dp))

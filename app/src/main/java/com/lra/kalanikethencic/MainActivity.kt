@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Payment
 import androidx.compose.material.icons.outlined.AddCircleOutline
+import androidx.compose.material.icons.outlined.Class
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.PersonAdd
 import androidx.compose.material.icons.outlined.PersonSearch
@@ -46,6 +47,7 @@ import androidx.navigation.compose.rememberNavController
 import com.lra.kalanikethencic.ui.components.KalanikethanAppDrawer
 import com.lra.kalanikethencic.ui.components.TopAppBar
 import com.lra.kalanikethencic.ui.screens.Add
+import com.lra.kalanikethencic.ui.screens.Home.Classes
 import com.lra.kalanikethencic.ui.screens.Home.HomeViewModel
 import com.lra.kalanikethencic.ui.screens.Payments
 import com.lra.kalanikethencic.ui.screens.SignIn.SignIn
@@ -98,6 +100,8 @@ class MainActivity : ComponentActivity() {
                     "History" -> { icon =  Icons.Filled.History }
                     "Payments" -> { icon = Icons.Default.Payment }
                     "Account" -> { icon = Icons.Default.AccountCircle }
+                    "Class" -> { icon = Icons.Outlined.Class }
+                    else -> { icon = Icons.Outlined.Home }
                 }
 
 
@@ -155,13 +159,14 @@ class MainActivity : ComponentActivity() {
                                     .padding(innerpadding)
                                     .imePaddingFraction(0.9f) // Apply reduced bottom padding
                                 ) {
-                                composable("Dashboard") { Home(homeViewModel) }
+                                composable("Dashboard") { Home(homeViewModel, navController) }
                                 composable("Sign In") { SignIn(signInViewModel) }
                                 composable("Add") { Add(signInViewModel) }
                                 composable("Who's In") {  }
                                 composable("History") {  }
                                 composable("Payments") { Payments() }
                                 composable("Account") {  }
+                                composable("Class") { Classes(homeViewModel) }
                             }
                     }
                 }

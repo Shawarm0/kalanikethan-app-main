@@ -11,6 +11,7 @@ import io.github.jan.supabase.realtime.selectAsFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -41,20 +42,21 @@ class Repository @Inject constructor() {
         return client.from("classes").selectAsFlow(Class::classId)
     }
 
-    suspend fun getStudentsForClass(classId: Int): Flow<List<Student>> {
+    suspend fun getStudentsForClass(classId: Int): List<Student> {
         val studentsFromClass = client
             .from("student_classes").select(columns = Columns.list("student_id", "class_id")) {
                 filter {
                     Class::classId eq classId
                 }
-            } .decodeList<StudentClass>()
+            }.decodeList<StudentClass>()
 
         val studentIds = studentsFromClass.map { it.studentId }
 
-        // Step 2: Return a filtered flow from getAllStudents()
-        return getAllStudents().map { studentList ->
-            studentList.filter { it.studentId in studentIds }
-        }
+        // Collect the flow to get the list
+        val allStudents = getAllStudents().first()
+
+        // Filter and return the list
+        return allStudents.filter { it.studentId in studentIds }
     }
 
 
