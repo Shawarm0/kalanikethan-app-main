@@ -1,4 +1,4 @@
-package com.lra.kalanikethencic.ui.screens
+package com.lra.kalanikethencic.ui.screens.Payments
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -11,7 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.lra.kalanikethencic.ui.components.Payment
-import com.lra.kalanikethencic.ui.components.TabBar
 import java.time.LocalDate
 
 @RequiresApi(Build.VERSION_CODES.O)

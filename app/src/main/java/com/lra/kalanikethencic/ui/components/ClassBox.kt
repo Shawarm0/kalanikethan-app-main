@@ -1,5 +1,7 @@
 package com.lra.kalanikethencic.ui.components
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -22,22 +24,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.lra.kalanikethencic.data.model.Class
+import com.lra.kalanikethencic.ui.theme.PrimaryLightColor
+import com.lra.kalanikethencic.util.bottomBorder
 import com.lra.kalanikethencic.util.convertLongToTime
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ClassBox(
+    modifier: Modifier = Modifier,
     classData: Class,
     onClassClick: (Class) -> Unit = {},
-    modifier: Modifier = Modifier
 ) {
     val darkTheme = isSystemInDarkTheme()
 
     // Convert Long timestamps to formatted time strings
     val startTime = convertLongToTime(classData.startTime) // You'll need the extension function we discussed
     val endTime = convertLongToTime(classData.endTime)
+    val istime = true
 
     Box(
         modifier = modifier
@@ -51,6 +59,10 @@ fun ClassBox(
             .height(277.dp)
             .width(404.dp)
             .background(color = if (darkTheme) Color.Black else Color.White)
+            .then(
+                if (istime) Modifier.bottomBorder(3.dp, PrimaryLightColor)
+                else Modifier
+            )
     ) {
         Column(
             modifier = Modifier
@@ -81,6 +93,20 @@ fun ClassBox(
                     style = MaterialTheme.typography.titleSmall
                 )
             }
+        }
+
+        if (istime) {
+            Text(
+                text = "ONGOING",
+                color = Color(0xFF3D4D5C),
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Light
+                ),
+                modifier = Modifier
+                    .padding(12.dp)
+                    .align(Alignment.BottomStart)
+            )
         }
 
         Button(

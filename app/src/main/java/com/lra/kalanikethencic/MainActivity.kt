@@ -49,7 +49,7 @@ import com.lra.kalanikethencic.ui.components.TopAppBar
 import com.lra.kalanikethencic.ui.screens.Add
 import com.lra.kalanikethencic.ui.screens.Home.Classes
 import com.lra.kalanikethencic.ui.screens.Home.HomeViewModel
-import com.lra.kalanikethencic.ui.screens.Payments
+import com.lra.kalanikethencic.ui.screens.Payments.Payments
 import com.lra.kalanikethencic.ui.screens.SignIn.SignIn
 import com.lra.kalanikethencic.ui.screens.SignIn.SignInViewModel
 import com.lra.kalanikethencic.ui.theme.KalanikethenCICTheme
