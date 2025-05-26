@@ -64,6 +64,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.media3.common.ktx)
     // This is for icons in the app
     val composeVersion = "1.0.5"
     implementation("androidx.compose.material:material-icons-extended:$composeVersion")

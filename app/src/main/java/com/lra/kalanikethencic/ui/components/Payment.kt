@@ -159,13 +159,3 @@ fun Payment(
         }
     }
 }
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview(widthDp = 1075, heightDp = 108)
-@Composable
-fun PaymentInfo() {
-    Payment(
-        "Alberry",
-        date = LocalDate.of(2025, 4, 13)
-    )
-}

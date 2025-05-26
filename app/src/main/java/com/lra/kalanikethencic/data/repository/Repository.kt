@@ -1,6 +1,9 @@
 package com.lra.kalanikethencic.data.repository
 
+import android.util.Log
 import com.lra.kalanikethencic.data.model.Class
+import com.lra.kalanikethencic.data.model.Family
+import com.lra.kalanikethencic.data.model.PaymentHistory
 import com.lra.kalanikethencic.data.model.Student
 import com.lra.kalanikethencic.data.model.StudentClass
 import com.lra.kalanikethencic.data.remote.SupabaseClientProvider
@@ -59,5 +62,15 @@ class Repository @Inject constructor() {
         return allStudents.filter { it.studentId in studentIds }
     }
 
+    fun getPaymentHistory(): Flow<List<PaymentHistory>> {
+        return client
+            .from("payment_history")
+            .selectAsFlow(primaryKey = PaymentHistory::paymentId)
+    }
 
+    fun getFamilyNames(): Flow<List<Family>> {
+        return client
+            .from("families")
+            .selectAsFlow(primaryKey = Family::familyId)
+    }
 }
