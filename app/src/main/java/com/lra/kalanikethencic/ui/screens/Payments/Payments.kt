@@ -49,14 +49,13 @@ fun Payments(viewModel: PaymentsViewModel = hiltViewModel()){
         item { Payment("Duong", date = LocalDate.of(2025, 5, 9), price = 10f, id = "RD905") }
         item { Payment("Sharma", date = LocalDate.of(2025, 4, 29), price = 8f, id = "LS420") }
         items(payments.value) { payment ->
-            //NEED TO GET FAMILYNAME FROM FAMILYID, already have familyid
             Log.d("FamName", "ID: ${payment.familyId}")
-            Log.d("FamName", "Name: ${viewModel.idToName(payment.paymentId)}")
+            Log.d("FamName", "Name: ${viewModel.idToName(payment.familyId)}")
             Payment(
-                name = viewModel.idToName(payment.familyId).toString(),
+                name = viewModel.idToName(payment.familyId)?.familyName.toString(),
                 date = LocalDate.parse(payment.date),
                 price = payment.amount,
-                id = payment.paymentId.toString(),
+                id = viewModel.idToName(payment.familyId)?.familyPaymentId.toString(),
             )
         }
     }
