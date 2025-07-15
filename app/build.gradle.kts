@@ -24,21 +24,6 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-
-        buildConfigField(
-            "String",
-            "BASE_URL",
-            "\"${project.findProperty("baseUrl")}\""
-        )
-
-        buildConfigField(
-            "String",
-            "API_KEY",
-            "\"${project.findProperty("apiKey")}\""
-        )
-
-
     }
 
     buildTypes {
@@ -56,10 +41,6 @@ android {
     }
     kotlinOptions {
         jvmTarget = "11"
-    }
-    buildFeatures {
-        compose = true
-        buildConfig = true
     }
 }
 

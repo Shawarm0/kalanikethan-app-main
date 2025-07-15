@@ -31,6 +31,7 @@ import com.lra.kalanikethencic.data.model.Class
 import com.lra.kalanikethencic.ui.theme.PrimaryLightColor
 import com.lra.kalanikethencic.util.bottomBorder
 import com.lra.kalanikethencic.util.convertLongToTime
+import com.lra.kalanikethencic.util.isCurrentTimeWithinRange
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalFoundationApi::class)
@@ -45,7 +46,7 @@ fun ClassBox(
     // Convert Long timestamps to formatted time strings
     val startTime = convertLongToTime(classData.startTime) // You'll need the extension function we discussed
     val endTime = convertLongToTime(classData.endTime)
-    val istime = true
+    val istime = isCurrentTimeWithinRange(classData.startTime, classData.endTime)
 
     Box(
         modifier = modifier

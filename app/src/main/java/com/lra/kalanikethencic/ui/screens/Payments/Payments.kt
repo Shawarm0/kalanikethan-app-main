@@ -28,35 +28,13 @@ import androidx.compose.foundation.lazy.items
 @OptIn(ExperimentalFoundationApi::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun Payments(viewModel: PaymentsViewModel = hiltViewModel()){
-    LaunchedEffect(Unit) {
-        viewModel.preloadPayments()
-        viewModel.preLoadFamilies()
-    }
+fun Payments(){
 
-    val payments =  viewModel.payments.collectAsState(emptyList())
-    val bringIntoViewRequester = remember { BringIntoViewRequester() }
-    val coroutineScope = rememberCoroutineScope()
-    val familyNames = viewModel.familyNames.collectAsState(emptyList()) //populated with all family names
-
-    Log.d("payments", "Size: ${payments.value.size}")
-    Log.d("familyNames", "Size: ${familyNames.value.size}")
-    Log.d("familyNames", "Values: ${familyNames.value}")
     LazyColumn(
         modifier = Modifier.fillMaxWidth().padding(14.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         item { Payment("Alberry", date = LocalDate.of(2025, 4, 13), price = 13f, id = "AB123") }
         item { Payment("Duong", date = LocalDate.of(2025, 5, 9), price = 10f, id = "RD905") }
         item { Payment("Sharma", date = LocalDate.of(2025, 4, 29), price = 8f, id = "LS420") }
-        items(payments.value) { payment ->
-            Log.d("FamName", "ID: ${payment.familyId}")
-            Log.d("FamName", "Name: ${viewModel.idToName(payment.familyId)}")
-            Payment(
-                name = viewModel.idToName(payment.familyId)?.familyName.toString(),
-                date = LocalDate.parse(payment.date),
-                price = payment.amount,
-                id = viewModel.idToName(payment.familyId)?.familyPaymentId.toString(),
-            )
-        }
     }
 }
