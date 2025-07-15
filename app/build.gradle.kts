@@ -40,6 +40,12 @@ android {
 }
 
 dependencies {
+    // This is to get the icons imported
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
+
+    // Imports for nagivation
+    val nav_version = "2.9.1"
+    implementation("androidx.navigation:navigation-compose:$nav_version")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

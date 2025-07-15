@@ -14,7 +14,7 @@ val Pink40 = Color(0xFF7D5260)
 // Because we want to use some parts of MaterialTheme we're going to manually select colours from here rather than going through the theming interface.
 
 // Primary and Secondary Colors
-val PrimaryColor = Color(0xFF144E88) // Deep blue
+val PrimaryLightColor = Color(0xFF144E88) // Deep blue
 val SecondaryLightColor = Color(0xFF1E63A5) // Soft but vibrant blue
 val TertiaryLightColor = Color(0xFF2B7CB8) // Lighter shade for accents
 
