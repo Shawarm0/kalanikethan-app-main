@@ -108,8 +108,6 @@ fun KalanikethanAppDrawer(
                 Screen.WhosIn,
                 Screen.History,
                 Screen.Payments,
-                Screen.Account,
-                Screen.Class,
             )
 
             Column {
@@ -127,9 +125,22 @@ fun KalanikethanAppDrawer(
     }
 }
 
-
+/**
+ * This is each individual button in the App drawer,
+ *
+ * @param icon this is the icon that is displayed in the button
+ * @param text this is the text that is displayed in the button
+ * @param isSelected this is a boolean that is used to determine if the button is selected
+ * @param onClick this is a callback function that is called when the button is clicked
+ *
+ */
 @Composable
-fun AppDrawerItem(icon: ImageVector, text: String, isSelected: Boolean, onClick: () -> Unit) {
+fun AppDrawerItem(
+    icon: ImageVector,
+    text: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()

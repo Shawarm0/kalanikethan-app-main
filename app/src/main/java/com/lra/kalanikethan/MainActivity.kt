@@ -33,8 +33,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
@@ -43,10 +45,16 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.lra.kalanikethan.components.KalanikethanAppDrawer
+import com.lra.kalanikethan.components.TopAppBar
+import com.lra.kalanikethan.screens.Add
+import com.lra.kalanikethan.screens.History
 import com.lra.kalanikethan.screens.Home
+import com.lra.kalanikethan.screens.Payments
 import com.lra.kalanikethan.screens.SignIn
+import com.lra.kalanikethan.screens.WhosIn
 import com.lra.kalanikethan.ui.theme.Background
 import com.lra.kalanikethan.ui.theme.KalanikethanTheme
+import com.lra.kalanikethan.util.imeBottomPaddingFraction
 import kotlinx.coroutines.launch
 
 /**
@@ -175,7 +183,7 @@ fun KalanikethanApp() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     var selectedScreen = navBackStackEntry?.destination?.route ?: Screen.Dashboard.route
-
+    var selectedIcon by remember { mutableStateOf(Screen.Dashboard.filledicon) }
     // This is to clear focus
     val focusManager = LocalFocusManager.current
 
@@ -189,10 +197,10 @@ fun KalanikethanApp() {
                 onScreenSelected = { newScreen ->
                     // This handles the closing animation after a new screen is selected
                     scope.launch {
-                        @Suppress("DEPRECATION")
+                        @Suppress("DEPRECATION") // This is to suppress the depreciation error.
                         drawerState.animateTo(DrawerValue.Closed, tween(500))
                     }
-                    selectedScreen = newScreen.route
+                    selectedIcon = newScreen.filledicon
                     // This handles navigation after a new screen is selected
                     navController.navigate(newScreen.route) {
                         launchSingleTop = true
@@ -205,6 +213,24 @@ fun KalanikethanApp() {
     ) {
         // The Modal Navigation Drawer
         Scaffold(
+            topBar = {
+                TopAppBar(
+                    icon = selectedIcon,
+                    selectedScreen = selectedScreen,
+                    title = selectedScreen,
+                    scope = scope,
+                    drawerState = drawerState,
+                    onAccountSelected = {
+                        scope.launch {
+                            navController.navigate(Screen.Account.route) {
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+                        selectedIcon = Screen.Account.filledicon
+                    }
+                )
+            },
             modifier = Modifier
             .fillMaxSize()
             .background(color = Background)
@@ -218,9 +244,17 @@ fun KalanikethanApp() {
                 startDestination = selectedScreen,
                 modifier = Modifier
                     .padding(innerpadding)
+                    .imeBottomPaddingFraction(0.9f)
             ) {
                 composable(route = Screen.Dashboard.route) { Home() }
                 composable(route = Screen.SignIn.route) { SignIn() }
+                composable(route = Screen.Add.route) { Add() }
+                composable(route = Screen.WhosIn.route) { WhosIn() }
+                composable(route = Screen.History.route) { History() }
+                composable(route = Screen.Payments.route) { Payments() }
+                composable(route = Screen.Account.route) { Payments() }
+                composable(route = Screen.Class.route) { SignIn() }
+
             }
         }
     }
