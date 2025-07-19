@@ -47,8 +47,8 @@ import androidx.navigation.compose.rememberNavController
 import com.lra.kalanikethan.components.KalanikethanAppDrawer
 import com.lra.kalanikethan.components.TopAppBar
 import com.lra.kalanikethan.screens.Add
+import com.lra.kalanikethan.screens.Dashboard
 import com.lra.kalanikethan.screens.History
-import com.lra.kalanikethan.screens.Home
 import com.lra.kalanikethan.screens.Payments
 import com.lra.kalanikethan.screens.SignIn
 import com.lra.kalanikethan.screens.WhosIn
@@ -182,7 +182,7 @@ fun KalanikethanApp() {
     // This is to handle navigation between screens.
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    var selectedScreen = navBackStackEntry?.destination?.route ?: Screen.Dashboard.route
+    val selectedScreen = navBackStackEntry?.destination?.route ?: Screen.Dashboard.route
     var selectedIcon by remember { mutableStateOf(Screen.Dashboard.filledicon) }
     // This is to clear focus
     val focusManager = LocalFocusManager.current
@@ -243,10 +243,12 @@ fun KalanikethanApp() {
             NavHost(navController,
                 startDestination = selectedScreen,
                 modifier = Modifier
+                    .fillMaxSize()
+                    .background(color = Background)
                     .padding(innerpadding)
                     .imeBottomPaddingFraction(0.9f)
             ) {
-                composable(route = Screen.Dashboard.route) { Home() }
+                composable(route = Screen.Dashboard.route) { Dashboard() }
                 composable(route = Screen.SignIn.route) { SignIn() }
                 composable(route = Screen.Add.route) { Add() }
                 composable(route = Screen.WhosIn.route) { WhosIn() }

@@ -5,5 +5,5 @@ import androidx.compose.runtime.Composable
 
 @Composable
 fun Add() {
-    Text("Add Screen")
+    Text("Add")
 }

@@ -22,6 +22,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -33,6 +35,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lra.kalanikethan.R
@@ -41,15 +44,15 @@ import com.lra.kalanikethan.ui.theme.Background
 import com.lra.kalanikethan.ui.theme.PrimaryLightColor
 import com.lra.kalanikethan.ui.theme.UnselectedButtonText
 
+@Composable
 /**
  * This is the custom app drawer that we have
  *
- * @param selectedScreen this is the current Screen that is selected
+ * @param selectedScreen this is the current Screen that is selected the input should always be the route
  * @param onScreenSelected this is a callback function that is called when a screen is selected, screen selection is handled in parent function
  *
  * @return The new Screen object that has been selected
  */
-@Composable
 fun KalanikethanAppDrawer(
     selectedScreen: String,
     onScreenSelected: (Screen) -> Unit
@@ -173,4 +176,36 @@ fun AppDrawerItem(
             )
         }
     }
+}
+
+@Preview
+@Composable
+fun AppDrawerPreview(){
+    KalanikethanAppDrawer(
+        selectedScreen = "Dashboard",
+        onScreenSelected = {}
+    )
+}
+
+@Preview
+@Composable
+fun AppDrawerItemUnselectedPreview() {
+
+    AppDrawerItem(
+        icon = Icons.Default.Add,
+        text = "Add",
+        isSelected = false,
+        onClick = {}
+    )
+}
+
+@Preview
+@Composable
+fun AppDrawerItemSelectedPreview() {
+    AppDrawerItem(
+        icon = Icons.Default.Add,
+        text = "Add",
+        isSelected = true,
+        onClick = {}
+    )
 }
