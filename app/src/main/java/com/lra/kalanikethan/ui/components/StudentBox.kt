@@ -1,16 +1,7 @@
-package com.lra.kalanikethan.components
+package com.lra.kalanikethan.ui.components
 
-import android.R
-import android.R.attr.checked
-import android.R.bool
-import android.os.Build
-import android.text.Editable
-import android.widget.Button
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,11 +11,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
@@ -46,9 +35,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.lra.kalanikethan.data.models.Student
 import com.lra.kalanikethan.ui.theme.ButtonColor
 import com.lra.kalanikethan.ui.theme.ErrorColor
 import com.lra.kalanikethan.ui.theme.LightBoxBackground
@@ -59,20 +48,6 @@ import com.lra.kalanikethan.ui.theme.UnselectedButtonText
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.time.LocalDate
-
-@Serializable
-data class Student(
-    @SerialName("student_id") val studentId: Int,
-    @SerialName("family_id") val familyId: Int,
-    @SerialName("first_name") val firstName: String,
-    @SerialName("last_name") val lastName: String,
-    val birthdate: LocalDate,
-    @SerialName("can_walk_alone") val canWalkAlone: Boolean,
-    val dance: Boolean,
-    val singing: Boolean,
-    val music: Boolean,
-    @SerialName("signed_in") val signedIn: Boolean
-)
 
 
 
@@ -298,7 +273,7 @@ fun StudentBoxPreview() {
                 familyId = 1,
                 firstName = "John",
                 lastName = "Doe",
-                birthdate = LocalDate.of(2000, 1, 1),
+                birthdate = TODO(),
                 canWalkAlone = true,
                 dance = true,
                 singing = false,

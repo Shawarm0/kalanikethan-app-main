@@ -1,4 +1,4 @@
-package com.lra.kalanikethan.screens
+package com.lra.kalanikethan.ui.screens
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable

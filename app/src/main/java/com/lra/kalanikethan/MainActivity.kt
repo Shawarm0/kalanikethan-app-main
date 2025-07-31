@@ -44,14 +44,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.lra.kalanikethan.components.KalanikethanAppDrawer
-import com.lra.kalanikethan.components.TopAppBar
-import com.lra.kalanikethan.screens.Add
-import com.lra.kalanikethan.screens.Dashboard
-import com.lra.kalanikethan.screens.History
-import com.lra.kalanikethan.screens.Payments
-import com.lra.kalanikethan.screens.SignIn
-import com.lra.kalanikethan.screens.WhosIn
+import com.lra.kalanikethan.data.repository.Repository
+import com.lra.kalanikethan.ui.components.KalanikethanAppDrawer
+import com.lra.kalanikethan.ui.components.TopAppBar
+import com.lra.kalanikethan.ui.screens.Add
+import com.lra.kalanikethan.ui.screens.Dashboard
+import com.lra.kalanikethan.ui.screens.History
+import com.lra.kalanikethan.ui.screens.Payments
+import com.lra.kalanikethan.ui.screens.SignIn.SignIn
+import com.lra.kalanikethan.ui.screens.SignIn.SignInViewModel
+import com.lra.kalanikethan.ui.screens.WhosIn
 import com.lra.kalanikethan.ui.theme.Background
 import com.lra.kalanikethan.ui.theme.KalanikethanTheme
 import com.lra.kalanikethan.util.imeBottomPaddingFraction
@@ -72,11 +74,15 @@ class MainActivity : ComponentActivity() {
      * being shut down, this contains the most recent state; otherwise, it is `null`.
      */
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        val repository = Repository()
+        val viewModel = SignInViewModel(repository)
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             KalanikethanTheme {
-                KalanikethanApp()
+                KalanikethanApp(viewModel)
             }
         }
     }
@@ -173,7 +179,7 @@ sealed class Screen(val route: String, val filledicon: ImageVector, val outlined
  * The selected screen is derived from the current back stack, and updated when a drawer item is clicked.
  */
 @Composable
-fun KalanikethanApp() {
+fun KalanikethanApp(viewModel: SignInViewModel) {
     // This stores the state of the navigation drawer
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     // This is required to handle the the navigation drawer not on the main thread
@@ -189,6 +195,8 @@ fun KalanikethanApp() {
 
 
 
+
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -200,12 +208,13 @@ fun KalanikethanApp() {
                         @Suppress("DEPRECATION") // This is to suppress the depreciation error.
                         drawerState.animateTo(DrawerValue.Closed, tween(500))
                     }
-                    selectedIcon = newScreen.filledicon
                     // This handles navigation after a new screen is selected
                     navController.navigate(newScreen.route) {
                         launchSingleTop = true
                         restoreState = true
                     }
+                    selectedIcon = newScreen.filledicon
+
                 }
             )
 
@@ -221,11 +230,9 @@ fun KalanikethanApp() {
                     scope = scope,
                     drawerState = drawerState,
                     onAccountSelected = {
-                        scope.launch {
-                            navController.navigate(Screen.Account.route) {
-                                launchSingleTop = true
-                                restoreState = true
-                            }
+                        navController.navigate(Screen.Account.route) {
+                            launchSingleTop = true
+                            restoreState = true
                         }
                         selectedIcon = Screen.Account.filledicon
                     }
@@ -246,17 +253,17 @@ fun KalanikethanApp() {
                     .fillMaxSize()
                     .background(color = Background)
                     .padding(innerpadding)
-                    .imeBottomPaddingFraction(0.9f)
+                    .imeBottomPaddingFraction(0.9f),
+
             ) {
                 composable(route = Screen.Dashboard.route) { Dashboard() }
-                composable(route = Screen.SignIn.route) { SignIn() }
+                composable(route = Screen.SignIn.route) { SignIn(viewModel) }
                 composable(route = Screen.Add.route) { Add() }
                 composable(route = Screen.WhosIn.route) { WhosIn() }
                 composable(route = Screen.History.route) { History() }
                 composable(route = Screen.Payments.route) { Payments() }
                 composable(route = Screen.Account.route) { Payments() }
-                composable(route = Screen.Class.route) { SignIn() }
-
+                composable(route = Screen.Class.route) { SignIn(viewModel) }
             }
         }
     }

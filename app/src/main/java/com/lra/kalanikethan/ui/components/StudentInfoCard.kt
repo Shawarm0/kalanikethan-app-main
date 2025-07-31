@@ -1,4 +1,4 @@
-package com.lra.kalanikethan.components
+package com.lra.kalanikethan.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.lra.kalanikethan.data.models.Student
 import java.time.LocalDate
 
 @Composable
@@ -231,7 +232,7 @@ fun StudentInfoCardPreview() {
             familyId = 1,
             firstName = "John",
             lastName = "Doe",
-            birthdate = LocalDate.of(2000, 1, 1),
+            birthdate = TODO(),
             canWalkAlone = true,
             dance = true,
             singing = false,

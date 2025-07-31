@@ -1,4 +1,4 @@
-package com.lra.kalanikethan.components
+package com.lra.kalanikethan.ui.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background

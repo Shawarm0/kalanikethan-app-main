@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    kotlin("plugin.serialization") version "2.2.0"
 }
 
 android {
@@ -40,12 +41,25 @@ android {
 }
 
 dependencies {
+    /**
+     * Imports for Database
+     */
+    // Supabase imports
+    implementation(platform("io.github.jan-tennert.supabase:bom:3.2.2"))
+    implementation("io.github.jan-tennert.supabase:postgrest-kt")
+    implementation("io.github.jan-tennert.supabase:realtime-kt")
+    // Ktor client import
+    implementation("io.ktor:ktor-client-cio:3.2.2")
+
     // This is to get the icons imported
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
-
     // Imports for nagivation
-    val nav_version = "2.9.1"
+    val nav_version = "2.9.2"
     implementation("androidx.navigation:navigation-compose:$nav_version")
+
+    // This is for mutableStateFlows
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.10.2")
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
