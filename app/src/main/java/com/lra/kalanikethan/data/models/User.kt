@@ -1,7 +1,10 @@
 package com.lra.kalanikethan.data.models
 
 data class User(
-    val firstName: String,
-    val lastName: String,
-    val isManager: Boolean
+    val first_name: String,
+    val last_name: String,
+    val manager: Boolean,
+    val uid: String
 )
+
+
