@@ -48,11 +48,15 @@ dependencies {
     implementation(platform("io.github.jan-tennert.supabase:bom:3.2.2"))
     implementation("io.github.jan-tennert.supabase:postgrest-kt")
     implementation("io.github.jan-tennert.supabase:realtime-kt")
+    implementation("io.github.jan-tennert.supabase:auth-kt")
     // Ktor client import
     implementation("io.ktor:ktor-client-cio:3.2.2")
 
     // This is to get the icons imported
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.androidx.activity)
     // Imports for nagivation
     val nav_version = "2.9.2"
     implementation("androidx.navigation:navigation-compose:$nav_version")
