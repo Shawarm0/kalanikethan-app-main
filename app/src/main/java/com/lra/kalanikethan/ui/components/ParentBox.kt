@@ -1,17 +1,17 @@
 package com.lra.kalanikethan.ui.components
 
+import android.widget.Space
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -35,38 +35,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.unit.dp
+import com.lra.kalanikethan.data.models.Parent
 import com.lra.kalanikethan.data.models.Student
 import com.lra.kalanikethan.ui.theme.ButtonColor
 import com.lra.kalanikethan.ui.theme.ErrorColor
 import com.lra.kalanikethan.ui.theme.LightBoxBackground
 import com.lra.kalanikethan.ui.theme.PrimaryLightColor
 import com.lra.kalanikethan.ui.theme.SuccessColor
-import com.lra.kalanikethan.ui.theme.UnselectedButtonText
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import java.time.LocalDate
-
-
-
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-/**
- * This is the studentbox Composable that holds the student data
- *
- * @param initialData the initial data of the student in the form of a [Student] data object
- * @param onConfirm a lambda that is called when the confirm button is clicked
- * @param editable a boolean that determines if the studentbox is editable or not
- */
-fun StudentBox(
-    initialData: Student,
-    onConfirm: (Student) -> Unit = {},
-    deleteStudent: () -> Unit = {},
+@OptIn(ExperimentalFoundationApi::class)
+fun ParentBox(
+    initialData: Parent,
+    onConfirm: (Parent) -> Unit = {},
+    deleteParent: () -> Unit = {},
     viewHistory: Boolean = false,
     editable: Boolean = false
-){
+) {
     // For the text boxes
     val bringIntoViewRequester = remember { BringIntoViewRequester() }
     val coroutineScope = rememberCoroutineScope()
@@ -75,7 +62,6 @@ fun StudentBox(
 
     var currentData by remember { mutableStateOf(initialData) }
     var tempData by remember { mutableStateOf(initialData.copy()) }
-
 
 
     Box(modifier = Modifier
@@ -98,15 +84,15 @@ fun StudentBox(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ){
-                Text("Student Details", style = MaterialTheme.typography.titleLarge)
+                Text("Parent Details", style = MaterialTheme.typography.titleLarge)
                 if(editableState){
-                    Button("Delete", Icons.Default.Delete, color = ErrorColor, onClick = { deleteStudent() })
+                    Button("Delete", Icons.Default.Delete, color = ErrorColor, onClick = { deleteParent() })
                 }
             }
 
             HorizontalDivider(color = Color.Gray, modifier = Modifier.fillMaxWidth())
 
-            if(editableState){
+            if(editableState) {
                 Row(horizontalArrangement = Arrangement.spacedBy(30.dp)) { // Typing in data
 
                     SimpleDecoratedTextField(
@@ -133,80 +119,40 @@ fun StudentBox(
 
                     SimpleDecoratedTextField(
                         placeholder = "Text",
-                        text = tempData.birthdate.toString(),
+                        text = tempData.phoneNumber.toString(),
                         onValueChange = {
-                            // Figure out how to change date
+                            tempData = tempData.copy(phoneNumber = it)
                         },
-                        label = "Birthday",
+                        label = "Number",
                         bringIntoViewRequester = bringIntoViewRequester,
                         coroutineScope = coroutineScope
                     )
-                }
 
-                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    Text("Classes: ", style = MaterialTheme.typography.titleSmall)
-                    SelectionButton(
-                        "Dance",
-                        selected = remember { mutableStateOf(tempData.dance) },
-                        onClick = { tempData = tempData.copy(dance = it) })
-                    SelectionButton(
-                        "Singing",
-                        selected = remember { mutableStateOf(tempData.singing) },
-                        onClick = { tempData = tempData.copy(singing = it) })
-                    SelectionButton(
-                        "Music",
-                        selected = remember { mutableStateOf(tempData.music) },
-                        onClick = { tempData = tempData.copy(music = it)})
+
+
                 }
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
-                ){ //Bottom Row
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ){ //Walk Alone switch
-                        Text("Can student walk alone?", style = MaterialTheme.typography.titleSmall)
-                        Switch(
-                            checked = tempData.canWalkAlone,
-                            onCheckedChange = {
-                                tempData = tempData.copy(canWalkAlone = it)
-                            },
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = Color.White,
-                                checkedTrackColor = PrimaryLightColor,
-                                uncheckedThumbColor = Color(0xFF79747E),
-                                uncheckedTrackColor = Color(0xFFe7e0ec),
-                                uncheckedBorderColor = Color(0xFF79747E)
-                            ),
-                            thumbContent = if (tempData.canWalkAlone) {
-                                {
-                                    Icon(
-                                        imageVector = Icons.Filled.Check,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(SwitchDefaults.IconSize),
-                                    )
-                                }
-                            } else {
-                                null
-                            }
-                        )
-                    }
+                ) { //Bottom Row
 
+                    Spacer(modifier = Modifier.weight(1f))
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Button("Cancel",
+                        Button(
+                            "Cancel",
                             Icons.Default.Clear,
                             onClick = {
                                 tempData = currentData.copy()
                                 editableState = false
-                                      },
+                            },
                             color = ButtonColor
                         )
-                        Button("Confirm", Icons.Default.Check,
+                        Button(
+                            "Confirm", Icons.Default.Check,
                             onClick = {
                                 currentData = tempData.copy()
                                 editableState = false
@@ -216,30 +162,17 @@ fun StudentBox(
                         )
                     }
                 }
+
             } else {
                 Text("Name: ${currentData.firstName} ${currentData.lastName}", style = MaterialTheme.typography.bodyMedium)
-                Text("Birthdate: ${currentData.birthdate}", style = MaterialTheme.typography.bodyMedium)
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)){
-                    Text("Classes: ")
-                    if (currentData.dance) {
-                        ClassBox("Dance")
-                    }
-                    if (currentData.singing) {
-                        ClassBox("Singing")
-                    }
-                    if (currentData.music) {
-                        ClassBox("Music")
-                    }
-                }
+                Text("Number: ${currentData.phoneNumber}", style = MaterialTheme.typography.bodyMedium)
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ){
-                    Text("Can walk alone: ${if(currentData.canWalkAlone) "Yes" else "No"}", style = MaterialTheme.typography.bodyMedium)
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)){
-                        if (viewHistory) {
-                            Button("View History", color = ButtonColor)
-                        }
+                        Spacer(modifier = Modifier.weight(1f))
                         Button("Edit Details", color = ButtonColor, onClick = {editableState = true})
                     }
                 }
@@ -247,42 +180,5 @@ fun StudentBox(
             }
         }
     }
-}
 
-@Composable
-fun ClassBox(text: String){
-    Box(modifier = Modifier
-        .clip(RoundedCornerShape(8.dp))
-        .background(color = Color(0xFFE7EEF5))
-        .height(30.dp)
-        .padding(horizontal = 10.dp)
-        .wrapContentWidth(),
-        contentAlignment = Alignment.Center
-        ){
-        Text(text = text, style = MaterialTheme.typography.titleSmall, color = UnselectedButtonText)
-    }
-}
-
-@Preview
-@Composable
-fun StudentBoxPreview() {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        StudentBox(
-            initialData = Student(
-                studentId = 1,
-                familyId = 1,
-                firstName = "John",
-                lastName = "Doe",
-                birthdate = TODO(),
-                canWalkAlone = true,
-                dance = true,
-                singing = false,
-                music = true,
-                signedIn = false,
-            )
-        )
-    }
 }

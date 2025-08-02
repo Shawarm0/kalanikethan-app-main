@@ -9,7 +9,7 @@ import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.realtime.Realtime
 import io.ktor.client.engine.cio.CIO
 
-val apiKey = BuildConfig.KEY
+const val apiKey = BuildConfig.KEY
 object SupabaseClientProvider {
     val client: SupabaseClient = createSupabaseClient(
         supabaseUrl = "https://kfzzlelvlekrkduhgksy.supabase.co",
