@@ -1,6 +1,7 @@
 package com.lra.kalanikethan.ui.screens.SignIn
 
-import android.util.Log
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lra.kalanikethan.data.models.Student
@@ -11,34 +12,94 @@ import io.github.jan.supabase.realtime.PostgresAction
 import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.postgresChangeFlow
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.onEach
-import kotlinx.serialization.decodeFromString
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
+import kotlin.collections.map
 
 
 class SignInViewModel(
     private val repository: Repository
 ): ViewModel() {
 
-    val allstudents = MutableStateFlow<List<Student>>(emptyList())
+    private val _allStudents = MutableStateFlow<List<Student>>(emptyList())
+    val allStudents: StateFlow<List<Student>> = _allStudents
+
+    private val _displayedStudents = MutableStateFlow<List<Student>>(emptyList())
+    val displayedStudents: StateFlow<List<Student>> = _displayedStudents
+
+    private val _searchQuery = mutableStateOf("")
+    val searchQuery: State<String> = _searchQuery
+
+
+    val channel = client.channel("students-listener")
+    val dataFlow = channel.postgresChangeFlow<PostgresAction>(schema = "public") {
+        table = "students"
+    }
+
     private var debounceJob: Job? = null
 
-    fun updateStudents(scope: CoroutineScope) {
+    init {
+        viewModelScope.launch {
+            _allStudents.value = repository.getAllStudents()
+            filterStudents()
+        }
+    }
+
+
+
+
+
+    fun updateSearchQuery(query: String) {
+        _searchQuery.value = query
+        viewModelScope.launch {
+            withContext(Dispatchers.Unconfined) {
+                filterStudents()
+            }
+        }
+    }
+
+
+    fun filterStudents() {
+        val query = _searchQuery.value.lowercase().trim()
+        if (query.isEmpty()) {
+            _displayedStudents.value = _allStudents.value.sortedBy { it.firstName.lowercase() }
+        } else {
+            _displayedStudents.value = _allStudents.value.filter { student ->
+                student.firstName.lowercase().contains(query) || student.lastName.lowercase().contains(query) || student.studentId.toString() == query
+            }.sortedBy { it.firstName.lowercase() }
+        }
+    }
+
+
+    fun unsubscribeFromChannel() {
+        viewModelScope.launch {
+            repository.unsubscribeFromChannel(channel)
+        }
+    }
+
+
+    fun createStudentChannel(scope: CoroutineScope) {
         debounceJob?.cancel()
         debounceJob = viewModelScope.launch {
             delay(1)
-            repository.initializeStudentChannel(scope).collect { action ->
+            repository.initializeStudentChannel(scope, channel, dataFlow).collect { action ->
                 when(action) {
                     is PostgresAction.Delete -> TODO()
                     is PostgresAction.Insert -> TODO()
                     is PostgresAction.Select -> TODO()
                     is PostgresAction.Update -> {
-                        Log.i("Database", "${action.record}")
+                        val student = Json.decodeFromJsonElement<Student>(action.record)
+                        _allStudents.update { list ->
+                            list.map { if (it.studentId == student.studentId) student else it }
+                        }
+                        filterStudents()
                     }
                 }
             }

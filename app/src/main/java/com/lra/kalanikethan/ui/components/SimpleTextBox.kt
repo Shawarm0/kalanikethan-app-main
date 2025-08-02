@@ -41,6 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.lra.kalanikethan.ui.theme.LightBoxBackground
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -143,7 +144,7 @@ fun SimpleDecoratedTextField(
                             shape = RoundedCornerShape(12.dp)
                         )
                         .background(
-                            color = MaterialTheme.colorScheme.surface,
+                            color = LightBoxBackground,
                             shape = RoundedCornerShape(12.dp)
                         )
                         .padding(horizontal = 12.dp, vertical = 10.dp),
