@@ -1,7 +1,9 @@
 package com.lra.kalanikethan
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.core.tween
@@ -39,7 +41,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -48,6 +52,7 @@ import com.lra.kalanikethan.data.repository.Repository
 import com.lra.kalanikethan.ui.components.KalanikethanAppDrawer
 import com.lra.kalanikethan.ui.components.TopAppBar
 import com.lra.kalanikethan.ui.screens.Add
+import com.lra.kalanikethan.ui.screens.Auth.AuthActivity
 import com.lra.kalanikethan.ui.screens.Dashboard
 import com.lra.kalanikethan.ui.screens.History
 import com.lra.kalanikethan.ui.screens.Payments
@@ -192,7 +197,7 @@ fun KalanikethanApp(viewModel: SignInViewModel) {
     var selectedIcon by remember { mutableStateOf(Screen.Dashboard.filledicon) }
     // This is to clear focus
     val focusManager = LocalFocusManager.current
-
+    val context = LocalContext.current
 
 
 
@@ -230,11 +235,8 @@ fun KalanikethanApp(viewModel: SignInViewModel) {
                     scope = scope,
                     drawerState = drawerState,
                     onAccountSelected = {
-                        navController.navigate(Screen.Account.route) {
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                        selectedIcon = Screen.Account.filledicon
+                        val intent = Intent(context, AuthActivity::class.java)
+                        context.startActivity(intent)
                     }
                 )
             },
@@ -262,7 +264,10 @@ fun KalanikethanApp(viewModel: SignInViewModel) {
                 composable(route = Screen.WhosIn.route) { WhosIn() }
                 composable(route = Screen.History.route) { History() }
                 composable(route = Screen.Payments.route) { Payments() }
-                composable(route = Screen.Account.route) { Payments() }
+                composable(route = Screen.Account.route) {
+                    val intent = Intent(context, AuthActivity::class.java)
+                    context.startActivity(intent)
+                }
                 composable(route = Screen.Class.route) { SignIn(viewModel) }
             }
         }
