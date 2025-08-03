@@ -1,5 +1,6 @@
 package com.lra.kalanikethan.ui.screens.Auth
 
+import android.app.Activity
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -18,7 +19,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,12 +26,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.lifecycle.ViewModel
+import com.lra.kalanikethan.data.models.authCompleted
 import com.lra.kalanikethan.ui.theme.KalanikethanTheme
-import kotlinx.coroutines.delay
 import kotlin.getValue
 
 class AuthActivity : ComponentActivity() {
@@ -80,22 +80,12 @@ fun AuthMain(model: AuthActivityViewmodel){
             visualTransformation = if (passwordHidden) PasswordVisualTransformation() else VisualTransformation.None,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
         )
+        val context = LocalContext.current
         Button(onClick = {
-            model.LoginUser(email.value, password.value)
+            model.loginUser(email.value, password.value, context)
         }) {
             Text("Log in")
         }
-        LaunchedEffect(Unit) {
-            while(true){
-                delay(10)
-                if(currentUser.first_name != "None"){
-                    username.value = "User data - First name: ${currentUser.first_name}, Last name: ${currentUser.last_name}, Manager: ${currentUser.manager}, UID: ${currentUser.uid}"
-                    break
-                }
-            }
-        }
-        Text("User Info")
-        Text(text = username.value)
     }
 
 

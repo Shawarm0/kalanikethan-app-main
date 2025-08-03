@@ -33,6 +33,7 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,6 +47,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.lra.kalanikethan.data.models.User
+import com.lra.kalanikethan.data.models.sessionPermissions
+import com.lra.kalanikethan.data.remote.SupabaseClientProvider.client
 import com.lra.kalanikethan.data.repository.Repository
 import com.lra.kalanikethan.ui.components.KalanikethanAppDrawer
 import com.lra.kalanikethan.ui.components.TopAppBar
@@ -61,6 +65,9 @@ import com.lra.kalanikethan.ui.screens.WhosIn
 import com.lra.kalanikethan.ui.theme.Background
 import com.lra.kalanikethan.ui.theme.KalanikethanTheme
 import com.lra.kalanikethan.util.imeBottomPaddingFraction
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.coroutines.launch
 import kotlin.math.sign
 
@@ -200,8 +207,16 @@ fun KalanikethanApp(signInViewModel: SignInViewModel, addViewModel: AddViewModel
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
 
-
-
+    //Retrieves the user that was last logged in on start up
+    LaunchedEffect(Unit) {
+        val currentSession = client.auth.retrieveUserForCurrentSession()
+        val newUser : User = client.from("employees").select(columns = Columns.list("first_name, last_name, manager, uid")){
+            filter {
+                User::uid eq currentSession.id
+            }
+        }.decodeSingle<User>()
+        sessionPermissions.value = newUser
+    }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -266,8 +281,7 @@ fun KalanikethanApp(signInViewModel: SignInViewModel, addViewModel: AddViewModel
                 composable(route = Screen.History.route) { History() }
                 composable(route = Screen.Payments.route) { Payments() }
                 composable(route = Screen.Account.route) {
-                    val intent = Intent(context, AuthActivity::class.java)
-                    context.startActivity(intent)
+
                 }
                 composable(route = Screen.Class.route) { SignIn(signInViewModel) }
             }

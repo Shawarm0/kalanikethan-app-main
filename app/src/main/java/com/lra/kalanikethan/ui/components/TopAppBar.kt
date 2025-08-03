@@ -35,6 +35,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.lra.kalanikethan.data.models.sessionPermissions
 import com.lra.kalanikethan.ui.theme.Background
 import com.lra.kalanikethan.util.bottomBorder
 import kotlinx.coroutines.CoroutineScope
@@ -106,7 +107,7 @@ fun TopAppBar(
                     }
                     if (!isPortrait) {
                         Text(
-                            "FirstName",
+                            sessionPermissions.value.first_name,
                             style = MaterialTheme.typography.displaySmall,
                             fontSize = 13.sp
                         )
