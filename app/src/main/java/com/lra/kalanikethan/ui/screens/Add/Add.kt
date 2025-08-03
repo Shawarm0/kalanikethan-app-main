@@ -1,4 +1,4 @@
-package com.lra.kalanikethan.ui.screens
+package com.lra.kalanikethan.ui.screens.Add
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,9 +17,7 @@ import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.CurrencyPound
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -31,7 +28,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotApplyResult
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,33 +47,51 @@ import com.lra.kalanikethan.ui.theme.SuccessColor
 import com.lra.kalanikethan.ui.theme.UnselectedButtonText
 import kotlinx.datetime.LocalDate
 
+data class PaymentData(
+    val paymentId: String = "",
+    val email: String = "",
+    val paymentDate: String = "",
+    val familyName: String = "",
+    val amount: String = ""
+)
+
 @Composable
-fun Add() {
+fun Add(addViewModel: AddViewModel) {
+
     val students = remember { mutableStateListOf<Student>() }
     val parents = remember { mutableStateListOf<Parent>() }
     var tab by remember { mutableStateOf(Tab.Student) }
 
+    // Single state object for payment data
+    var paymentData by remember { mutableStateOf(PaymentData()) }
+    val familyID = addViewModel.getFamilyID() + 1
 
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Content based on selected tab - now takes available space but leaves room for TabBar
         Box(modifier = Modifier.weight(1f)) {
             when (tab) {
                 Tab.Student -> StudentContent(
                     students = students,
-                    onAddStudent = { students.add(it) }
+                    onAddStudent = { students.add(it) },
+                    familyID = familyID
                 )
                 Tab.Parents -> ParentContent(
-                parents = parents,
-                onAddParent = { parents.add(it) }
-            )
-                Tab.Payments -> PaymentContent()
+                    parents = parents,
+                    onAddParent = { parents.add(it) },
+                    familyID = familyID
+                )
+                Tab.Payments -> PaymentContent(
+                    paymentData = paymentData,
+                    onPaymentDataChanged = { paymentData = it },
+                    createFamily = {
+                        addViewModel.createFamily(paymentData, parents, students)
+                    }
+                )
             }
         }
-
         TabBar(onTabSelected = { tab = it })
     }
 }
@@ -87,8 +101,10 @@ fun Add() {
 @Composable
 private fun StudentContent(
     students: MutableList<Student>,  // Changed to MutableList for adding items
-    onAddStudent: (Student) -> Unit  // Callback for adding students
+    onAddStudent: (Student) -> Unit,  // Callback for adding students
+    familyID: Int
 ) {
+
     Box(modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.TopCenter,
         ) {
@@ -132,7 +148,7 @@ private fun StudentContent(
                     onClick = {
                         val newStudent = Student(
                             studentId = 1,
-                            familyId = 1,
+                            familyId = familyID,
                             firstName = "",
                             lastName = "",
                             birthdate = LocalDate(2000, 1, 1),
@@ -153,7 +169,8 @@ private fun StudentContent(
 @Composable
 private fun ParentContent(
     parents: MutableList<Parent>,  // Changed to MutableList for adding items
-    onAddParent: (Parent) -> Unit  // Callback for adding students
+    onAddParent: (Parent) -> Unit,  // Callback for adding students
+    familyID: Int
 ) {
     Box(modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.TopCenter,
@@ -197,7 +214,7 @@ private fun ParentContent(
                     onClick = {
                         val parent = Parent(
                             parentId = 1,
-                            familyId = 1,
+                            familyId = familyID,
                             firstName = "",
                             lastName = "",
                             phoneNumber = ""
@@ -218,7 +235,9 @@ private fun ParentContent(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun PaymentContent(
-
+    paymentData: PaymentData,
+    onPaymentDataChanged: (PaymentData) -> Unit,
+    createFamily: () -> Unit,
 ) {
     // For the text boxes
     val bringIntoViewRequester = remember { BringIntoViewRequester() }
@@ -266,17 +285,31 @@ private fun PaymentContent(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
+
                 Row(
                     modifier = Modifier.wrapContentSize(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(25.dp)
                 ) {
 
+                        SimpleDecoratedTextField(
+                            text = paymentData.paymentId,
+                            placeholder = "Enter Family Name",
+                            label = "Family Name",
+                            onValueChange = {
+                                onPaymentDataChanged(paymentData.copy(familyName = it))
+
+                            },
+                            bringIntoViewRequester = bringIntoViewRequester,
+                            coroutineScope = coroutineScope
+                        )
+
                     SimpleDecoratedTextField(
-                        text = "",
+                        text = paymentData.paymentId,
                         placeholder = "Enter Payment ID",
                         label = "Payment ID",
                         onValueChange = {
+                            onPaymentDataChanged(paymentData.copy(paymentId = it))
 
                         },
                         bringIntoViewRequester = bringIntoViewRequester,
@@ -284,17 +317,15 @@ private fun PaymentContent(
                     )
 
                     SimpleDecoratedTextField(
-                        text = "",
+                        text = paymentData.email,
                         placeholder = "Enter Email",
                         label = "Email",
                         onValueChange = {
-
+                            onPaymentDataChanged(paymentData.copy(email = it))
                         },
                         bringIntoViewRequester = bringIntoViewRequester,
                         coroutineScope = coroutineScope
                     )
-
-
                 }
 
 
@@ -305,41 +336,34 @@ private fun PaymentContent(
                 ) {
 
                     SimpleDecoratedTextField(
-                        text = "",
+                        text = paymentData.paymentDate,
                         placeholder = "DD/MM/YYYY",
                         label = "Enter Payment Date",
                         onValueChange = {
-
-                        },
+                            onPaymentDataChanged(paymentData.copy(paymentDate = it))                        },
                         bringIntoViewRequester = bringIntoViewRequester,
                         coroutineScope = coroutineScope,
-                        trailingIcon = Icons.Default.CalendarMonth
                     )
 
                     SimpleDecoratedTextField(
-                        text = "",
+                        text = paymentData.amount,
                         placeholder = "Enter Amount",
                         label = "Amount",
                         onValueChange = {
-
+                            onPaymentDataChanged(paymentData.copy(amount = it))
                         },
                         bringIntoViewRequester = bringIntoViewRequester,
                         coroutineScope = coroutineScope,
                     )
-
-
                 }
-
-
-
-
             }
+
 
             Button(
                 text = "Create Family",
                 symbol = Icons.Default.Check,
                 onClick = {
-
+                    createFamily()
                 },
                 color = SuccessColor,
                 modifier = Modifier.fillMaxWidth()
@@ -348,8 +372,4 @@ private fun PaymentContent(
 
         }
     }
-
-
-
-
 }

@@ -3,7 +3,6 @@ package com.lra.kalanikethan
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.core.tween
@@ -43,7 +42,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -51,7 +49,8 @@ import androidx.navigation.compose.rememberNavController
 import com.lra.kalanikethan.data.repository.Repository
 import com.lra.kalanikethan.ui.components.KalanikethanAppDrawer
 import com.lra.kalanikethan.ui.components.TopAppBar
-import com.lra.kalanikethan.ui.screens.Add
+import com.lra.kalanikethan.ui.screens.Add.Add
+import com.lra.kalanikethan.ui.screens.Add.AddViewModel
 import com.lra.kalanikethan.ui.screens.Auth.AuthActivity
 import com.lra.kalanikethan.ui.screens.Dashboard
 import com.lra.kalanikethan.ui.screens.History
@@ -63,6 +62,7 @@ import com.lra.kalanikethan.ui.theme.Background
 import com.lra.kalanikethan.ui.theme.KalanikethanTheme
 import com.lra.kalanikethan.util.imeBottomPaddingFraction
 import kotlinx.coroutines.launch
+import kotlin.math.sign
 
 /**
  * The main entry point of the app
@@ -81,13 +81,14 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         val repository = Repository()
-        val viewModel = SignInViewModel(repository)
+        val signinViewModel = SignInViewModel(repository)
+        val addViewModel = AddViewModel(repository)
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             KalanikethanTheme {
-                KalanikethanApp(viewModel)
+                KalanikethanApp(signinViewModel, addViewModel)
             }
         }
     }
@@ -184,7 +185,7 @@ sealed class Screen(val route: String, val filledicon: ImageVector, val outlined
  * The selected screen is derived from the current back stack, and updated when a drawer item is clicked.
  */
 @Composable
-fun KalanikethanApp(viewModel: SignInViewModel) {
+fun KalanikethanApp(signInViewModel: SignInViewModel, addViewModel: AddViewModel) {
     // This stores the state of the navigation drawer
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     // This is required to handle the the navigation drawer not on the main thread
@@ -259,8 +260,8 @@ fun KalanikethanApp(viewModel: SignInViewModel) {
 
             ) {
                 composable(route = Screen.Dashboard.route) { Dashboard() }
-                composable(route = Screen.SignIn.route) { SignIn(viewModel) }
-                composable(route = Screen.Add.route) { Add() }
+                composable(route = Screen.SignIn.route) { SignIn(signInViewModel) }
+                composable(route = Screen.Add.route) { Add(addViewModel) }
                 composable(route = Screen.WhosIn.route) { WhosIn() }
                 composable(route = Screen.History.route) { History() }
                 composable(route = Screen.Payments.route) { Payments() }
@@ -268,7 +269,7 @@ fun KalanikethanApp(viewModel: SignInViewModel) {
                     val intent = Intent(context, AuthActivity::class.java)
                     context.startActivity(intent)
                 }
-                composable(route = Screen.Class.route) { SignIn(viewModel) }
+                composable(route = Screen.Class.route) { SignIn(signInViewModel) }
             }
         }
     }
