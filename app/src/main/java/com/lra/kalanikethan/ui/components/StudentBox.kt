@@ -273,7 +273,7 @@ fun StudentBoxPreview() {
         StudentBox(
             initialData = Student(
                 studentId = 1,
-                familyId = 1,
+                familyId = "",
                 firstName = "John",
                 lastName = "Doe",
                 birthdate = TODO(),

@@ -1,5 +1,6 @@
 package com.lra.kalanikethan.ui.screens.Add
 
+import android.util.Log
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,42 +13,28 @@ import kotlinx.coroutines.launch
 class AddViewModel(
     private val repository: Repository
 ): ViewModel() {
-
-    val familyID = mutableIntStateOf(1)
-
-    fun getFamilyID(): Int {
-        viewModelScope.launch {
-            familyID.intValue = repository.getLastFamilyID()
-        }
-        return familyID.intValue
-    }
-
-
     fun createFamily(paymentData: PaymentData, parents: List<Parent>, students: List<Student>) {
+        var id : String? = null
 
         val family = Family(
-            familyId = 1, // hopefully this overrights
             familyName = paymentData.familyName,
-            email = paymentData.email,
+            email = paymentData.email
         )
         viewModelScope.launch {
-            repository.addFamily(family)
-        }
-
-        viewModelScope.launch {
-            for (parent in parents) {
-                repository.addParent(parent)
+            try{
+                id = repository.addFamily(family)
+                for (parent in parents) {
+                    parent.familyId = id as String
+                    repository.addParent(parent)
+                }
+                for (student in students) {
+                    student.familyId = id as String
+                    repository.addStudent(student)
+                }
+            } catch (e: Exception) {
+                Log.e("Database", "Error while attempting to add family : $e")
             }
         }
-
-        viewModelScope.launch {
-            for (student in students) {
-                repository.addStudent(student)
-            }
-        }
-
-
-
     }
 
 

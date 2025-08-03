@@ -2,6 +2,7 @@ package com.lra.kalanikethan
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -209,13 +210,17 @@ fun KalanikethanApp(signInViewModel: SignInViewModel, addViewModel: AddViewModel
 
     //Retrieves the user that was last logged in on start up
     LaunchedEffect(Unit) {
-        val currentSession = client.auth.retrieveUserForCurrentSession()
-        val newUser : User = client.from("employees").select(columns = Columns.list("first_name, last_name, manager, uid")){
-            filter {
-                User::uid eq currentSession.id
-            }
-        }.decodeSingle<User>()
-        sessionPermissions.value = newUser
+        try{
+            val currentSession = client.auth.retrieveUserForCurrentSession()
+            val newUser : User = client.from("employees").select(columns = Columns.list("first_name, last_name, manager, uid")){
+                filter {
+                    User::uid eq currentSession.id
+                }
+            }.decodeSingle<User>()
+            sessionPermissions.value = newUser
+        } catch (e: Exception){
+            Log.i("Auth", "No session found $e")
+        }
     }
 
     ModalNavigationDrawer(

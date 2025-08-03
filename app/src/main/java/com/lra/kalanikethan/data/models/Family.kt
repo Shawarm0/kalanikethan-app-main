@@ -5,8 +5,15 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Family(
+    @SerialName("family_name")
+    val familyName: String,
+    val email: String,
+)
+
+@Serializable
+data class FamilyWithID(
     @SerialName("family_id")
-    val familyId: Int,
+    val familyID : String,
     @SerialName("family_name")
     val familyName: String,
     val email: String,

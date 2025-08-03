@@ -48,9 +48,9 @@ import java.time.LocalDate
  */
 fun StudentInfoCard(
     studentData: Student,
-    onSignInToggle: (studentId: Int) -> Unit,
-    onAbsentClick: (studentId: Int) -> Unit,
-    onEditClick: (studentId: Int) -> Unit,
+    onSignInToggle: (studentId: Int?) -> Unit,
+    onAbsentClick: (studentId: Int?) -> Unit,
+    onEditClick: (studentId: Int?) -> Unit,
 ) {
 
     // Determine the label for the sign-in/sign-out button
@@ -229,7 +229,7 @@ fun StudentInfoCardPreview() {
     StudentInfoCard(
         studentData = Student(
             studentId = 1,
-            familyId = 1,
+            familyId = "",
             firstName = "John",
             lastName = "Doe",
             birthdate = TODO(),

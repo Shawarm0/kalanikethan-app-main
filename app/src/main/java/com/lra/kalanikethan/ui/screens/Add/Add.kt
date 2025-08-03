@@ -64,7 +64,6 @@ fun Add(addViewModel: AddViewModel) {
 
     // Single state object for payment data
     var paymentData by remember { mutableStateOf(PaymentData()) }
-    val familyID = addViewModel.getFamilyID() + 1
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -75,13 +74,11 @@ fun Add(addViewModel: AddViewModel) {
             when (tab) {
                 Tab.Student -> StudentContent(
                     students = students,
-                    onAddStudent = { students.add(it) },
-                    familyID = familyID
+                    onAddStudent = { students.add(it) }
                 )
                 Tab.Parents -> ParentContent(
                     parents = parents,
-                    onAddParent = { parents.add(it) },
-                    familyID = familyID
+                    onAddParent = { parents.add(it) }
                 )
                 Tab.Payments -> PaymentContent(
                     paymentData = paymentData,
@@ -101,8 +98,7 @@ fun Add(addViewModel: AddViewModel) {
 @Composable
 private fun StudentContent(
     students: MutableList<Student>,  // Changed to MutableList for adding items
-    onAddStudent: (Student) -> Unit,  // Callback for adding students
-    familyID: Int
+    onAddStudent: (Student) -> Unit  // Callback for adding students
 ) {
 
     Box(modifier = Modifier.fillMaxSize(),
@@ -147,8 +143,7 @@ private fun StudentContent(
                     symbol = Icons.Default.Add,
                     onClick = {
                         val newStudent = Student(
-                            studentId = 1,
-                            familyId = familyID,
+                            familyId = "",
                             firstName = "",
                             lastName = "",
                             birthdate = LocalDate(2000, 1, 1),
@@ -169,8 +164,7 @@ private fun StudentContent(
 @Composable
 private fun ParentContent(
     parents: MutableList<Parent>,  // Changed to MutableList for adding items
-    onAddParent: (Parent) -> Unit,  // Callback for adding students
-    familyID: Int
+    onAddParent: (Parent) -> Unit  // Callback for adding students
 ) {
     Box(modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.TopCenter,
@@ -213,8 +207,7 @@ private fun ParentContent(
                     symbol = Icons.Default.Add,
                     onClick = {
                         val parent = Parent(
-                            parentId = 1,
-                            familyId = familyID,
+                            familyId = "",
                             firstName = "",
                             lastName = "",
                             phoneNumber = ""

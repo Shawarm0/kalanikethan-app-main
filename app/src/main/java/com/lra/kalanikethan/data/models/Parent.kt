@@ -5,8 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Parent(
-    @SerialName("parent_id") val parentId: Int,
-    @SerialName("family_id") val familyId: Int,
+    @SerialName("parent_id") val parentId: Int? = null,
+    @SerialName("family_id") var familyId: String,
     @SerialName("first_name") val firstName: String,
     @SerialName("last_name") val lastName: String,
     @SerialName("phone_number") val phoneNumber: String? = null
