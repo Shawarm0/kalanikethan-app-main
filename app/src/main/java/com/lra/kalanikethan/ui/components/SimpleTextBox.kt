@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -38,6 +40,8 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -62,6 +66,7 @@ import kotlinx.coroutines.launch
  * @param onValueChange Lambda invoked when the text changes.
  * @param leadingIcon Optional leading [ImageVector] icon.
  * @param trailingIcon Optional trailing [ImageVector] icon.
+ * @param trailingIcon2 Optional trailing composable icon.
  * @param clearButton If true, shows a clear button when text is non-empty.
  * @param bringIntoViewRequester Used to scroll the field into view when focused.
  * @param coroutineScope The scope used to launch bring-into-view animations.
@@ -74,10 +79,14 @@ fun SimpleDecoratedTextField(
     onValueChange: (String) -> Unit = {},
     leadingIcon: ImageVector? = null,
     trailingIcon: ImageVector? = null,
+    trailingIcon2: @Composable (() -> Unit)? = null,
     clearButton: Boolean = false,
     bringIntoViewRequester: BringIntoViewRequester,
     coroutineScope: CoroutineScope,
+    passwordHidden: Boolean = false
 ) {
+
+
     // Maintain text state internally
     val text = remember { mutableStateOf(text) }
 
@@ -120,9 +129,9 @@ fun SimpleDecoratedTextField(
             textStyle = MaterialTheme.typography.bodyLarge.copy(
                 color = if (isFocused) Color.Black.copy(alpha = 0.7f) else Color.Gray,
             ),
-            modifier = modifier
-                .wrapContentWidth()
-                .wrapContentHeight()
+            modifier = Modifier
+                .fillMaxWidth()  // Take all available width
+                .heightIn(min = 48.dp)  // Or use fixed height if preferred
                 .padding(0.dp)
                 .clip(RoundedCornerShape(12.dp))
                 .bringIntoViewRequester(bringIntoViewRequester)
@@ -135,6 +144,7 @@ fun SimpleDecoratedTextField(
                     }
                 }
                 .focusTarget(),
+            visualTransformation = if (passwordHidden) PasswordVisualTransformation() else VisualTransformation.None,
             decorationBox = { innerTextField ->
                 Row(
                     modifier = Modifier
@@ -204,6 +214,9 @@ fun SimpleDecoratedTextField(
                             contentDescription = "Trailing Icon",
                             tint = iconColor
                         )
+                    }
+                    if (trailingIcon2 != null) {
+                        trailingIcon2()
                     }
                 }
             }

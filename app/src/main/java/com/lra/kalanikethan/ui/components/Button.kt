@@ -57,13 +57,12 @@ fun Button(
     symbol: ImageVector? = null,
     onClick: () -> Unit = {},
     color: Color = ButtonColor,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier.wrapContentWidth(Alignment.CenterHorizontally)
 ){
     // This is the background
     Surface(
         modifier = modifier
-            .height(30.dp)
-            .wrapContentWidth(Alignment.CenterHorizontally),
+            .height(30.dp),
         onClick = onClick,
         tonalElevation = 4.dp,
         color = color,
@@ -73,11 +72,13 @@ fun Button(
         // This is the content of the button
         Row (
             modifier = Modifier.padding(horizontal = 15.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
         ){
             if(symbol != null){
                 Icon(symbol, contentDescription = "Symbol", modifier = Modifier.size(20.dp), tint = Color.White)
             }
+            Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = text,
                 style = MaterialTheme.typography.titleSmall,

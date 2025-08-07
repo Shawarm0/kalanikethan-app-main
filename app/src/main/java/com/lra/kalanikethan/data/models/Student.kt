@@ -1,10 +1,12 @@
 package com.lra.kalanikethan.data.models
 
+import androidx.compose.runtime.Immutable
 import com.lra.kalanikethan.util.LocalDateSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.time.LocalDate
 
+@Immutable
 @Serializable
 data class Student(
     @SerialName("student_id") val studentId: Int? = null,

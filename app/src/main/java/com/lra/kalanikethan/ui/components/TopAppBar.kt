@@ -3,6 +3,7 @@ package com.lra.kalanikethan.ui.components
 import android.content.res.Configuration
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -109,7 +110,8 @@ fun TopAppBar(
                         Text(
                             sessionPermissions.value.first_name,
                             style = MaterialTheme.typography.displaySmall,
-                            fontSize = 13.sp
+                            fontSize = 13.sp,
+                            color = Color.Black
                         )
                     }
                 }
