@@ -1,5 +1,6 @@
 package com.lra.kalanikethan
 
+import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -29,12 +30,14 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Payment
 import androidx.compose.material.icons.outlined.PersonAdd
 import androidx.compose.material.icons.outlined.PersonSearch
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,6 +54,7 @@ import androidx.navigation.compose.rememberNavController
 import com.lra.kalanikethan.data.models.User
 import com.lra.kalanikethan.data.models.authCompleted
 import com.lra.kalanikethan.data.models.sessionPermissions
+import com.lra.kalanikethan.data.remote.SupabaseClientProvider
 import com.lra.kalanikethan.data.remote.SupabaseClientProvider.client
 import com.lra.kalanikethan.data.repository.Repository
 import com.lra.kalanikethan.ui.components.KalanikethanAppDrawer
@@ -67,12 +71,12 @@ import com.lra.kalanikethan.ui.screens.WhosIn
 import com.lra.kalanikethan.ui.theme.Background
 import com.lra.kalanikethan.ui.theme.KalanikethanTheme
 import com.lra.kalanikethan.util.imeBottomPaddingFraction
+import io.github.jan.supabase.auth.SignOutScope
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.coroutines.launch
-import kotlin.math.sign
-
 /**
  * The main entry point of the app
  *
@@ -88,16 +92,44 @@ class MainActivity : ComponentActivity() {
      * being shut down, this contains the most recent state; otherwise, it is `null`.
      */
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
 
         val repository = Repository()
         val signinViewModel = SignInViewModel(repository)
         val addViewModel = AddViewModel(repository)
 
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
+            val context = LocalContext.current
+            val authState = client.auth.sessionStatus.collectAsState()
+            Log.i("Auth", "Auth state: $authState")
+
+            LaunchedEffect(Unit) {
+                if (!SupabaseClientProvider.isUserStillValid()) {
+                    client.auth.signOut(SignOutScope.GLOBAL)
+                }
+            }
+
             KalanikethanTheme {
-                KalanikethanApp(signinViewModel, addViewModel)
+                when (authState.value) {
+                    is SessionStatus.Authenticated -> {
+                        // User is authenticated
+                        signinViewModel.initializeStudents()
+                        KalanikethanApp(signinViewModel, addViewModel)
+                    }
+                    SessionStatus.Initializing -> {
+                        // Still loading, show loading UI
+                        CircularProgressIndicator()
+                    }
+                    else -> {
+                        // Not authenticated, redirect to AuthActivity
+                        context.startActivity(
+                            Intent(context, AuthActivity::class.java),
+                            ActivityOptions.makeCustomAnimation(context, 0, 0).toBundle()
+                        )
+                        finish()
+                    }
+                }
             }
         }
     }
@@ -108,7 +140,7 @@ class MainActivity : ComponentActivity() {
      */
     override fun onStart() {
         super.onStart()
-        println("MainActivity: onStart() called")
+        enableEdgeToEdge()
     }
 
     /**
@@ -209,21 +241,6 @@ fun KalanikethanApp(signInViewModel: SignInViewModel, addViewModel: AddViewModel
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
 
-    //Retrieves the user that was last logged in on start up
-    LaunchedEffect(Unit) {
-        try{
-            val currentSession = client.auth.retrieveUserForCurrentSession()
-            val newUser : User = client.from("employees").select(columns = Columns.list("first_name, last_name, manager, uid")){
-                filter {
-                    User::uid eq currentSession.id
-                }
-            }.decodeSingle<User>()
-            sessionPermissions.value = newUser
-            authCompleted.value = true
-        } catch (e: Exception){
-            Log.i("Auth", "No session found $e")
-        }
-    }
 
     ModalNavigationDrawer(
         drawerState = drawerState,

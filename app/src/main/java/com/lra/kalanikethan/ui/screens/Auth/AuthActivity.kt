@@ -54,7 +54,7 @@ fun AuthMain(model: AuthActivityViewmodel){
     var password = remember { mutableStateOf("") }
     var passwordHidden by rememberSaveable { mutableStateOf(true) }
     var username = remember { mutableStateOf("Not logged in yet") }
-    val loggedin by authCompleted
+    val loggedin = authCompleted
 
     Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
         if (!loggedin){

@@ -2,10 +2,12 @@ package com.lra.kalanikethan.ui.screens.Auth
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.lra.kalanikethan.MainActivity
 import com.lra.kalanikethan.data.models.User
 import com.lra.kalanikethan.data.models.authCompleted
 import com.lra.kalanikethan.data.models.sessionPermissions
@@ -44,8 +46,11 @@ class AuthActivityViewmodel: ViewModel() {
                 }.decodeSingle<User>()
                 currentUser.value = newUser
                 sessionPermissions.value = newUser
+
+                val intent = Intent(context, MainActivity::class.java)
+                context.startActivity(intent)
                 (context as Activity).finish()
-                authCompleted.value = true
+                authCompleted = true
                 Log.i("Auth", "User data retrieved - First name: ${newUser.first_name}, Last name: ${newUser.last_name}, Manager: ${newUser.manager}")
             } catch (e: Exception){
                 Log.e("Auth", "User data retrieval failed : $e")
@@ -57,7 +62,7 @@ class AuthActivityViewmodel: ViewModel() {
         viewModelScope.launch {
             auth.signOut(SignOutScope.GLOBAL)
             (context as Activity).finish()
-            authCompleted.value = false
+            authCompleted = false
             sessionPermissions.value = User("None", "None", false, "")
         }
     }

@@ -14,4 +14,4 @@ data class User(
 
 var sessionPermissions: MutableState<User> = mutableStateOf(User("None", "", false, ""))
 
-var authCompleted = mutableStateOf(false)
+var authCompleted = false

@@ -45,14 +45,14 @@ class SignInViewModel(
 
     private var debounceJob: Job? = null
 
-    init {
+
+
+    fun initializeStudents() {
         viewModelScope.launch {
             _allStudents.value = repository.getAllStudents()
             filterStudents()
         }
     }
-
-
 
 
 
