@@ -31,6 +31,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import com.lra.kalanikethan.data.models.authCompleted
+import com.lra.kalanikethan.data.models.sessionPermissions
 import com.lra.kalanikethan.ui.theme.KalanikethanTheme
 import kotlin.getValue
 
@@ -53,39 +54,51 @@ fun AuthMain(model: AuthActivityViewmodel){
     var password = remember { mutableStateOf("") }
     var passwordHidden by rememberSaveable { mutableStateOf(true) }
     var username = remember { mutableStateOf("Not logged in yet") }
+    val loggedin by authCompleted
 
     Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
-        Text("Sign in")
-        TextField(
-            value = email.value,
-            onValueChange = { email.value = it },
-            label = {Text("Email")},
-            placeholder = {Text("Enter email here")},
-            singleLine = true
-        )
+        if (!loggedin){
+            Text("Sign in")
+            TextField(
+                value = email.value,
+                onValueChange = { email.value = it },
+                label = {Text("Email")},
+                placeholder = {Text("Enter email here")},
+                singleLine = true
+            )
 
-        TextField(
-            value = password.value,
-            onValueChange = { password.value = it },
-            label = {Text("Password")},
-            placeholder = {Text("Enter password here")},
-            singleLine = true,
-            trailingIcon = {
-                IconButton(onClick = {passwordHidden = !passwordHidden}) {
-                    val visibilityIcon = if (passwordHidden) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                    val description = if (passwordHidden) "Show password" else "Hide password"
-                    Icon(imageVector = visibilityIcon, contentDescription = description)
-                }
-            },
-            visualTransformation = if (passwordHidden) PasswordVisualTransformation() else VisualTransformation.None,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
-        )
-        val context = LocalContext.current
-        Button(onClick = {
-            model.loginUser(email.value, password.value, context)
-        }) {
-            Text("Log in")
+            TextField(
+                value = password.value,
+                onValueChange = { password.value = it },
+                label = {Text("Password")},
+                placeholder = {Text("Enter password here")},
+                singleLine = true,
+                trailingIcon = {
+                    IconButton(onClick = {passwordHidden = !passwordHidden}) {
+                        val visibilityIcon = if (passwordHidden) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                        val description = if (passwordHidden) "Show password" else "Hide password"
+                        Icon(imageVector = visibilityIcon, contentDescription = description)
+                    }
+                },
+                visualTransformation = if (passwordHidden) PasswordVisualTransformation() else VisualTransformation.None,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+            )
+            val context = LocalContext.current
+            Button(onClick = {
+                model.loginUser(email.value, password.value, context)
+            }) {
+                Text("Log in")
+            }
+        } else {
+            Text("Current Account")
+            Text("${sessionPermissions.value.first_name} ${sessionPermissions.value.last_name}")
+            Text("Manager: ${sessionPermissions.value.manager}")
+            val context = LocalContext.current
+            Button(onClick = {model.signOutUser(context)}) {
+                Text("Sign out")
+            }
         }
+
     }
 
 

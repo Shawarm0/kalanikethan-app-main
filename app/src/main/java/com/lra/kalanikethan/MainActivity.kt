@@ -49,6 +49,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.lra.kalanikethan.data.models.User
+import com.lra.kalanikethan.data.models.authCompleted
 import com.lra.kalanikethan.data.models.sessionPermissions
 import com.lra.kalanikethan.data.remote.SupabaseClientProvider.client
 import com.lra.kalanikethan.data.repository.Repository
@@ -218,6 +219,7 @@ fun KalanikethanApp(signInViewModel: SignInViewModel, addViewModel: AddViewModel
                 }
             }.decodeSingle<User>()
             sessionPermissions.value = newUser
+            authCompleted.value = true
         } catch (e: Exception){
             Log.i("Auth", "No session found $e")
         }

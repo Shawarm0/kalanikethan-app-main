@@ -11,6 +11,7 @@ import com.lra.kalanikethan.data.models.authCompleted
 import com.lra.kalanikethan.data.models.sessionPermissions
 import com.lra.kalanikethan.data.remote.SupabaseClientProvider.client
 import com.lra.kalanikethan.data.remote.SupabaseClientProvider.auth
+import io.github.jan.supabase.auth.SignOutScope
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.user.UserInfo
 import io.github.jan.supabase.postgrest.from
@@ -44,10 +45,20 @@ class AuthActivityViewmodel: ViewModel() {
                 currentUser.value = newUser
                 sessionPermissions.value = newUser
                 (context as Activity).finish()
+                authCompleted.value = true
                 Log.i("Auth", "User data retrieved - First name: ${newUser.first_name}, Last name: ${newUser.last_name}, Manager: ${newUser.manager}")
             } catch (e: Exception){
                 Log.e("Auth", "User data retrieval failed : $e")
             }
+        }
+    }
+
+    fun signOutUser(context: Context){
+        viewModelScope.launch {
+            auth.signOut(SignOutScope.GLOBAL)
+            (context as Activity).finish()
+            authCompleted.value = false
+            sessionPermissions.value = User("None", "None", false, "")
         }
     }
 }
