@@ -305,9 +305,8 @@ fun KalanikethanApp(signInViewModel: SignInViewModel, addViewModel: AddViewModel
                 composable(route = Screen.History.route) { History() }
                 composable(route = Screen.Payments.route) { Payments() }
                 composable(route = Screen.Account.route) {
-
                 }
-                composable(route = Screen.Class.route) { SignIn(signInViewModel) }
+                composable(route = Screen.Class.route) {  }
             }
         }
     }

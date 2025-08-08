@@ -11,7 +11,7 @@ data class Channel(
     val tableName: String,
     var listening: Boolean = false
 ) {
-    val dataFlow = channel.postgresChangeFlow<PostgresAction>(schema = "public"){
+    private val dataFlow = channel.postgresChangeFlow<PostgresAction>(schema = "public"){
         table = tableName
     }
     fun getFlow() : Flow<PostgresAction> {
