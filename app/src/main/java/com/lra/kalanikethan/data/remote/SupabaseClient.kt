@@ -13,6 +13,8 @@ import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.realtime.Realtime
 import io.ktor.client.engine.cio.CIO
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 
 const val apiKey = BuildConfig.KEY
 object SupabaseClientProvider {
@@ -57,5 +59,6 @@ object SupabaseClientProvider {
             false
         }
     }
+
 
 }

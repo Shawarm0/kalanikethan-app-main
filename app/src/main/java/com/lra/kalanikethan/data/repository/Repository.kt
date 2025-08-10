@@ -29,24 +29,9 @@ class Repository {
         return count.toInt()
     }
 
-
-
     suspend fun getAllStudents(): List<Student> {
         val students = client.from("students").select().decodeList<Student>()
         return students
-    }
-
-    /**
-     * Initializes the variables and sets up the channel called students-listener
-     * */
-    suspend fun initializeStudentChannel(scope: CoroutineScope, channel: RealtimeChannel, dataFlow: Flow<PostgresAction>): Flow<PostgresAction> {
-        channel.subscribe()
-        return dataFlow
-    }
-
-    suspend fun unsubscribeFromChannel(channel: RealtimeChannel) {
-        println("Unsubscribed")
-        channel.unsubscribe()
     }
 
     suspend fun addFamily(family: Family): String? {

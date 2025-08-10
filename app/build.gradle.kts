@@ -61,6 +61,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
+    implementation(libs.transport.runtime)
     // Imports for nagivation
     val nav_version = "2.9.2"
     implementation("androidx.navigation:navigation-compose:$nav_version")

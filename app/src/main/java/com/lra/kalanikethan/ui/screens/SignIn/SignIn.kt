@@ -35,8 +35,7 @@ fun SignIn(viewModel: SignInViewModel) {
     // Use DisposableEffect to handle channel lifecycle
     LaunchedEffect(Unit) {
         // Create the channel when the composable enters composition
-        viewModel.initializeStudentChannel()
-        viewModel.createStudentChannel(this)
+        viewModel.initialiseStudentsChannel()
     }
 
     Column(

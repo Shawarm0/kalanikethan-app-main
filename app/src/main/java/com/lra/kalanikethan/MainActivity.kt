@@ -102,7 +102,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val context = LocalContext.current
             val authState = client.auth.sessionStatus.collectAsState()
-            Log.i("Auth", "Auth state: $authState")
+            Log.i("Auth-Main", "Auth state: $authState")
 
             LaunchedEffect(Unit) {
                 if (!SupabaseClientProvider.isUserStillValid()) {
