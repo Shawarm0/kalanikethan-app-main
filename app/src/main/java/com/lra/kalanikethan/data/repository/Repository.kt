@@ -1,6 +1,7 @@
 package com.lra.kalanikethan.data.repository
 
 
+import android.util.Log
 import com.lra.kalanikethan.data.models.Family
 import com.lra.kalanikethan.data.models.FamilyWithID
 import com.lra.kalanikethan.data.models.Parent
@@ -35,6 +36,7 @@ class Repository {
     }
 
     suspend fun updateStudent(student: Student) {
+        Log.i("Repository-SignIn", "Student: $student")
         try {
             client.from("students").upsert(student) {
                 onConflict = "student_id"

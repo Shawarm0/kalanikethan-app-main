@@ -1,5 +1,6 @@
 package com.lra.kalanikethan.ui.screens.SignIn
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -45,8 +46,7 @@ class SignInViewModel(
     private val _searchQuery = mutableStateOf("")
     val searchQuery: State<String> = _searchQuery
 
-    // Job reference for debouncing channel updates.
-    private val pendingUpdates = mutableMapOf<Int, Student>()
+    private val signInDebounceJobs = mutableMapOf<Int?, Job>()
     private var debounceJob: Job? = null
 
     /**
@@ -68,25 +68,25 @@ class SignInViewModel(
     }
 
     fun signIn(updatedStudent: Student) {
+        Log.i("Database-SignIn", "Student: $updatedStudent")
 
-        println("Updating student ${updatedStudent}")
+        // Always update UI immediately
         _allStudents.update { list ->
-            list.map { if (it.studentId == updatedStudent.studentId) updatedStudent else it }
-        }
-
-        _displayedStudents.update { list ->
             list.map { if (it.studentId == updatedStudent.studentId) updatedStudent else it }
         }
         filterStudents()
 
-        viewModelScope.launch {
-            delay(1000)
-            val updatesToSend = pendingUpdates.values.toList()
-            pendingUpdates.clear()
-            updatesToSend.forEach {
-                repository.updateStudent(it)
-            }
+        // Cancel any pending DB update for this student
+        signInDebounceJobs[updatedStudent.studentId]?.cancel()
+
+        // Schedule a new DB update after 1 second of inactivity
+        val job = viewModelScope.launch {
+            delay(1000) // wait to see if spam stops
+            repository.updateStudent(updatedStudent) // update DB once
+            signInDebounceJobs.remove(updatedStudent.studentId) // cleanup
         }
+
+        signInDebounceJobs[updatedStudent.studentId] = job
     }
 
 
