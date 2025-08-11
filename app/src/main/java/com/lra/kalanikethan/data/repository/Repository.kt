@@ -4,8 +4,10 @@ package com.lra.kalanikethan.data.repository
 import com.lra.kalanikethan.data.models.Family
 import com.lra.kalanikethan.data.models.FamilyWithID
 import com.lra.kalanikethan.data.models.Parent
+import com.lra.kalanikethan.data.models.PaymentPlan
 import com.lra.kalanikethan.data.models.Student
 import com.lra.kalanikethan.data.remote.SupabaseClientProvider
+import com.lra.kalanikethan.ui.screens.Add.PaymentData
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Count
@@ -65,5 +67,9 @@ class Repository {
 
     suspend fun addParent(parent: Parent) {
         client.from("parents").insert(parent)
+    }
+
+    suspend fun addPaymentData(paymentPlan: PaymentPlan){
+        client.from("payment_plan").insert(paymentPlan)
     }
 }

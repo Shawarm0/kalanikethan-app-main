@@ -330,10 +330,11 @@ private fun PaymentContent(
 
                     SimpleDecoratedTextField(
                         text = paymentData.paymentDate,
-                        placeholder = "DD/MM/YYYY",
+                        placeholder = "YYYY-MM-DD",
                         label = "Enter Payment Date",
                         onValueChange = {
-                            onPaymentDataChanged(paymentData.copy(paymentDate = it))                        },
+                            onPaymentDataChanged(paymentData.copy(paymentDate = it))
+                        },
                         bringIntoViewRequester = bringIntoViewRequester,
                         coroutineScope = coroutineScope,
                     )

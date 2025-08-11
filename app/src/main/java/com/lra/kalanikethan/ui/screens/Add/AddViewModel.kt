@@ -6,9 +6,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lra.kalanikethan.data.models.Family
 import com.lra.kalanikethan.data.models.Parent
+import com.lra.kalanikethan.data.models.PaymentPlan
 import com.lra.kalanikethan.data.models.Student
 import com.lra.kalanikethan.data.repository.Repository
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
 
 class AddViewModel(
     private val repository: Repository
@@ -23,6 +25,8 @@ class AddViewModel(
         viewModelScope.launch {
             try{
                 id = repository.addFamily(family)
+                val plan = PaymentPlan(id as String, paymentData.amount.toFloat(), LocalDate.parse(paymentData.paymentDate), paymentData.paymentId)
+                repository.addPaymentData(plan)
                 for (parent in parents) {
                     parent.familyId = id as String
                     repository.addParent(parent)

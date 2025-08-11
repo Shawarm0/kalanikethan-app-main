@@ -1,5 +1,6 @@
 package com.lra.kalanikethan.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -44,6 +45,9 @@ import com.lra.kalanikethan.ui.theme.LightBoxBackground
 import com.lra.kalanikethan.ui.theme.PrimaryLightColor
 import com.lra.kalanikethan.ui.theme.SuccessColor
 import com.lra.kalanikethan.ui.theme.UnselectedButtonText
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.number
+import java.time.format.DateTimeFormatter
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -71,7 +75,7 @@ fun StudentBox(
     var currentData by remember { mutableStateOf(initialData) }
     var tempData by remember { mutableStateOf(initialData.copy()) }
 
-
+    val birthdate = remember {mutableStateOf("")}
 
     Box(modifier = Modifier
         .shadow(
@@ -130,7 +134,7 @@ fun StudentBox(
                         placeholder = "Text",
                         text = tempData.birthdate.toString(),
                         onValueChange = {
-                            // Figure out how to change date
+                            birthdate.value = it
                         },
                         label = "Birthday",
                         bringIntoViewRequester = bringIntoViewRequester,
@@ -203,6 +207,9 @@ fun StudentBox(
                         )
                         Button("Confirm", Icons.Default.Check,
                             onClick = {
+                                val birthdayDate = LocalDate.parse(birthdate.value)
+                                Log.i("Create family", "Student birthday : Day - ${birthdayDate.day}, Month - ${birthdayDate.month.number}, Year - ${birthdayDate.year}")
+                                tempData = tempData.copy(birthdate = LocalDate.parse(birthdate.value))
                                 currentData = tempData.copy()
                                 editableState = false
                                 onConfirm(tempData)
