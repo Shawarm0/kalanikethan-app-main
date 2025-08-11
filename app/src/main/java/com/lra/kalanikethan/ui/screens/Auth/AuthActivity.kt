@@ -1,6 +1,5 @@
 package com.lra.kalanikethan.ui.screens.Auth
 
-import android.R.attr.top
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -18,7 +17,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.relocation.BringIntoViewRequester
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Visibility
@@ -28,7 +26,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -42,9 +39,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lra.kalanikethan.data.models.User
@@ -58,10 +52,17 @@ import com.lra.kalanikethan.ui.theme.KalanikethanTheme
 import com.lra.kalanikethan.ui.theme.SuccessColor
 import com.lra.kalanikethan.ui.theme.UnselectedButtonText
 import io.github.jan.supabase.auth.auth
-import kotlin.getValue
 
+/**
+ * Activity responsible for handling user authentication (Login / Account info).
+ *
+ * Displays a login form if the user is not authenticated, or account details if authenticated.
+ */
 class AuthActivity : ComponentActivity() {
+
+    // ViewModel responsible for authentication logic
     val model: AuthActivityViewmodel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -70,20 +71,26 @@ class AuthActivity : ComponentActivity() {
             }
         }
     }
+
     override fun onDestroy() {
-        // Reset loading state when activity is destroyed
         super.onDestroy()
-        model.loading = false
+        model.loading = false // Reset loading state on destroy
     }
 }
 
 
 
-
+/**
+ * Main authentication UI.
+ *
+ * Shows login form when the user is signed out, and account info when signed in.
+ *
+ * @param model The [AuthActivityViewmodel] used for authentication logic.
+ */
 @Composable
 fun AuthMain(model: AuthActivityViewmodel) {
-    var email = remember { mutableStateOf("") }
-    var password = remember { mutableStateOf("") }
+    val email = remember { mutableStateOf("") }
+    val password = remember { mutableStateOf("") }
     val loggedin = authCompleted
     val context = LocalContext.current
 
@@ -117,6 +124,13 @@ fun AuthMain(model: AuthActivityViewmodel) {
 
 
 
+/**
+ * Displays user account information when logged in.
+ *
+ * @param sessionPermissions The current user's permissions and details.
+ * @param model The [AuthActivityViewmodel] for authentication state.
+ * @param onSignOut Action to perform on sign-out.
+ */
 @Composable
 fun LoggedIn(
     sessionPermissions: MutableState<User>,
@@ -145,34 +159,18 @@ fun LoggedIn(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalAlignment = Alignment.Start
             ) {
+
                 Text(
                     text = "Account Name: ${sessionPermissions.value.first_name} ${sessionPermissions.value.last_name}",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 14.sp,
-                        lineHeight = 21.sp,
-                        color = UnselectedButtonText
-                    )
+                    style = infoTextStyle()
                 )
-
                 Text(
                     text = "Account Email: ${client.auth.currentSessionOrNull()?.user?.email}",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 14.sp,
-                        lineHeight = 21.sp,
-                        color = UnselectedButtonText
-                    )
+                    style = infoTextStyle()
                 )
-
                 Text(
                     text = "Manager: ${sessionPermissions.value.manager}",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 14.sp,
-                        lineHeight = 21.sp,
-                        color = UnselectedButtonText
-                    )
+                    style = infoTextStyle()
                 )
 
                 Button(
@@ -190,6 +188,14 @@ fun LoggedIn(
 
 
 
+/**
+ * Displays the login form when the user is signed out.
+ *
+ * @param email Mutable state for the email input.
+ * @param password Mutable state for the password input.
+ * @param model The [AuthActivityViewmodel] handling authentication logic.
+ * @param onLogin Action to perform when the login button is clicked.
+ */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SignedOut(
@@ -287,8 +293,6 @@ fun SignedOut(
                     passwordHidden = passwordHidden
                 )
             }
-
-
             Button(
                 text = "Login",
                 symbol = Icons.Default.Check,
@@ -297,8 +301,14 @@ fun SignedOut(
                 modifier = Modifier.width(173.dp)
             )
         }
-
-
     }
-
 }
+
+/** Common style for account info text */
+@Composable
+private fun infoTextStyle() = MaterialTheme.typography.titleMedium.copy(
+    fontWeight = FontWeight.ExtraBold,
+    fontSize = 14.sp,
+    lineHeight = 21.sp,
+    color = UnselectedButtonText
+)

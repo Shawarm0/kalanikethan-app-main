@@ -36,9 +36,4 @@ class AddViewModel(
             }
         }
     }
-
-
-
-
-
 }

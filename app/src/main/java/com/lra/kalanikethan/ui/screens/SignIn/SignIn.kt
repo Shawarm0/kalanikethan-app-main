@@ -22,6 +22,17 @@ import androidx.compose.ui.unit.dp
 import com.lra.kalanikethan.ui.components.SimpleDecoratedTextField
 import com.lra.kalanikethan.ui.components.StudentInfoCard
 
+
+/**
+ * The sign in screen for the app.
+ *
+ * This screen displays a list of students and allows users to sign in or sign out.
+ * It uses a [LazyColumn] to display the list of students and a [SimpleDecoratedTextField]
+ * It uses [LaunchedEffect] to initialise the students realTime channel in the [SignInViewModel]
+ *
+ * @param viewModel The view model for the sign in screen.
+ */
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SignIn(viewModel: SignInViewModel) {

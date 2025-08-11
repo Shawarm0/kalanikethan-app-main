@@ -1,5 +1,6 @@
 package com.lra.kalanikethan
 
+
 import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Bundle
@@ -51,9 +52,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.lra.kalanikethan.data.models.User
-import com.lra.kalanikethan.data.models.authCompleted
-import com.lra.kalanikethan.data.models.sessionPermissions
 import com.lra.kalanikethan.data.remote.SupabaseClientProvider
 import com.lra.kalanikethan.data.remote.SupabaseClientProvider.client
 import com.lra.kalanikethan.data.repository.Repository
@@ -74,19 +72,19 @@ import com.lra.kalanikethan.util.imeBottomPaddingFraction
 import io.github.jan.supabase.auth.SignOutScope
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.status.SessionStatus
-import io.github.jan.supabase.postgrest.from
-import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.coroutines.launch
 /**
  * The main entry point of the app
  *
- * Sets up the navigation graph and handles initial app configurations
  */
 class MainActivity : ComponentActivity() {
     /**
      * Called when the activity is first created.
-     * This is where you should perform initial setup such as inflating layouts,
-     * initializing components, and setting up Compose content or navigation.
+     *
+     * Initialised repository and view models.
+     * Checks for Authenticated user in the current session:
+     *      - If not authenticated, redirects to  [Kalanikethan]
+     *      - If authenticated, redirects to KalanikethanApp
      *
      * @param savedInstanceState If the activity is being re-initialized after previously
      * being shut down, this contains the most recent state; otherwise, it is `null`.
@@ -96,7 +94,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         val repository = Repository()
-        val signinViewModel = SignInViewModel(repository)
+        val signInViewModel = SignInViewModel(repository)
         val addViewModel = AddViewModel(repository)
 
         setContent {
@@ -114,8 +112,8 @@ class MainActivity : ComponentActivity() {
                 when (authState.value) {
                     is SessionStatus.Authenticated -> {
                         // User is authenticated
-                        signinViewModel.initializeStudents()
-                        KalanikethanApp(signinViewModel, addViewModel)
+                        signInViewModel.initializeStudents()
+                        KalanikethanApp(signInViewModel, addViewModel)
                     }
                     SessionStatus.Initializing -> {
                         // Still loading, show loading UI
