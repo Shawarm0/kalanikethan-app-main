@@ -58,6 +58,16 @@ class SignInViewModel(
     }
 
     /**
+     * Removes the current search query.
+     */
+    fun removeSearchQuery() {
+        _searchQuery.value = ""
+        filterStudents()
+    }
+
+
+
+    /**
      * Updates the current search query and triggers filtering.
      *
      * @param query The new search term entered by the user.

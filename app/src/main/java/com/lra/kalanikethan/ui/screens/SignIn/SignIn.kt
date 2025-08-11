@@ -42,11 +42,11 @@ fun SignIn(viewModel: SignInViewModel) {
     val coroutineScope = rememberCoroutineScope()
 
 
-
     // Use DisposableEffect to handle channel lifecycle
     LaunchedEffect(Unit) {
         // Create the channel when the composable enters composition
         viewModel.initialiseStudentsChannel()
+        viewModel.removeSearchQuery()
     }
 
     Column(
