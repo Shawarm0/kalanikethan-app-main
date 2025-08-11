@@ -9,10 +9,13 @@ import com.lra.kalanikethan.data.remote.SupabaseClientProvider
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Count
+import io.github.jan.supabase.postgrest.query.request.UpsertRequestBuilder
 import io.github.jan.supabase.realtime.PostgresAction
 import io.github.jan.supabase.realtime.RealtimeChannel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 
 class Repository {
     // Defines the client
@@ -28,6 +31,19 @@ class Repository {
             .countOrNull()!!
         return count.toInt()
     }
+
+    suspend fun updateStudent(student: Student) {
+        try {
+            client.from("students").upsert(student) {
+                onConflict = "student_id"
+            }
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
 
     suspend fun getAllStudents(): List<Student> {
         val students = client.from("students").select().decodeList<Student>()

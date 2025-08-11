@@ -10,6 +10,7 @@ import com.lra.kalanikethan.data.repository.Repository
 import io.github.jan.supabase.realtime.PostgresAction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -45,6 +46,8 @@ class SignInViewModel(
     val searchQuery: State<String> = _searchQuery
 
     // Job reference for debouncing channel updates.
+
+    private val pendingUpdates = mutableMapOf<Int, Student>()
     private var debounceJob: Job? = null
 
     /**
@@ -63,6 +66,29 @@ class SignInViewModel(
     fun removeSearchQuery() {
         _searchQuery.value = ""
         filterStudents()
+    }
+
+    fun signIn(updatedStudent: Student) {
+
+        println("Updating student ${updatedStudent}")
+        _allStudents.update { list ->
+            list.map { if (it.studentId == updatedStudent.studentId) updatedStudent else it }
+        }
+
+        _displayedStudents.update { list ->
+            list.map { if (it.studentId == updatedStudent.studentId) updatedStudent else it }
+        }
+        filterStudents()
+
+        debounceJob?.cancel()
+        debounceJob = viewModelScope.launch {
+            delay(1000)
+            val updatesToSend = pendingUpdates.values.toList()
+            pendingUpdates.clear()
+            updatesToSend.forEach {
+                repository.updateStudent(it)
+            }
+        }
     }
 
 

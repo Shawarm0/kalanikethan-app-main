@@ -48,7 +48,7 @@ import java.time.LocalDate
  */
 fun StudentInfoCard(
     studentData: Student,
-    onSignInToggle: (studentId: Int?) -> Unit,
+    onSignInToggle: (Student) -> Unit,
     onAbsentClick: (studentId: Int?) -> Unit,
     onEditClick: (studentId: Int?) -> Unit,
 ) {
@@ -212,7 +212,7 @@ fun StudentInfoCard(
                         text = signedInText,
                         symbol = Icons.Default.Check,
                         onClick = {
-                            onSignInToggle(studentData.studentId)
+                            onSignInToggle(studentData.copy(signedIn = !studentData.signedIn))
                         },
                         modifier = Modifier.wrapContentSize(),
                     )
