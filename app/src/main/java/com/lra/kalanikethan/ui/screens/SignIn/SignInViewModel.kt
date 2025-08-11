@@ -46,7 +46,6 @@ class SignInViewModel(
     val searchQuery: State<String> = _searchQuery
 
     // Job reference for debouncing channel updates.
-
     private val pendingUpdates = mutableMapOf<Int, Student>()
     private var debounceJob: Job? = null
 
@@ -80,8 +79,7 @@ class SignInViewModel(
         }
         filterStudents()
 
-        debounceJob?.cancel()
-        debounceJob = viewModelScope.launch {
+        viewModelScope.launch {
             delay(1000)
             val updatesToSend = pendingUpdates.values.toList()
             pendingUpdates.clear()

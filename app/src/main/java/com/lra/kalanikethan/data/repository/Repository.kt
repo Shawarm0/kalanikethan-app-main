@@ -37,10 +37,8 @@ class Repository {
             client.from("students").upsert(student) {
                 onConflict = "student_id"
             }
-            true
         } catch (e: Exception) {
             e.printStackTrace()
-            false
         }
     }
 
