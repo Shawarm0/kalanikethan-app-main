@@ -16,11 +16,13 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -46,6 +48,8 @@ import com.lra.kalanikethan.ui.theme.PrimaryLightColor
 import com.lra.kalanikethan.ui.theme.SuccessColor
 import com.lra.kalanikethan.ui.theme.UnselectedButtonText
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.format
+import kotlinx.datetime.format.char
 import kotlinx.datetime.number
 import java.time.format.DateTimeFormatter
 
@@ -74,6 +78,8 @@ fun StudentBox(
 
     var currentData by remember { mutableStateOf(initialData) }
     var tempData by remember { mutableStateOf(initialData.copy()) }
+
+    val formatter = LocalDate.Format { day(); char('/'); monthNumber(); char('/') ; year() }
 
     val birthdate = remember {mutableStateOf("")}
 
@@ -131,16 +137,20 @@ fun StudentBox(
                     )
 
                     SimpleDecoratedTextField(
-                        placeholder = "Text",
-                        text = tempData.birthdate.toString(),
+                        placeholder = "DD/MM/YYYY",
+                        text = if (tempData.birthdate.toString() == "2000-01-01") "" else tempData.birthdate.format(formatter),
                         onValueChange = {
                             birthdate.value = it
                         },
+                        isLeadingIconClickable = true,
+                        leadingIcon = Icons.Default.CalendarMonth,
                         label = "Birthday",
                         bringIntoViewRequester = bringIntoViewRequester,
                         coroutineScope = coroutineScope
                     )
                 }
+
+
 
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     Text("Classes: ", style = MaterialTheme.typography.titleSmall)
@@ -207,9 +217,9 @@ fun StudentBox(
                         )
                         Button("Confirm", Icons.Default.Check,
                             onClick = {
-                                val birthdayDate = LocalDate.parse(birthdate.value)
-                                Log.i("Create family", "Student birthday : Day - ${birthdayDate.day}, Month - ${birthdayDate.month.number}, Year - ${birthdayDate.year}")
-                                tempData = tempData.copy(birthdate = LocalDate.parse(birthdate.value))
+                                tempData = tempData.copy(birthdate = LocalDate.parse(birthdate.value, formatter))
+
+
                                 currentData = tempData.copy()
                                 editableState = false
                                 onConfirm(tempData)
@@ -220,7 +230,7 @@ fun StudentBox(
                 }
             } else {
                 Text("Name: ${currentData.firstName} ${currentData.lastName}", style = MaterialTheme.typography.bodyMedium)
-                Text("Birthdate: ${currentData.birthdate}", style = MaterialTheme.typography.bodyMedium)
+                Text("Birthdate: ${currentData.birthdate.format(formatter)}", style = MaterialTheme.typography.bodyMedium)
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)){
                     Text("Classes: ")
                     if (currentData.dance) {

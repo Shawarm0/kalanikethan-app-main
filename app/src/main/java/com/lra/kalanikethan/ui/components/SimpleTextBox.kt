@@ -3,6 +3,7 @@ package com.lra.kalanikethan.ui.components
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -29,9 +30,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,7 +51,13 @@ import androidx.compose.ui.unit.sp
 import com.lra.kalanikethan.ui.theme.LightBoxBackground
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-
+import kotlinx.datetime.LocalDate
+import java.text.SimpleDateFormat
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Date
+import java.util.Locale
+import kotlin.time.Instant
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -78,12 +87,13 @@ fun SimpleDecoratedTextField(
     label: String? = null,
     onValueChange: (String) -> Unit = {},
     leadingIcon: ImageVector? = null,
+    isLeadingIconClickable: Boolean = false,
     trailingIcon: ImageVector? = null,
     trailingIcon2: @Composable (() -> Unit)? = null,
     clearButton: Boolean = false,
     bringIntoViewRequester: BringIntoViewRequester,
     coroutineScope: CoroutineScope,
-    passwordHidden: Boolean = false
+    passwordHidden: Boolean = false,
 ) {
 
 
@@ -95,6 +105,8 @@ fun SimpleDecoratedTextField(
 
     // Track whether the text field is currently focused
     val isFocused = interactionSource.collectIsFocusedAsState().value
+
+    var showDatePicker by remember { mutableStateOf(false) }
 
     // Adjust border and icon color based on focus state
     val borderColor = if (isFocused) Color.Black.copy(alpha = 0.7f) else Color(0xFFDCDEDD)
@@ -163,10 +175,17 @@ fun SimpleDecoratedTextField(
 
                     // Optional leading icon
                     if (leadingIcon != null) {
+
                         Icon(
+                            modifier = if (isLeadingIconClickable) Modifier.clickable(
+                                onClick = {
+                                    showDatePicker = true
+                                }
+                            ) else Modifier,
                             imageVector = leadingIcon,
                             contentDescription = "Leading Icon",
                             tint = iconColor
+
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                     }
@@ -221,6 +240,27 @@ fun SimpleDecoratedTextField(
                 }
             }
         )
+
+                if (showDatePicker) {
+                    DatePickerModal(
+                        onDateSelected = { newDateMillis ->
+                            newDateMillis?.let { millis ->
+                                val date = java.time.Instant.ofEpochMilli(millis)
+                                    .atZone(ZoneId.systemDefault())
+                                    .toLocalDate()
+
+                                val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+                                text.value = date.format(formatter)
+                                onValueChange(text.value)
+                            }
+                            showDatePicker = false // Hide the modal after selection
+                        },
+                        onDismiss = {
+                            showDatePicker = false // Hide the modal if dismissed
+                        }
+                    )
+                }
+
     }
 }
 

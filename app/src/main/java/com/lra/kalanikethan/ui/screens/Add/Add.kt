@@ -17,6 +17,7 @@ import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
@@ -46,6 +47,7 @@ import com.lra.kalanikethan.ui.components.TabBar
 import com.lra.kalanikethan.ui.theme.SuccessColor
 import com.lra.kalanikethan.ui.theme.UnselectedButtonText
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.format.char
 
 data class PaymentData(
     val paymentId: String = "",
@@ -330,8 +332,10 @@ private fun PaymentContent(
 
                     SimpleDecoratedTextField(
                         text = paymentData.paymentDate,
-                        placeholder = "YYYY-MM-DD",
+                        placeholder = "DD/MM/YYYY",
                         label = "Enter Payment Date",
+                        isLeadingIconClickable = true,
+                        leadingIcon = Icons.Default.CalendarMonth,
                         onValueChange = {
                             onPaymentDataChanged(paymentData.copy(paymentDate = it))
                         },
