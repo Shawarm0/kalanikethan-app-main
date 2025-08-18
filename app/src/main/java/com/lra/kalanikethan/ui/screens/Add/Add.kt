@@ -121,9 +121,9 @@ private fun StudentContent(
                     },
                     deleteStudent = {
                         students.remove(student)
-
                     },
-                    editable = student.firstName == "" && student.lastName == ""
+                    editable = student.firstName == "" && student.lastName == "",
+                    deleteIfCancelledOnFirstEdit = true
                 )
             }
         }
@@ -238,6 +238,17 @@ private fun PaymentContent(
     val bringIntoViewRequester = remember { BringIntoViewRequester() }
     val coroutineScope = rememberCoroutineScope()
 
+    val nameError = remember { mutableStateOf(false) }
+    val idError = remember { mutableStateOf(false) }
+    val emailError = remember { mutableStateOf(false) }
+    val dateError = remember { mutableStateOf(false) }
+    val amountError = remember { mutableStateOf(false) }
+
+    val emptyErrorMsg = "Cannot be empty"
+    val invalidDateMsg = "Invalid date (DD/MM/YYYY)"
+    val amountTypeMsg = "Input a number"
+
+
     Box(
          modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -293,10 +304,11 @@ private fun PaymentContent(
                             label = "Family Name",
                             onValueChange = {
                                 onPaymentDataChanged(paymentData.copy(familyName = it))
-
                             },
                             bringIntoViewRequester = bringIntoViewRequester,
-                            coroutineScope = coroutineScope
+                            coroutineScope = coroutineScope,
+                            error = nameError.value,
+                            errorMessage = emptyErrorMsg
                         )
 
                     SimpleDecoratedTextField(
@@ -305,10 +317,11 @@ private fun PaymentContent(
                         label = "Payment ID",
                         onValueChange = {
                             onPaymentDataChanged(paymentData.copy(paymentId = it))
-
                         },
                         bringIntoViewRequester = bringIntoViewRequester,
-                        coroutineScope = coroutineScope
+                        coroutineScope = coroutineScope,
+                        error = idError.value,
+                        errorMessage = emptyErrorMsg
                     )
 
                     SimpleDecoratedTextField(
@@ -319,7 +332,9 @@ private fun PaymentContent(
                             onPaymentDataChanged(paymentData.copy(email = it))
                         },
                         bringIntoViewRequester = bringIntoViewRequester,
-                        coroutineScope = coroutineScope
+                        coroutineScope = coroutineScope,
+                        error = emailError.value,
+                        errorMessage = emptyErrorMsg
                     )
                 }
 
@@ -341,6 +356,8 @@ private fun PaymentContent(
                         },
                         bringIntoViewRequester = bringIntoViewRequester,
                         coroutineScope = coroutineScope,
+                        error = dateError.value,
+                        errorMessage = invalidDateMsg
                     )
 
                     SimpleDecoratedTextField(
@@ -352,6 +369,9 @@ private fun PaymentContent(
                         },
                         bringIntoViewRequester = bringIntoViewRequester,
                         coroutineScope = coroutineScope,
+                        error = amountError.value,
+                        errorMessage = emptyErrorMsg,
+                        floatsOnly = true
                     )
                 }
             }
@@ -361,7 +381,33 @@ private fun PaymentContent(
                 text = "Create Family",
                 symbol = Icons.Default.Check,
                 onClick = {
-                    createFamily()
+                    if (paymentData.familyName == ""){
+                        nameError.value = true
+                    } else {
+                        nameError.value = false
+                    }
+                    if (paymentData.paymentId == ""){
+                        idError.value = true
+                    } else {
+                        idError.value = false
+                    }
+                    if (paymentData.email == ""){
+                        emailError.value = true
+                    } else {
+                        emailError.value = false
+                    }
+                    try{
+                        LocalDate.parse(paymentData.paymentDate, LocalDate.Format { day(); char('/'); monthNumber(); char('/') ; year() })
+                        dateError.value = false
+                    } catch (e: Exception) {
+                        dateError.value = true
+                    }
+                    if (paymentData.amount == ""){
+                        amountError.value = true
+                    } else {
+                        amountError.value = false
+                    }
+                    if(!nameError.value && !idError.value && !emailError.value && !dateError.value && !amountError.value) createFamily()
                 },
                 color = SuccessColor,
                 modifier = Modifier.fillMaxWidth()

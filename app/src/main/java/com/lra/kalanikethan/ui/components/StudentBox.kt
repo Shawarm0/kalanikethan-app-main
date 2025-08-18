@@ -53,7 +53,9 @@ import kotlinx.datetime.format.char
 import kotlinx.datetime.number
 import java.time.format.DateTimeFormatter
 
-
+private class EmptyFirstName : Exception("First name text field is empty")
+private class EmptyLastName : Exception("Last name text field is empty")
+private class InvalidDate : Exception("Date value is invalid and cannot be parsed")
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 /**
@@ -62,13 +64,15 @@ import java.time.format.DateTimeFormatter
  * @param initialData the initial data of the student in the form of a [Student] data object
  * @param onConfirm a lambda that is called when the confirm button is clicked
  * @param editable a boolean that determines if the studentbox is editable or not
+ * @param deleteIfCancelledOnFirstEdit if a student box is being edited for the first time and is cancelled, if this is true the student will instead be deleted
  */
 fun StudentBox(
     initialData: Student,
     onConfirm: (Student) -> Unit = {},
     deleteStudent: () -> Unit = {},
     viewHistory: Boolean = false,
-    editable: Boolean = false
+    editable: Boolean = false,
+    deleteIfCancelledOnFirstEdit: Boolean = false
 ){
     // For the text boxes
     val bringIntoViewRequester = remember { BringIntoViewRequester() }
@@ -76,12 +80,22 @@ fun StudentBox(
 
     var editableState by remember { mutableStateOf(editable) }
 
+    val firstEdit = remember { mutableStateOf(true) }
     var currentData by remember { mutableStateOf(initialData) }
     var tempData by remember { mutableStateOf(initialData.copy()) }
 
     val formatter = LocalDate.Format { day(); char('/'); monthNumber(); char('/') ; year() }
 
     val birthdate = remember {mutableStateOf("")}
+
+    val dateError = remember { mutableStateOf(false) }
+    val firstNameError = remember { mutableStateOf(false) }
+    val lastNameError = remember { mutableStateOf(false) }
+
+    val dateErrorMsg = remember { mutableStateOf("") }
+    val firstNameErrorMsg = remember { mutableStateOf("") }
+    val lastNameErrorMsg = remember { mutableStateOf("") }
+
 
     Box(modifier = Modifier
         .shadow(
@@ -122,7 +136,9 @@ fun StudentBox(
                         },
                         label = "First Name",
                         bringIntoViewRequester = bringIntoViewRequester,
-                        coroutineScope = coroutineScope
+                        coroutineScope = coroutineScope,
+                        error = firstNameError.value,
+                        errorMessage = firstNameErrorMsg.value
                     )
 
                     SimpleDecoratedTextField(
@@ -133,7 +149,9 @@ fun StudentBox(
                         },
                         label = "Last Name",
                         bringIntoViewRequester = bringIntoViewRequester,
-                        coroutineScope = coroutineScope
+                        coroutineScope = coroutineScope,
+                        error = lastNameError.value,
+                        errorMessage = lastNameErrorMsg.value
                     )
 
                     SimpleDecoratedTextField(
@@ -146,7 +164,9 @@ fun StudentBox(
                         leadingIcon = Icons.Default.CalendarMonth,
                         label = "Birthday",
                         bringIntoViewRequester = bringIntoViewRequester,
-                        coroutineScope = coroutineScope
+                        coroutineScope = coroutineScope,
+                        error = dateError.value,
+                        errorMessage = dateErrorMsg.value
                     )
                 }
 
@@ -210,19 +230,50 @@ fun StudentBox(
                         Button("Cancel",
                             Icons.Default.Clear,
                             onClick = {
-                                tempData = currentData.copy()
-                                editableState = false
-                                      },
+                                if(firstEdit.value && deleteIfCancelledOnFirstEdit){
+                                    deleteStudent()
+                                } else {
+                                    tempData = currentData.copy()
+                                    editableState = false
+                                }
+                            },
                             color = ButtonColor
                         )
                         Button("Confirm", Icons.Default.Check,
                             onClick = {
-                                tempData = tempData.copy(birthdate = LocalDate.parse(birthdate.value, formatter))
+                                try{
+                                    tempData = tempData.copy(birthdate = LocalDate.parse(birthdate.value, formatter))
+                                    dateError.value = false
+                                } catch (e : Exception){
+                                    Log.e("Add Family", "Invalid date : $e")
+                                    dateError.value = true
+                                    dateErrorMsg.value = "Invalid date (DD/MM/YYYY)"
+                                }
 
+                                try {
+                                    if (tempData.firstName.isEmpty()) throw EmptyFirstName()
+                                    firstNameError.value = false
+                                } catch (e : EmptyFirstName){
+                                    Log.e("Add Family", "First name text field is empty")
+                                    firstNameError.value = true
+                                    firstNameErrorMsg.value = "Cannot be left empty"
+                                }
 
-                                currentData = tempData.copy()
-                                editableState = false
-                                onConfirm(tempData)
+                                try {
+                                    if (tempData.lastName.isEmpty()) throw EmptyLastName()
+                                    lastNameError.value = false
+                                } catch (e : EmptyLastName){
+                                    Log.e("Add Family", "Last name text field is empty")
+                                    lastNameError.value = true
+                                    lastNameErrorMsg.value = "Cannot be left empty"
+                                }
+
+                                if(!dateError.value && !firstNameError.value && !lastNameError.value){
+                                    firstEdit.value = false
+                                    currentData = tempData.copy()
+                                    editableState = false
+                                    onConfirm(tempData)
+                                }
                             },
                             color = SuccessColor
                         )

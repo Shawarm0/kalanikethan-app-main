@@ -44,7 +44,8 @@ fun ParentBox(
     onConfirm: (Parent) -> Unit = {},
     deleteParent: () -> Unit = {},
     viewHistory: Boolean = false,
-    editable: Boolean = false
+    editable: Boolean = false,
+    deleteIfCancelledOnFirstEdit: Boolean = false
 ) {
     // For the text boxes
     val bringIntoViewRequester = remember { BringIntoViewRequester() }
@@ -52,9 +53,16 @@ fun ParentBox(
 
     var editableState by remember { mutableStateOf(editable) }
 
+    val firstEdit = remember { mutableStateOf(true) }
+
     var currentData by remember { mutableStateOf(initialData) }
     var tempData by remember { mutableStateOf(initialData.copy()) }
 
+    val firstNameError = remember { mutableStateOf(false) }
+    val lastNameError = remember { mutableStateOf(false) }
+    val numberError = remember { mutableStateOf(false) }
+
+    val emptyErrorMsg = "Cannot be empty"
 
     Box(modifier = Modifier
         .shadow(
@@ -95,7 +103,9 @@ fun ParentBox(
                         },
                         label = "First Name",
                         bringIntoViewRequester = bringIntoViewRequester,
-                        coroutineScope = coroutineScope
+                        coroutineScope = coroutineScope,
+                        error = firstNameError.value,
+                        errorMessage = emptyErrorMsg
                     )
 
                     SimpleDecoratedTextField(
@@ -106,7 +116,9 @@ fun ParentBox(
                         },
                         label = "Last Name",
                         bringIntoViewRequester = bringIntoViewRequester,
-                        coroutineScope = coroutineScope
+                        coroutineScope = coroutineScope,
+                        error = lastNameError.value,
+                        errorMessage = emptyErrorMsg
                     )
 
                     SimpleDecoratedTextField(
@@ -117,7 +129,9 @@ fun ParentBox(
                         },
                         label = "Number",
                         bringIntoViewRequester = bringIntoViewRequester,
-                        coroutineScope = coroutineScope
+                        coroutineScope = coroutineScope,
+                        error = numberError.value,
+                        errorMessage = emptyErrorMsg
                     )
 
 
@@ -138,17 +152,41 @@ fun ParentBox(
                             "Cancel",
                             Icons.Default.Clear,
                             onClick = {
-                                tempData = currentData.copy()
-                                editableState = false
+                                if(firstEdit.value && deleteIfCancelledOnFirstEdit){
+                                    deleteParent()
+                                } else {
+                                    tempData = currentData.copy()
+                                    editableState = false
+                                }
                             },
                             color = ButtonColor
                         )
                         Button(
                             "Confirm", Icons.Default.Check,
                             onClick = {
-                                currentData = tempData.copy()
-                                editableState = false
-                                onConfirm(tempData)
+                                if(tempData.firstName == ""){
+                                    firstNameError.value = true
+                                } else {
+                                    firstNameError.value = false
+                                }
+
+                                if(tempData.lastName == ""){
+                                    lastNameError.value = true
+                                } else {
+                                    lastNameError.value = false
+                                }
+
+                                if(tempData.phoneNumber == ""){
+                                    numberError.value = true
+                                } else {
+                                    numberError.value = false
+                                }
+
+                                if(!firstNameError.value && !lastNameError.value && !numberError.value){
+                                    currentData = tempData.copy()
+                                    editableState = false
+                                    onConfirm(tempData)
+                                }
                             },
                             color = SuccessColor
                         )

@@ -23,6 +23,7 @@ import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
@@ -43,6 +44,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -94,6 +96,9 @@ fun SimpleDecoratedTextField(
     bringIntoViewRequester: BringIntoViewRequester,
     coroutineScope: CoroutineScope,
     passwordHidden: Boolean = false,
+    error: Boolean = false,
+    errorMessage: String? = null,
+    floatsOnly: Boolean = false
 ) {
 
 
@@ -109,7 +114,7 @@ fun SimpleDecoratedTextField(
     var showDatePicker by remember { mutableStateOf(false) }
 
     // Adjust border and icon color based on focus state
-    val borderColor = if (isFocused) Color.Black.copy(alpha = 0.7f) else Color(0xFFDCDEDD)
+    val borderColor = if (isFocused && error) Color.Red else if (isFocused) Color.Black.copy(alpha = 0.7f) else if (error) Color(0xFFF19191) else Color(0xFFDCDEDD)
     val iconColor = if (isFocused) Color.Black.copy(alpha = 0.7f) else Color.Gray
 
     Column(
@@ -118,23 +123,45 @@ fun SimpleDecoratedTextField(
         verticalArrangement = Arrangement.Top
     ) {
         // Optional label displayed above the text field
-        if (label != null) {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold
-                ),
-                modifier = Modifier.padding(start = 0.dp)
-            )
+        Row() {
+            if (label != null) {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold
+                    ),
+                    modifier = Modifier.padding(end = 5.dp)
+                )
+            }
+            if (error) {
+                if (errorMessage!=null){
+                    Text(
+                        text = errorMessage,
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = Color.Red
+                        )
+                    )
+                }
+            }
         }
 
         // Core text input field with customization
         BasicTextField(
             value = text.value,
+            keyboardOptions = if (floatsOnly) KeyboardOptions(keyboardType = KeyboardType.Number) else KeyboardOptions(keyboardType = KeyboardType.Text),
             onValueChange = {
-                text.value = it
-                onValueChange(it) // Propagate the change upstream
+                if(floatsOnly){
+                    if(it.matches(Regex("^\\d*\\.?\\d*$"))){
+                        text.value = it
+                        onValueChange(it)
+                    }
+                } else {
+                    text.value = it
+                    onValueChange(it) // Propagate the change upstream
+                }
             },
             singleLine = true,
             interactionSource = interactionSource,
