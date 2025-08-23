@@ -213,6 +213,7 @@ fun StudentInfoCard(
                         symbol = Icons.Default.Check,
                         onClick = {
                             onSignInToggle(studentData.copy(signedIn = !studentData.signedIn))
+
                         },
                         modifier = Modifier.wrapContentSize(),
                     )

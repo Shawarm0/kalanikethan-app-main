@@ -2,11 +2,13 @@ package com.lra.kalanikethan.data.repository
 
 
 import android.util.Log
+import com.lra.kalanikethan.data.models.Class
 import com.lra.kalanikethan.data.models.Family
 import com.lra.kalanikethan.data.models.FamilyWithID
 import com.lra.kalanikethan.data.models.Parent
 import com.lra.kalanikethan.data.models.PaymentPlan
 import com.lra.kalanikethan.data.models.Student
+import com.lra.kalanikethan.data.models.StudentClass
 import com.lra.kalanikethan.data.remote.SupabaseClientProvider
 import com.lra.kalanikethan.ui.screens.Add.PaymentData
 import io.github.jan.supabase.postgrest.from
@@ -18,11 +20,15 @@ import io.github.jan.supabase.realtime.RealtimeChannel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
+import kotlin.collections.contains
 
 class Repository {
     // Defines the client
     private val client = SupabaseClientProvider.client
+
+
 
 
 
@@ -45,6 +51,12 @@ class Repository {
             e.printStackTrace()
         }
     }
+
+    suspend fun getAllClasses(): List<Class> {
+        return client.from("classes").select().decodeList<Class>()
+    }
+
+
 
 
     suspend fun getAllStudents(): List<Student> {

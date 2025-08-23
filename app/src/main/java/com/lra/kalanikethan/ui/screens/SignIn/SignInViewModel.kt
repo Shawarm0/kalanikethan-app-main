@@ -67,6 +67,13 @@ class SignInViewModel(
         filterStudents()
     }
 
+    /**
+     * Retrieves the complete list of students.
+     *
+     * @return A [StateFlow] containing the list of students.
+     */
+    fun getAllStudentsFlow(): StateFlow<List<Student>> = allStudents
+
     fun signIn(updatedStudent: Student) {
         Log.i("Database-SignIn", "Student: $updatedStudent")
 

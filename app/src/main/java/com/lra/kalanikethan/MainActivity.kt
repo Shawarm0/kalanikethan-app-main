@@ -60,7 +60,9 @@ import com.lra.kalanikethan.ui.components.TopAppBar
 import com.lra.kalanikethan.ui.screens.Add.Add
 import com.lra.kalanikethan.ui.screens.Add.AddViewModel
 import com.lra.kalanikethan.ui.screens.Auth.AuthActivity
-import com.lra.kalanikethan.ui.screens.Dashboard
+import com.lra.kalanikethan.ui.screens.DashBoardViewModel.Classes
+import com.lra.kalanikethan.ui.screens.DashBoardViewModel.DashBoardViewModel
+import com.lra.kalanikethan.ui.screens.DashBoardViewModel.Dashboard
 import com.lra.kalanikethan.ui.screens.History
 import com.lra.kalanikethan.ui.screens.Payments
 import com.lra.kalanikethan.ui.screens.SignIn.SignIn
@@ -73,6 +75,8 @@ import io.github.jan.supabase.auth.SignOutScope
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.coroutines.launch
+import kotlin.math.sign
+
 /**
  * The main entry point of the app
  *
@@ -96,6 +100,7 @@ class MainActivity : ComponentActivity() {
         val repository = Repository()
         val signInViewModel = SignInViewModel(repository)
         val addViewModel = AddViewModel(repository)
+        val dashboardViewModel = DashBoardViewModel(repository, signInViewModel)
 
         setContent {
             val context = LocalContext.current
@@ -113,7 +118,8 @@ class MainActivity : ComponentActivity() {
                     is SessionStatus.Authenticated -> {
                         // User is authenticated
                         signInViewModel.initializeStudents()
-                        KalanikethanApp(signInViewModel, addViewModel)
+                        dashboardViewModel.loadClasses()
+                        KalanikethanApp(signInViewModel, addViewModel, dashboardViewModel)
                     }
                     SessionStatus.Initializing -> {
                         // Still loading, show loading UI
@@ -224,7 +230,7 @@ sealed class Screen(val route: String, val filledicon: ImageVector, val outlined
  * The selected screen is derived from the current back stack, and updated when a drawer item is clicked.
  */
 @Composable
-fun KalanikethanApp(signInViewModel: SignInViewModel, addViewModel: AddViewModel) {
+fun KalanikethanApp(signInViewModel: SignInViewModel, addViewModel: AddViewModel, dashboardViewModel: DashBoardViewModel) {
     // This stores the state of the navigation drawer
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     // This is required to handle the the navigation drawer not on the main thread
@@ -296,7 +302,7 @@ fun KalanikethanApp(signInViewModel: SignInViewModel, addViewModel: AddViewModel
                     .imeBottomPaddingFraction(0.9f),
 
             ) {
-                composable(route = Screen.Dashboard.route) { Dashboard() }
+                composable(route = Screen.Dashboard.route) { Dashboard(dashboardViewModel, navController) }
                 composable(route = Screen.SignIn.route) { SignIn(signInViewModel) }
                 composable(route = Screen.Add.route) { Add(addViewModel) }
                 composable(route = Screen.WhosIn.route) { WhosIn() }
@@ -304,7 +310,9 @@ fun KalanikethanApp(signInViewModel: SignInViewModel, addViewModel: AddViewModel
                 composable(route = Screen.Payments.route) { Payments() }
                 composable(route = Screen.Account.route) {
                 }
-                composable(route = Screen.Class.route) {  }
+                composable(route = Screen.Class.route) {
+                    Classes(dashboardViewModel, signInViewModel)
+                }
             }
         }
     }
