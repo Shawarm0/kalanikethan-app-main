@@ -34,10 +34,13 @@ fun ClassStudentComposable(
     modifier: Modifier = Modifier,
     name: String = "Student Name",
     isSelected: Boolean = false,
+    onClickListener: () -> Unit = {}
 ) {
     Box(
         modifier = modifier.clip(RoundedCornerShape(12.dp)).background(color = if (isSelected) AccentColor else Color.White).clickable(
-            onClick = {},
+            onClick = {
+                onClickListener()
+            },
             interactionSource = remember { MutableInteractionSource() },
             indication = null
         ),

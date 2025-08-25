@@ -72,6 +72,7 @@ fun Dashboard(viewModel: DashBoardViewModel, navController: NavHostController) {
                     isManager = isManager(),
                     onEditClick = { thisclass ->
                         viewModel.thisClass.value = thisclass
+                        viewModel.resetPendingUpdates()
                         navController.navigate(Screen.EditClass.route)
                     },
                     onClassClick = { thisclass ->

@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
@@ -37,6 +38,14 @@ class DashBoardViewModel (
     private val _classState = mutableStateOf<StudentClassComposable?>(null)
     val classState: State<StudentClassComposable?> = _classState
 
+
+    // Local mutable state for pending changes
+    private val _pendingStudentSelections = MutableStateFlow<Map<Int, Set<Int>>>(emptyMap())
+    val pendingStudentSelections: StateFlow<Map<Int, Set<Int>>> = _pendingStudentSelections
+
+
+
+
     var isLoading = mutableStateOf(false)
 
     private val _class = mutableStateOf<Class>(
@@ -49,6 +58,29 @@ class DashBoardViewModel (
         )
     )
     val thisClass: MutableState<Class> = _class
+
+    // Function to toggle student selection for a class
+    fun toggleStudentSelection(classId: Int, studentId: Int, isSelected: Boolean) {
+        _pendingStudentSelections.update { currentMap ->
+            val currentSelections = currentMap[classId] ?: emptySet()
+            val newSelections = if (isSelected) {
+                currentSelections + studentId
+            } else {
+                currentSelections - studentId
+            }
+
+            currentMap.toMutableMap().apply {
+                this[classId] = newSelections
+            }
+        }
+
+        println(pendingStudentSelections.value)
+
+    }
+
+    fun resetPendingUpdates () {
+        _pendingStudentSelections.value = emptyMap()
+    }
 
 
 
