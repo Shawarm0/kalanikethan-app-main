@@ -45,7 +45,6 @@ import java.util.Locale
 fun SignIn(viewModel: SignInViewModel) {
     val students = viewModel.displayedStudents.collectAsState(emptyList())
     val searchQuery = viewModel.searchQuery.value
-    val bringIntoViewRequester = remember { BringIntoViewRequester() }
     val coroutineScope = rememberCoroutineScope()
 
 
@@ -69,8 +68,8 @@ fun SignIn(viewModel: SignInViewModel) {
             onValueChange = { viewModel.updateSearchQuery(it) },
             placeholder = "Search by firstname, ID or lastname...",
             leadingIcon = Icons.Default.Search,
-            bringIntoViewRequester = bringIntoViewRequester,
-            coroutineScope = coroutineScope,
+//            bringIntoViewRequester = bringIntoViewRequester,
+//            coroutineScope = coroutineScope,
             modifier = Modifier.width(1075.dp),
             clearButton = true,
         )

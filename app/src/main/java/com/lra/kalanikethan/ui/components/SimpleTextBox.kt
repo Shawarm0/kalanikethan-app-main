@@ -93,13 +93,18 @@ fun SimpleDecoratedTextField(
     trailingIcon: ImageVector? = null,
     trailingIcon2: @Composable (() -> Unit)? = null,
     clearButton: Boolean = false,
-    bringIntoViewRequester: BringIntoViewRequester,
-    coroutineScope: CoroutineScope,
+//    bringIntoViewRequester: BringIntoViewRequester,
+//    coroutineScope: CoroutineScope,
     passwordHidden: Boolean = false,
     error: Boolean = false,
     errorMessage: String? = null,
     floatsOnly: Boolean = false
 ) {
+
+
+    // For the text boxes
+    val coroutineScope = rememberCoroutineScope()
+    val bringIntoViewRequester = remember { BringIntoViewRequester() }
 
 
     // Maintain text state internally
@@ -310,8 +315,7 @@ fun SimpleDecoratedTextFieldPreview() {
             text = "",
             onValueChange = {},
             label = "Label Only",
-            bringIntoViewRequester = bringIntoViewRequester,
-            coroutineScope = coroutineScope
+
         )
 
         // 2. Placeholder only, no label
@@ -319,8 +323,7 @@ fun SimpleDecoratedTextFieldPreview() {
             text = "",
             onValueChange = {},
             placeholder = "Placeholder Only",
-            bringIntoViewRequester = bringIntoViewRequester,
-            coroutineScope = coroutineScope
+
         )
 
         // 3. Label + trailing icon only
@@ -329,8 +332,7 @@ fun SimpleDecoratedTextFieldPreview() {
             onValueChange = {},
             label = "Trailing Icon",
             trailingIcon = Icons.Default.Close,
-            bringIntoViewRequester = bringIntoViewRequester,
-            coroutineScope = coroutineScope
+
         )
 
         // 4. Label + leading icon only
@@ -339,8 +341,7 @@ fun SimpleDecoratedTextFieldPreview() {
             onValueChange = {},
             label = "Leading Icon",
             leadingIcon = Icons.Default.Close,
-            bringIntoViewRequester = bringIntoViewRequester,
-            coroutineScope = coroutineScope
+
         )
 
         // 5. Label + clear button only
@@ -350,8 +351,7 @@ fun SimpleDecoratedTextFieldPreview() {
             onValueChange = { clearText1.value = it },
             label = "Clear Button",
             clearButton = true,
-            bringIntoViewRequester = bringIntoViewRequester,
-            coroutineScope = coroutineScope
+
         )
 
         // 6. All features: label + leading + trailing + clear button
@@ -363,8 +363,7 @@ fun SimpleDecoratedTextFieldPreview() {
             leadingIcon = Icons.Default.Close,
             trailingIcon = Icons.Default.Close,
             clearButton = true,
-            bringIntoViewRequester = bringIntoViewRequester,
-            coroutineScope = coroutineScope
+
         )
     }
 }

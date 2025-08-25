@@ -305,8 +305,8 @@ private fun PaymentContent(
                             onValueChange = {
                                 onPaymentDataChanged(paymentData.copy(familyName = it))
                             },
-                            bringIntoViewRequester = bringIntoViewRequester,
-                            coroutineScope = coroutineScope,
+//                            bringIntoViewRequester = bringIntoViewRequester,
+//                            coroutineScope = coroutineScope,
                             error = nameError.value,
                             errorMessage = emptyErrorMsg
                         )
@@ -318,8 +318,8 @@ private fun PaymentContent(
                         onValueChange = {
                             onPaymentDataChanged(paymentData.copy(paymentId = it))
                         },
-                        bringIntoViewRequester = bringIntoViewRequester,
-                        coroutineScope = coroutineScope,
+//                        bringIntoViewRequester = bringIntoViewRequester,
+//                        coroutineScope = coroutineScope,
                         error = idError.value,
                         errorMessage = emptyErrorMsg
                     )
@@ -331,8 +331,8 @@ private fun PaymentContent(
                         onValueChange = {
                             onPaymentDataChanged(paymentData.copy(email = it))
                         },
-                        bringIntoViewRequester = bringIntoViewRequester,
-                        coroutineScope = coroutineScope,
+//                        bringIntoViewRequester = bringIntoViewRequester,
+//                        coroutineScope = coroutineScope,
                         error = emailError.value,
                         errorMessage = emptyErrorMsg
                     )
@@ -354,8 +354,8 @@ private fun PaymentContent(
                         onValueChange = {
                             onPaymentDataChanged(paymentData.copy(paymentDate = it))
                         },
-                        bringIntoViewRequester = bringIntoViewRequester,
-                        coroutineScope = coroutineScope,
+//                        bringIntoViewRequester = bringIntoViewRequester,
+//                        coroutineScope = coroutineScope,
                         error = dateError.value,
                         errorMessage = invalidDateMsg
                     )
@@ -367,8 +367,8 @@ private fun PaymentContent(
                         onValueChange = {
                             onPaymentDataChanged(paymentData.copy(amount = it))
                         },
-                        bringIntoViewRequester = bringIntoViewRequester,
-                        coroutineScope = coroutineScope,
+//                        bringIntoViewRequester = bringIntoViewRequester,
+//                        coroutineScope = coroutineScope,
                         error = amountError.value,
                         errorMessage = emptyErrorMsg,
                         floatsOnly = true

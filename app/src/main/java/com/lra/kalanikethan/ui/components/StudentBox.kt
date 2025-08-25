@@ -135,8 +135,8 @@ fun StudentBox(
                             tempData = tempData.copy(firstName = it)
                         },
                         label = "First Name",
-                        bringIntoViewRequester = bringIntoViewRequester,
-                        coroutineScope = coroutineScope,
+//                        bringIntoViewRequester = bringIntoViewRequester,
+//                        coroutineScope = coroutineScope,
                         error = firstNameError.value,
                         errorMessage = firstNameErrorMsg.value
                     )
@@ -148,8 +148,8 @@ fun StudentBox(
                             tempData = tempData.copy(lastName = it)
                         },
                         label = "Last Name",
-                        bringIntoViewRequester = bringIntoViewRequester,
-                        coroutineScope = coroutineScope,
+//                        bringIntoViewRequester = bringIntoViewRequester,
+//                        coroutineScope = coroutineScope,
                         error = lastNameError.value,
                         errorMessage = lastNameErrorMsg.value
                     )
@@ -163,8 +163,8 @@ fun StudentBox(
                         isLeadingIconClickable = true,
                         leadingIcon = Icons.Default.CalendarMonth,
                         label = "Birthday",
-                        bringIntoViewRequester = bringIntoViewRequester,
-                        coroutineScope = coroutineScope,
+//                        bringIntoViewRequester = bringIntoViewRequester,
+//                        coroutineScope = coroutineScope,
                         error = dateError.value,
                         errorMessage = dateErrorMsg.value
                     )

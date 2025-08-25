@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Class
+import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Payment
@@ -26,6 +27,7 @@ import androidx.compose.material.icons.filled.PersonSearch
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.AddCircleOutline
 import androidx.compose.material.icons.outlined.Class
+import androidx.compose.material.icons.outlined.EditNote
 import androidx.compose.material.icons.outlined.HistoryToggleOff
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Payment
@@ -63,6 +65,7 @@ import com.lra.kalanikethan.ui.screens.Auth.AuthActivity
 import com.lra.kalanikethan.ui.screens.DashBoardViewModel.Classes
 import com.lra.kalanikethan.ui.screens.DashBoardViewModel.DashBoardViewModel
 import com.lra.kalanikethan.ui.screens.DashBoardViewModel.Dashboard
+import com.lra.kalanikethan.ui.screens.DashBoardViewModel.EditClass
 import com.lra.kalanikethan.ui.screens.History
 import com.lra.kalanikethan.ui.screens.Payments
 import com.lra.kalanikethan.ui.screens.SignIn.SignIn
@@ -210,6 +213,7 @@ sealed class Screen(val route: String, val filledicon: ImageVector, val outlined
     object Payments : Screen("payments", Icons.Filled.Payment, Icons.Outlined.Payment)
     object Account : Screen("account", Icons.Filled.AccountCircle, Icons.Outlined.AccountCircle)
     object Class : Screen("class", Icons.Filled.Class, Icons.Outlined.Class)
+    object EditClass : Screen("edit_class", Icons.Filled.EditNote, Icons.Outlined.EditNote)
 }
 
 
@@ -308,11 +312,9 @@ fun KalanikethanApp(signInViewModel: SignInViewModel, addViewModel: AddViewModel
                 composable(route = Screen.WhosIn.route) { WhosIn() }
                 composable(route = Screen.History.route) { History() }
                 composable(route = Screen.Payments.route) { Payments() }
-                composable(route = Screen.Account.route) {
-                }
-                composable(route = Screen.Class.route) {
-                    Classes(dashboardViewModel, signInViewModel)
-                }
+                composable(route = Screen.Account.route) { }
+                composable(route = Screen.Class.route) { Classes(dashboardViewModel, signInViewModel) }
+                composable(route = Screen.EditClass.route) { EditClass(dashboardViewModel, signInViewModel) }
             }
         }
     }

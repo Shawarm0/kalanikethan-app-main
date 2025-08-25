@@ -269,8 +269,8 @@ fun SignedOut(
                     placeholder = "test123@email.com",
                     label = "Email",
                     onValueChange = { email.value = it },
-                    bringIntoViewRequester = bringIntoViewRequester,
-                    coroutineScope = coroutineScope,
+//                    bringIntoViewRequester = bringIntoViewRequester,
+//                    coroutineScope = coroutineScope,
                 )
 
                 SimpleDecoratedTextField(
@@ -288,8 +288,8 @@ fun SignedOut(
                             Icon(imageVector = visibilityIcon, contentDescription = description)
                         }
                     },
-                    bringIntoViewRequester = bringIntoViewRequester,
-                    coroutineScope = coroutineScope,
+//                    bringIntoViewRequester = bringIntoViewRequester,
+//                    coroutineScope = coroutineScope,
                     passwordHidden = passwordHidden
                 )
             }

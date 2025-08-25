@@ -30,6 +30,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.lra.kalanikethan.Screen
 import com.lra.kalanikethan.ui.components.ClassBox
+import com.lra.kalanikethan.util.isManager
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -67,9 +69,19 @@ fun Dashboard(viewModel: DashBoardViewModel, navController: NavHostController) {
             items(classes.value) {thisclass ->
                 ClassBox(
                     classData = thisclass,
+                    isManager = isManager(),
+                    onEditClick = { thisclass ->
+                        viewModel.thisClass.value = thisclass
+                        navController.navigate(Screen.EditClass.route)
+                    },
                     onClassClick = { thisclass ->
                         viewModel.thisClass.value = thisclass
                         navController.navigate(Screen.Class.route)
+                        scope.launch {
+                            viewModel.isLoading.value = true
+                            delay(500)
+                            viewModel.isLoading.value = false
+                        }
                     },
                 )
                 Spacer(modifier = Modifier.width(16.dp))

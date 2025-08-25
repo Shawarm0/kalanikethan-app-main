@@ -102,8 +102,8 @@ fun ParentBox(
                             tempData = tempData.copy(firstName = it)
                         },
                         label = "First Name",
-                        bringIntoViewRequester = bringIntoViewRequester,
-                        coroutineScope = coroutineScope,
+//                        bringIntoViewRequester = bringIntoViewRequester,
+//                        coroutineScope = coroutineScope,
                         error = firstNameError.value,
                         errorMessage = emptyErrorMsg
                     )
@@ -115,8 +115,8 @@ fun ParentBox(
                             tempData = tempData.copy(lastName = it)
                         },
                         label = "Last Name",
-                        bringIntoViewRequester = bringIntoViewRequester,
-                        coroutineScope = coroutineScope,
+//                        bringIntoViewRequester = bringIntoViewRequester,
+//                        coroutineScope = coroutineScope,
                         error = lastNameError.value,
                         errorMessage = emptyErrorMsg
                     )
@@ -128,8 +128,8 @@ fun ParentBox(
                             tempData = tempData.copy(phoneNumber = it)
                         },
                         label = "Number",
-                        bringIntoViewRequester = bringIntoViewRequester,
-                        coroutineScope = coroutineScope,
+//                        bringIntoViewRequester = bringIntoViewRequester,
+//                        coroutineScope = coroutineScope,
                         error = numberError.value,
                         errorMessage = emptyErrorMsg
                     )

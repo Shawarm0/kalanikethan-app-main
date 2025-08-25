@@ -56,7 +56,7 @@ fun Classes(
             // Title Section with 113.dp padding from left
             Column(
                 modifier = Modifier
-                    .padding(start = 113.dp, top = 14.dp)
+                    .padding(start = 53.dp, top = 14.dp)
                     .fillMaxWidth()
             ) {
                 Text(

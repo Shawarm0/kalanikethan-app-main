@@ -197,15 +197,15 @@ fun StudentInfoCard(
                         modifier = Modifier.wrapContentSize(),
                     )
 
-                    // Button to mark student as absent
-                    Button(
-                        text = "Sign Absent",
-                        symbol = Icons.Default.Close,
-                        onClick = {
-                            onAbsentClick(studentData.studentId)
-                        },
-                        modifier = Modifier.wrapContentSize(),
-                    )
+//                    // Button to mark student as absent
+//                    Button(
+//                        text = "Sign Absent",
+//                        symbol = Icons.Default.Close,
+//                        onClick = {
+//                            onAbsentClick(studentData.studentId)
+//                        },
+//                        modifier = Modifier.wrapContentSize(),
+//                    )
 
                     // Sign in / Sign out button
                     Button(

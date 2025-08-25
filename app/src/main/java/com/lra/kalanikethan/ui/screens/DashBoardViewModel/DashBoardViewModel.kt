@@ -37,9 +37,7 @@ class DashBoardViewModel (
     private val _classState = mutableStateOf<StudentClassComposable?>(null)
     val classState: State<StudentClassComposable?> = _classState
 
-    private val _isLoading = mutableStateOf(false)
-    val isLoading: State<Boolean> = _isLoading
-
+    var isLoading = mutableStateOf(false)
 
     private val _class = mutableStateOf<Class>(
         Class(
@@ -50,7 +48,6 @@ class DashBoardViewModel (
             endTime = 0
         )
     )
-
     val thisClass: MutableState<Class> = _class
 
 
@@ -62,12 +59,8 @@ class DashBoardViewModel (
     }
 
 
-    fun signInStudent(updatedStudent: Student) {
-        signInViewModel.signIn(updatedStudent)
-    }
-
-
     fun getStudentsForClassFlow(classId: Int): Flow<List<Student>> {
+
         signInViewModel.initialiseStudentsChannel()
 
         return signInViewModel.allStudents.combine(allClasses) { students, classes ->
@@ -92,16 +85,6 @@ class DashBoardViewModel (
                     }
                 }.decodeList<StudentClass>()
                 .map { it.studentId }
-        }
-    }
-
-    private suspend fun getClass(classId: Int): Class {
-        return withContext(Dispatchers.IO) {
-            client.from("classes").select {
-                filter {
-                    Class::classId eq classId
-                }
-            }.decodeList<Class>().first()
         }
     }
 }
