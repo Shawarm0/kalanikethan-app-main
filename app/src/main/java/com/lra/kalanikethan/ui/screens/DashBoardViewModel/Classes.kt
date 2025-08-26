@@ -83,6 +83,7 @@ fun Classes(
                     StudentInfoCard(
                         studentData = student,
                         onSignInToggle = {
+
                             signInViewModel.signIn(it)
                         },
                         onAbsentClick = { },

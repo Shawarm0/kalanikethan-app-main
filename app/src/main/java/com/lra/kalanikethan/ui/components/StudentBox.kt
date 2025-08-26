@@ -86,7 +86,7 @@ fun StudentBox(
 
     val formatter = LocalDate.Format { day(); char('/'); monthNumber(); char('/') ; year() }
 
-    val birthdate = remember {mutableStateOf("")}
+    val birthdate = remember {mutableStateOf(currentData.birthdate.format(formatter))}
 
     val dateError = remember { mutableStateOf(false) }
     val firstNameError = remember { mutableStateOf(false) }
@@ -241,6 +241,7 @@ fun StudentBox(
                         )
                         Button("Confirm", Icons.Default.Check,
                             onClick = {
+
                                 try{
                                     tempData = tempData.copy(birthdate = LocalDate.parse(birthdate.value, formatter))
                                     dateError.value = false
