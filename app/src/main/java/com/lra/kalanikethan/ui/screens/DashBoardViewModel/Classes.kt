@@ -56,7 +56,7 @@ fun Classes(
             // Title Section with 113.dp padding from left
             Column(
                 modifier = Modifier
-                    .padding(start = 53.dp, top = 14.dp)
+                    .padding(start = 113.dp, top = 14.dp)
                     .fillMaxWidth()
             ) {
                 Text(
@@ -79,7 +79,7 @@ fun Classes(
                     .padding(top = 14.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
-                items(students.value) { student ->
+                items(students.value.sortedBy { it.firstName }) { student ->
                     StudentInfoCard(
                         studentData = student,
                         onSignInToggle = {

@@ -314,7 +314,7 @@ fun KalanikethanApp(signInViewModel: SignInViewModel, addViewModel: AddViewModel
                 composable(route = Screen.Payments.route) { Payments() }
                 composable(route = Screen.Account.route) { }
                 composable(route = Screen.Class.route) { Classes(dashboardViewModel, signInViewModel) }
-                composable(route = Screen.EditClass.route) { EditClass(dashboardViewModel, signInViewModel) }
+                composable(route = Screen.EditClass.route) { EditClass(dashboardViewModel, signInViewModel, navController) }
             }
         }
     }

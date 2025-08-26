@@ -37,6 +37,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import com.lra.kalanikethan.Screen
 import com.lra.kalanikethan.data.models.Student
 import com.lra.kalanikethan.ui.components.Button
 import com.lra.kalanikethan.ui.components.ClassStudentComposable
@@ -53,7 +55,8 @@ import kotlin.math.sign
 @Composable
 fun EditClass(
     viewModel: DashBoardViewModel,
-    signInViewModel: SignInViewModel
+    signInViewModel: SignInViewModel,
+    navController: NavHostController
 )
 {
     val thisClass = viewModel.thisClass.value
@@ -206,7 +209,7 @@ fun EditClass(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
-                        items(students) { student ->
+                        items(students.sortedBy { it.firstName }) { student ->
                             ClassStudentDisplay(
                                 modifier = Modifier.width(681.dp).wrapContentHeight(),
                                 name = "${student.firstName} ${student.lastName}"
@@ -268,7 +271,6 @@ fun EditClass(
                                 )
 
                             } else {
-
                                 students += student
                                 viewModel.toggleStudentSelection(
                                     thisClass.classId,
@@ -284,7 +286,11 @@ fun EditClass(
             Button(
                 text = "Save",
                 symbol = Icons.Default.Check,
-                onClick = { },
+                onClick = {
+                    viewModel.updateClassState(thisClass.classId)
+                    viewModel.thisClass.value = thisClass
+                    navController.navigate(Screen.Dashboard.route)
+                },
                 color = SuccessColor,
                 modifier = Modifier.width(367.dp)
             )

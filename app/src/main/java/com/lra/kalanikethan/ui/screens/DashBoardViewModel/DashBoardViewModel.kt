@@ -41,7 +41,6 @@ class DashBoardViewModel (
 
     // Local mutable state for pending changes
     private val _pendingStudentSelections = MutableStateFlow<Map<Int, Set<Int>>>(emptyMap())
-    val pendingStudentSelections: StateFlow<Map<Int, Set<Int>>> = _pendingStudentSelections
 
 
 
@@ -74,8 +73,6 @@ class DashBoardViewModel (
             }
         }
 
-        println(pendingStudentSelections.value)
-
     }
 
     fun resetPendingUpdates () {
@@ -87,6 +84,13 @@ class DashBoardViewModel (
     fun loadClasses() {
         viewModelScope.launch {
             _allClasses.value = repository.getAllClasses()
+        }
+    }
+
+    fun updateClassState(classId: Int) {
+        viewModelScope.launch {
+            val pendingSelections = _pendingStudentSelections.value[classId] ?: emptySet()
+            repository.updateClassState(classId, pendingSelections)
         }
     }
 

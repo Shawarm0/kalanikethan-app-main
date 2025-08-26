@@ -57,6 +57,37 @@ class Repository {
     }
 
 
+    suspend fun updateClassState(classID: Int, studentIDs: Set<Int>) {
+        Log.i("Repository-updateClassState", "Class ID: $classID, has students $studentIDs")
+        val existingStudentClass = client.from("student_classes").select() {
+            filter {
+                StudentClass::classId eq classID
+            }
+
+        }.decodeList<StudentClass>().map { it.studentId }
+
+        val studentsToAdd = studentIDs.filter { !existingStudentClass.contains(it) }
+        val studentsToRemove = existingStudentClass.filter { !studentIDs.contains(it) }
+
+        Log.i("Repository-updateClassState", "Students to add: $studentsToAdd")
+        Log.i("Repository-updateClassState", "Students to remove: $studentsToRemove")
+
+        for (studentID in studentsToAdd) {
+            client.from("student_classes").insert(StudentClass(studentID, classID))
+        }
+
+        for (studentID in studentsToRemove) {
+            client.from("student_classes").delete {
+                filter {
+                    StudentClass::classId eq classID
+                    StudentClass::studentId eq studentID
+                }
+            }
+        }
+
+    }
+
+
 
 
     suspend fun getAllStudents(): List<Student> {
