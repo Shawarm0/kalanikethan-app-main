@@ -312,7 +312,7 @@ fun KalanikethanApp(signInViewModel: SignInViewModel, addViewModel: AddViewModel
                 }) }
                 composable(route = Screen.SignIn.route) { SignIn(signInViewModel) }
                 composable(route = Screen.Add.route) { Add(addViewModel) }
-                composable(route = Screen.WhosIn.route) { WhosIn() }
+                composable(route = Screen.WhosIn.route) { WhosIn(signInViewModel) }
                 composable(route = Screen.History.route) { History() }
                 composable(route = Screen.Payments.route) { Payments() }
                 composable(route = Screen.Account.route) { }

@@ -43,7 +43,7 @@ import com.lra.kalanikethan.util.isCurrentTimeWithinRange
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ClassBox(
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier.height(277.dp).width(404.dp),
     isManager: Boolean = false,
     classData: Class,
     onClassClick: (Class) -> Unit = {},
@@ -65,8 +65,6 @@ fun ClassBox(
                 spotColor = Color.Black.copy(alpha = 0.1f)
             )
             .clip(RoundedCornerShape(12.dp))
-            .height(277.dp)
-            .width(404.dp)
             .background(color = if (darkTheme) Color.Black else Color.White)
             .then(
                 if (istime) Modifier.bottomBorder(3.dp, PrimaryLightColor)

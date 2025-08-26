@@ -39,7 +39,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.lra.kalanikethan.data.models.Student
 import com.lra.kalanikethan.ui.theme.ButtonColor
 import com.lra.kalanikethan.ui.theme.ErrorColor
@@ -286,13 +289,13 @@ fun StudentBox(
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)){
                     Text("Classes: ")
                     if (currentData.dance) {
-                        ClassBox("Dance")
+                        InfoBox(text = "Dance")
                     }
                     if (currentData.singing) {
-                        ClassBox("Singing")
+                        InfoBox(text = "Singing")
                     }
                     if (currentData.music) {
-                        ClassBox("Music")
+                        InfoBox(text = "Music")
                     }
                 }
                 Row(
@@ -314,8 +317,12 @@ fun StudentBox(
 }
 
 @Composable
-fun ClassBox(text: String){
-    Box(modifier = Modifier
+fun InfoBox(
+    modifier: Modifier = Modifier.height(30.dp).wrapContentWidth(),
+    text: String,
+    fontSize: TextUnit = 14.sp,
+){
+    Box(modifier = modifier
         .clip(RoundedCornerShape(8.dp))
         .background(color = Color(0xFFE7EEF5))
         .height(30.dp)
@@ -323,7 +330,9 @@ fun ClassBox(text: String){
         .wrapContentWidth(),
         contentAlignment = Alignment.Center
         ){
-        Text(text = text, style = MaterialTheme.typography.titleSmall, color = UnselectedButtonText)
+        Text(text = text, style = MaterialTheme.typography.titleSmall.copy(
+            fontSize = fontSize
+        ), color = UnselectedButtonText)
     }
 }
 

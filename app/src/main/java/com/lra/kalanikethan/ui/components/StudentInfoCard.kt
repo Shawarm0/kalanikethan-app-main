@@ -1,5 +1,6 @@
 package com.lra.kalanikethan.ui.components
 
+import android.icu.text.IDNA
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -141,7 +142,7 @@ fun StudentInfoCard(
                     )
 
                     // Custom composable to display date
-                    ClassBox(text = studentData.birthdate.toString())
+                    InfoBox(text = studentData.birthdate.toString())
                 }
 
                 VerticalDivider(modifier = Modifier.height(50.dp))
@@ -167,13 +168,13 @@ fun StudentInfoCard(
                     ) {
                         // Show only the classes the student is enrolled in
                         if (studentData.dance) {
-                            ClassBox(text = "Dance")
+                            InfoBox(text = "Dance")
                         }
                         if (studentData.singing) {
-                            ClassBox(text = "Singing")
+                            InfoBox(text = "Singing")
                         }
                         if (studentData.music) {
-                            ClassBox(text = "Music")
+                            InfoBox(text = "Music")
                         }
                     }
                 }
