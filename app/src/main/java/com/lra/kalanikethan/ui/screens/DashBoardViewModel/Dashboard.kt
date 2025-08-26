@@ -16,6 +16,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,6 +25,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
@@ -35,11 +37,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun Dashboard(viewModel: DashBoardViewModel, navController: NavHostController) {
+fun Dashboard(viewModel: DashBoardViewModel, navController: NavHostController, selectedIconChange: (ImageVector) -> Unit = {}) {
     val classes = viewModel.allClasses.collectAsState(emptyList())
     var textWidth by remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
     val scope = rememberCoroutineScope()
+
+
 
 
     Column( // This is the Title
@@ -73,10 +77,12 @@ fun Dashboard(viewModel: DashBoardViewModel, navController: NavHostController) {
                     onEditClick = { thisclass ->
                         viewModel.thisClass.value = thisclass
                         viewModel.resetPendingUpdates()
+                        selectedIconChange(Screen.EditClass.filledicon)
                         navController.navigate(Screen.EditClass.route)
                     },
                     onClassClick = { thisclass ->
                         viewModel.thisClass.value = thisclass
+                        selectedIconChange(Screen.Class.filledicon)
                         navController.navigate(Screen.Class.route)
                         scope.launch {
                             viewModel.isLoading.value = true

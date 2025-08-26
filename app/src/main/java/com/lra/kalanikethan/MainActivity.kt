@@ -214,6 +214,7 @@ sealed class Screen(val route: String, val filledicon: ImageVector, val outlined
     object Account : Screen("account", Icons.Filled.AccountCircle, Icons.Outlined.AccountCircle)
     object Class : Screen("class", Icons.Filled.Class, Icons.Outlined.Class)
     object EditClass : Screen("edit_class", Icons.Filled.EditNote, Icons.Outlined.EditNote)
+    object EditFamily: Screen("edit_family", Icons.Filled.EditNote, Icons.Outlined.EditNote)
 }
 
 
@@ -306,7 +307,9 @@ fun KalanikethanApp(signInViewModel: SignInViewModel, addViewModel: AddViewModel
                     .imeBottomPaddingFraction(0.9f),
 
             ) {
-                composable(route = Screen.Dashboard.route) { Dashboard(dashboardViewModel, navController) }
+                composable(route = Screen.Dashboard.route) { Dashboard(dashboardViewModel, navController, selectedIconChange = { icon ->
+                    selectedIcon = icon
+                }) }
                 composable(route = Screen.SignIn.route) { SignIn(signInViewModel) }
                 composable(route = Screen.Add.route) { Add(addViewModel) }
                 composable(route = Screen.WhosIn.route) { WhosIn() }
@@ -315,6 +318,7 @@ fun KalanikethanApp(signInViewModel: SignInViewModel, addViewModel: AddViewModel
                 composable(route = Screen.Account.route) { }
                 composable(route = Screen.Class.route) { Classes(dashboardViewModel, signInViewModel) }
                 composable(route = Screen.EditClass.route) { EditClass(dashboardViewModel, signInViewModel, navController) }
+                composable(route = Screen.EditFamily.route) {  }
             }
         }
     }
