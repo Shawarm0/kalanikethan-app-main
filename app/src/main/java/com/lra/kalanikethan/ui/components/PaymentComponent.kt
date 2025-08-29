@@ -1,6 +1,5 @@
 package com.lra.kalanikethan.ui.components
 
-import android.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -8,8 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -38,7 +35,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lra.kalanikethan.ui.screens.Add.PaymentData
 import com.lra.kalanikethan.ui.theme.AccentColor
-import com.lra.kalanikethan.ui.theme.ButtonColor
 import com.lra.kalanikethan.ui.theme.ErrorColor
 import com.lra.kalanikethan.ui.theme.PrimaryLightColor
 import com.lra.kalanikethan.ui.theme.SuccessColor
@@ -58,133 +54,137 @@ fun PaymentComponent(
     onConfirmClick: () -> Unit = {},
     onSendReminderClick: () -> Unit = {},
     onIncorrectClick: () -> Unit = {},
+    onViewHistoryClick: () -> Unit = {},
 ) {
     Box(
         modifier = modifier,
-
     ) {
         Column(
             modifier = Modifier.fillMaxSize().padding(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth().wrapContentHeight(),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-//                Row(
-//                    modifier = Modifier.wrapContentWidth().wrapContentHeight(),
-//                    horizontalArrangement = Arrangement.Start,
-//                    verticalAlignment = Alignment.CenterVertically
-//                ) {
-//                    Icon(
-//                        imageVector = Icons.Outlined.PersonOutline,
-//                        contentDescription = "Hello",
-//                        tint = Color.Unspecified,
-//                        modifier = Modifier.width(38.dp).height(38.dp)
-//                    )
-//
-//                    Column(
-//                        modifier = Modifier.height(38.dp).wrapContentWidth(),
-//                        verticalArrangement = Arrangement.Top
-//                    ) {
-//                        Row(
-//                            modifier = Modifier.wrapContentWidth().wrapContentHeight(),
-//                            horizontalArrangement = Arrangement.spacedBy(15.dp),
-//                            verticalAlignment = Alignment.CenterVertically
-//                        ) {
-//                            Text(
-//                                text = data.familyName,
-//                                style = MaterialTheme.typography.bodyMedium.copy(
-//                                    color = Color.Black,
-//                                    fontSize = 15.sp,
-//                                    fontWeight = FontWeight.ExtraBold
-//                                )
-//                            )
-//
-//                            Text(
-//                                text = "View History",
-//                                style = MaterialTheme.typography.bodySmall.copy(
-//                                    color = PrimaryLightColor,
-//                                    fontSize = 10.sp,
-//                                    fontWeight = FontWeight.Normal
-//                                ),
-//                                textDecoration = TextDecoration.Underline,
-//                                modifier = Modifier.clickable(
-//                                    onClick = {},
-//                                    interactionSource = remember { MutableInteractionSource() },
-//                                    indication = null,
-//                                )
-//                            )
-//                        }
-//
-//                        Row(
-//                            modifier = Modifier.wrapContentWidth().wrapContentHeight(),
-//                            verticalAlignment = Alignment.CenterVertically
-//                        ) {
-//
-//                            Text(
-//                                text = "ID: ${data.paymentId}",
-//                                style = MaterialTheme.typography.bodySmall.copy(
-//                                    fontSize = 12.sp,
-//                                    color = UnselectedButtonText,
-//                                    fontWeight = FontWeight.Light,
-//                                )
-//                            )
-//
-//                            VerticalDivider()
-//
-//                            Text(
-//                                text = "£${data.amount}",
-//                                style = MaterialTheme.typography.bodySmall.copy(
-//                                    fontSize = 12.sp,
-//                                    color = UnselectedButtonText,
-//                                    fontWeight = FontWeight.Light,
-//                                )
-//                            )
-//                        }
-//                    }
-//                }
-//
-//                Spacer(modifier = Modifier.weight(1f))
-//
-//
-//
-//                InfoBox(
-//                    modifier = modifier.wrapContentWidth().wrapContentHeight().clip(RoundedCornerShape(16.dp)),
-//                    text = "DD/MM/YYYY",
-//                    fontSize = 14.sp,
-//
-//                )
-//            }
-//        }
-//
-//
-//
-//        Row(
-//            modifier = Modifier.fillMaxWidth().wrapContentHeight(),
-//            verticalAlignment = Alignment.CenterVertically,
-//        ) {
-//            Button(
-//                text = "Confirm Payment",
-//                onClick = {},
-//                color = SuccessColor,
-//            )
-//
-//            Button(
-//                text = "Send Reminder",
-//                onClick = {},
-//                color = AccentColor,
-//            )
-//
-//            Button(
-//                text = "Incorrect Amount Paid",
-//                onClick = {},
-//                color = ErrorColor,
-//            )
+                Row(
+                    modifier = Modifier.wrapContentWidth().wrapContentHeight(),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.PersonOutline,
+                        contentDescription = "Hello",
+                        tint = Color.Unspecified,
+                        modifier = Modifier.width(38.dp).height(38.dp)
+                    )
 
+                    Column(
+                        modifier = Modifier.height(38.dp).wrapContentWidth(),
+                        verticalArrangement = Arrangement.Top
+                    ) {
+                        Row(
+                            modifier = Modifier.wrapContentWidth().wrapContentHeight(),
+                            horizontalArrangement = Arrangement.spacedBy(15.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = data.familyName,
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    color = Color.Black,
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.ExtraBold
+                                )
+                            )
 
+                            Text(
+                                text = "View History",
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    color = PrimaryLightColor,
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Normal
+                                ),
+                                textDecoration = TextDecoration.Underline,
+                                modifier = Modifier.clickable(
+                                    onClick = {
+                                        onViewHistoryClick()
+                                    },
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null,
+                                )
+                            )
+                        }
+
+                        Row(
+                            modifier = Modifier.wrapContentWidth().wrapContentHeight(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+
+                            Text(
+                                modifier = Modifier.padding(end = 15.dp),
+                                text = "ID: ${data.paymentId}",
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    fontSize = 12.sp,
+                                    color = UnselectedButtonText,
+                                    fontWeight = FontWeight.Light,
+                                )
+                            )
+
+                            VerticalDivider()
+
+                            Text(
+                                modifier = Modifier.padding(start = 15.dp),
+                                text = "£${data.amount}",
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    fontSize = 12.sp,
+                                    color = UnselectedButtonText,
+                                    fontWeight = FontWeight.Light,
+                                )
+                            )
+                        }
+                    }
+                }
+
+                InfoBox(
+                    modifier = Modifier.wrapContentWidth().wrapContentHeight().clip(RoundedCornerShape(16.dp)),
+                    text = "DD/MM/YYYY",
+                    fontSize = 14.sp,
+                )
             }
+
+            Row(
+                modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Button(
+                    text = "Confirm Payment",
+                    onClick = {
+                        onConfirmClick()
+                    },
+                    color = SuccessColor,
+                )
+
+                Button(
+                    text = "Send Reminder",
+                    onClick = {
+                        onSendReminderClick()
+                    },
+                    color = AccentColor,
+                )
+
+                Button(
+                    text = "Incorrect Amount Paid",
+                    onClick = {
+                        onIncorrectClick()
+                    },
+                    color = ErrorColor,
+                )
+            }
+
+
         }
     }
 }
