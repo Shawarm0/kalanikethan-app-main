@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -78,16 +79,16 @@ fun PaymentComponent(
                         imageVector = Icons.Outlined.PersonOutline,
                         contentDescription = "Hello",
                         tint = Color.Unspecified,
-                        modifier = Modifier.width(38.dp).height(38.dp)
+                        modifier = Modifier.size(38.dp)
                     )
 
                     Column(
-                        modifier = Modifier.height(38.dp).wrapContentWidth(),
+                        modifier = Modifier.height(38.dp).width(168.dp),
                         verticalArrangement = Arrangement.Top
                     ) {
                         Row(
-                            modifier = Modifier.wrapContentWidth().wrapContentHeight(),
-                            horizontalArrangement = Arrangement.spacedBy(15.dp),
+                            modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
@@ -118,8 +119,9 @@ fun PaymentComponent(
                         }
 
                         Row(
-                            modifier = Modifier.wrapContentWidth().wrapContentHeight(),
-                            verticalAlignment = Alignment.CenterVertically
+                            modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
 
                             Text(
@@ -128,7 +130,7 @@ fun PaymentComponent(
                                 style = MaterialTheme.typography.bodySmall.copy(
                                     fontSize = 12.sp,
                                     color = UnselectedButtonText,
-                                    fontWeight = FontWeight.Light,
+                                    fontWeight = FontWeight.Normal,
                                 )
                             )
 
@@ -140,7 +142,7 @@ fun PaymentComponent(
                                 style = MaterialTheme.typography.bodySmall.copy(
                                     fontSize = 12.sp,
                                     color = UnselectedButtonText,
-                                    fontWeight = FontWeight.Light,
+                                    fontWeight = FontWeight.Normal,
                                 )
                             )
                         }
@@ -196,11 +198,15 @@ fun PaymentComponent(
 fun PaymentComponentPreview(
 
 ) {
-    PaymentComponent(
-        data = PaymentData(
-            familyName = "Family Name",
-            paymentId = "NV14LLG",
-            amount = "12.00"
-        ),
-    )
+    Row(
+        modifier=Modifier.width(1075.dp)
+    ) {
+        PaymentComponent(
+            data = PaymentData(
+                familyName = "Family Name",
+                paymentId = "NV14LLG",
+                amount = "12.00"
+            ),
+        )
+    }
 }
