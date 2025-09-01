@@ -37,11 +37,17 @@ object ChannelManager {
      * @return A [Flow] emitting realtime [PostgresAction] events from the students channel.
      */
     suspend fun subscribeToStudentsChannel(): Flow<PostgresAction> {
-        unsubscribeFromAllChannels()
         delay(10)
         Log.i("ChannelManager", "Attempting to connect to students channel")
         studentsChannel.subscribe()
         return studentsChannel.getFlow()
+    }
+
+    suspend fun subscribeToHistoryChannel(): Flow<PostgresAction> {
+        delay(10)
+        Log.i("ChannelManager", "Attempting to connect to students channel")
+        historyChannel.subscribe()
+        return historyChannel.getFlow()
     }
 
     /**
@@ -50,8 +56,6 @@ object ChannelManager {
      * Useful to clean up active connections before opening new ones.
      */
     suspend fun unsubscribeFromAllChannels() {
-        studentsChannel.unsubscribe()
-        historyChannel.unsubscribe()
         Log.i("Database-ChannelManager", "Unsubscribed from all channels")
     }
 }

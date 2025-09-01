@@ -1,6 +1,5 @@
 package com.lra.kalanikethan.ui.screens.SignIn
 
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,14 +8,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.DrawerValue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,9 +21,6 @@ import com.lra.kalanikethan.data.remote.ChannelManager
 import com.lra.kalanikethan.ui.components.SimpleDecoratedTextField
 import com.lra.kalanikethan.ui.components.StudentInfoCard
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 
 /**
@@ -53,7 +46,6 @@ fun SignIn(viewModel: SignInViewModel) {
     LaunchedEffect(Unit) {
         // Create the channel when the composable enters composition
         viewModel.initialiseStudentsChannel()
-        viewModel.removeSearchQuery()
     }
 
     Column(
@@ -85,7 +77,7 @@ fun SignIn(viewModel: SignInViewModel) {
                 StudentInfoCard(
                     studentData = student,
                     onSignInToggle = {
-                        viewModel.signIn(it)
+                        viewModel.updateStudentAttendance(it, currentSignInStatus = !it.signedIn)
                     },
                     onAbsentClick = { },
                     onEditClick = {

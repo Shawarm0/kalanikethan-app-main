@@ -5,7 +5,10 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.lra.kalanikethan.data.models.Employee
+import com.lra.kalanikethan.data.models.History
 import com.lra.kalanikethan.data.models.Student
+import com.lra.kalanikethan.data.models.sessionPermissions
 import com.lra.kalanikethan.data.remote.ChannelManager
 import com.lra.kalanikethan.data.repository.Repository
 import io.github.jan.supabase.realtime.PostgresAction
@@ -13,7 +16,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -38,6 +44,13 @@ class SignInViewModel(
     private val _allStudents = MutableStateFlow<List<Student>>(emptyList())
     val allStudents: StateFlow<List<Student>> = _allStudents
 
+    private val _allEmployees = MutableStateFlow<List<Employee>>(emptyList())
+    val employees: StateFlow<List<Employee>> = _allEmployees
+
+    private val _allHistories = MutableStateFlow<List<History>>(emptyList())
+    val histories: StateFlow<List<History>> = _allHistories
+
+
     // Holds the filtered list of students currently displayed in the UI.
     private val _displayedStudents = MutableStateFlow<List<Student>>(emptyList())
     val displayedStudents: StateFlow<List<Student>> = _displayedStudents
@@ -55,6 +68,8 @@ class SignInViewModel(
     fun initializeStudents() {
         viewModelScope.launch {
             _allStudents.value = repository.getAllStudents()
+            _allEmployees.value = repository.getAllEmployees()
+            _allHistories.value = repository.getAllHistories()
             filterStudents()
         }
     }
@@ -74,8 +89,8 @@ class SignInViewModel(
      */
     fun getAllStudentsFlow(): StateFlow<List<Student>> = allStudents
 
-    fun signIn(updatedStudent: Student) {
-        Log.i("Database-SignIn", "Student: $updatedStudent")
+    fun updateStudentAttendance(updatedStudent: Student, currentSignInStatus: Boolean) {
+        Log.i("Database-Attendance", "Student: $updatedStudent, Action: ${if (currentSignInStatus) "SignIn" else "SignOut"}")
 
         // Always update UI immediately
         _allStudents.update { list ->
@@ -83,13 +98,37 @@ class SignInViewModel(
         }
         filterStudents()
 
+
         // Cancel any pending DB update for this student
         signInDebounceJobs[updatedStudent.studentId]?.cancel()
 
         // Schedule a new DB update after 1 second of inactivity
         val job = viewModelScope.launch {
             delay(1000) // wait to see if spam stops
-            repository.updateStudent(updatedStudent) // update DB once
+
+            if (currentSignInStatus) {
+                // Find the history from the current _allHistories value (not activeSignIns)
+                val history = _allHistories.value.find {
+                    it.studentID == updatedStudent.studentId && it.signOutTime == null
+                }
+                Log.i("History-SignIn", "History: $history")
+                repository.signOutStudent(updatedStudent, history) // Handle sign-out specifically
+                delay(10)
+                syncAllHistories()
+            } else {
+
+                val history = History(
+                    studentID = updatedStudent.studentId,
+                    date = "2025-09-01",
+                    signInTime = System.currentTimeMillis(),
+                    signOutTime = null,
+                    uid = sessionPermissions.value.uid
+                )
+                repository.signInStudent(updatedStudent, history) // Handle sign-in specifically
+                delay(10)
+                syncAllHistories()
+            }
+
             signInDebounceJobs.remove(updatedStudent.studentId) // cleanup
         }
 
@@ -163,4 +202,48 @@ class SignInViewModel(
             }
         }
     }
+
+
+    // In ViewModel
+    private fun syncAllHistories() {
+        viewModelScope.launch {
+            try {
+                val allHistories = repository.getAllHistories()
+                _allHistories.value = allHistories
+            } catch (e: Exception) {
+                Log.e("HistorySync", "Error syncing all histories: ${e.message}")
+            }
+        }
+    }
+
+    fun initialiseHistoryChannel() {
+        debounceJob?.cancel()
+        debounceJob = viewModelScope.launch {
+            val channel = ChannelManager.subscribeToHistoryChannel()
+
+            channel.collect { action ->
+                when (action) {
+                    is PostgresAction.Delete -> {
+                        val history = Json.decodeFromJsonElement<History>(action.oldRecord)
+                        _allHistories.update { list -> list - history }
+                    }
+                    is PostgresAction.Insert -> {
+                        val history = Json.decodeFromJsonElement<History>(action.record)
+                        _allHistories.update { list -> list + history }
+                    }
+                    is PostgresAction.Select -> {}
+                    is PostgresAction.Update -> {
+                        val history = Json.decodeFromJsonElement<History>(action.record)
+                        _allHistories.update { list ->
+                            list.map { if (it.historyID == history.historyID) history else it }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+
+
 }

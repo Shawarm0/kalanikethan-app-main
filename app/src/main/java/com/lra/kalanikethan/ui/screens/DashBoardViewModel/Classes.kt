@@ -84,7 +84,7 @@ fun Classes(
                         studentData = student,
                         onSignInToggle = {
 
-                            signInViewModel.signIn(it)
+                            signInViewModel.updateStudentAttendance(it, currentSignInStatus = !it.signedIn)
                         },
                         onAbsentClick = { },
                         onEditClick = { }

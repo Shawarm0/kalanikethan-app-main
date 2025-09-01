@@ -3,30 +3,23 @@ package com.lra.kalanikethan.data.repository
 
 import android.util.Log
 import com.lra.kalanikethan.data.models.Class
+import com.lra.kalanikethan.data.models.Employee
 import com.lra.kalanikethan.data.models.Family
 import com.lra.kalanikethan.data.models.FamilyWithID
+import com.lra.kalanikethan.data.models.History
 import com.lra.kalanikethan.data.models.Parent
 import com.lra.kalanikethan.data.models.PaymentPlan
 import com.lra.kalanikethan.data.models.Student
 import com.lra.kalanikethan.data.models.StudentClass
+import com.lra.kalanikethan.data.models.sessionPermissions
 import com.lra.kalanikethan.data.remote.SupabaseClientProvider
-import com.lra.kalanikethan.ui.screens.Add.PaymentData
 import io.github.jan.supabase.postgrest.from
-import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Count
-import io.github.jan.supabase.postgrest.query.request.UpsertRequestBuilder
-import io.github.jan.supabase.realtime.PostgresAction
-import io.github.jan.supabase.realtime.RealtimeChannel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.withContext
-import kotlin.collections.contains
 
 class Repository {
     // Defines the client
     private val client = SupabaseClientProvider.client
+
 
 
 
@@ -41,12 +34,38 @@ class Repository {
         return count.toInt()
     }
 
-    suspend fun updateStudent(student: Student) {
+    suspend fun signInStudent(student: Student, history: History) {
         Log.i("Repository-SignIn", "Student: $student")
         try {
             client.from("students").upsert(student) {
                 onConflict = "student_id"
             }
+
+            client.from("history").insert(history)
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+
+    suspend fun signOutStudent(student: Student, history: History?) {
+        Log.i("Repository-SignOut", "Student: $student")
+        try {
+            client.from("students").upsert(student) {
+                onConflict = "student_id"
+            }
+
+            if (history != null) {
+
+                val updatedHistory = history.copy( signOutTime = System.currentTimeMillis(), uid = sessionPermissions.value.uid )
+                client.from("history").upsert(updatedHistory) {
+                    onConflict = "history_id"
+                }
+            } else {
+                Log.i("Repository-SignOut", "Student history not found")
+            }
+
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -55,6 +74,21 @@ class Repository {
     suspend fun getAllClasses(): List<Class> {
         return client.from("classes").select().decodeList<Class>()
     }
+
+    suspend fun getAllEmployees(): List<Employee> {
+        return client.from("employees").select().decodeList<Employee>()
+    }
+
+    suspend fun getAllHistories(): List<History> {
+        return client.from("history").select().decodeList<History>()
+    }
+
+    suspend fun queryNullHistories(): List<History> {
+        return client.from("history").select().decodeList<History>().filter {
+            it.signOutTime == null
+        }
+    }
+
 
 
     suspend fun updateClassState(classID: Int, studentIDs: Set<Int>) {

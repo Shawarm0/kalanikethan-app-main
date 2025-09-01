@@ -2,100 +2,74 @@ package com.lra.kalanikethan.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.lra.kalanikethan.data.models.History
+import androidx.compose.ui.unit.dp
 import com.lra.kalanikethan.ui.components.HistoryComponent
+import com.lra.kalanikethan.ui.screens.SignIn.SignInViewModel
+import com.lra.kalanikethan.util.formatDateToDayMonth
+import com.lra.kalanikethan.util.groupHistoriesByDay
 
 @Composable
-fun History() {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
+fun History(viewModel: SignInViewModel) {
 
-        val testHistoryList = listOf(
-            History(
-                historyID = 1,
-                studentID = 123,
-                classID = 456,
-                date = "2024-01-15",
-                signInTime = 1705312800000, // January 15, 2024 10:00:00 AM
-                signOutTime = 1705323600000, // January 15, 2024 1:00:00 PM
-                uid = "uid_123_1705312800000"
-            ),
-            History(
-                historyID = 2,
-                studentID = 123,
-                classID = 456,
-                date = "2024-01-16",
-                signInTime = 1705399200000, // January 16, 2024 10:00:00 AM
-                signOutTime = 1705410000000, // January 16, 2024 1:00:00 PM
-                uid = "uid_123_1705399200000"
-            ),
-            History(
-                historyID = 3,
-                studentID = 123,
-                classID = 789,
-                date = "2024-01-17",
-                signInTime = 1705485600000, // January 17, 2024 10:00:00 AM
-                signOutTime = null, // Still signed in
-                uid = "uid_123_1705485600000"
-            ),
-            History(
-                historyID = 4,
-                studentID = 456,
-                classID = 456,
-                date = "2024-01-15",
-                signInTime = 1705316400000, // January 15, 2024 11:00:00 AM
-                signOutTime = 1705327200000, // January 15, 2024 2:00:00 PM
-                uid = "uid_456_1705316400000"
-            ),
-            History(
-                historyID = 1,
-                studentID = 123,
-                classID = 456,
-                date = "2024-01-15",
-                signInTime = 1705312800000, // January 15, 2024 10:00:00 AM
-                signOutTime = 1705323600000, // January 15, 2024 1:00:00 PM
-                uid = "uid_123_1705312800000"
-            ),
-            History(
-                historyID = 2,
-                studentID = 123,
-                classID = 456,
-                date = "2024-01-16",
-                signInTime = 1705399200000, // January 16, 2024 10:00:00 AM
-                signOutTime = 1705410000000, // January 16, 2024 1:00:00 PM
-                uid = "uid_123_1705399200000"
-            ),
-            History(
-                historyID = 3,
-                studentID = 123,
-                classID = 789,
-                date = "2024-01-17",
-                signInTime = 1705485600000, // January 17, 2024 10:00:00 AM
-                signOutTime = null, // Still signed in
-                uid = "uid_123_1705485600000"
-            ),
-            History(
-                historyID = 4,
-                studentID = 456,
-                classID = 456,
-                date = "2024-01-15",
-                signInTime = 1705316400000, // January 15, 2024 11:00:00 AM
-                signOutTime = 1705327200000, // January 15, 2024 2:00:00 PM
-                uid = "uid_456_1705316400000"
+    val students by viewModel.allStudents. collectAsState(emptyList())
+    val employees by viewModel.employees.collectAsState(emptyList())
+    val histories by viewModel.histories.collectAsState(emptyList())
+
+    // Create a map for quick student lookup by ID
+    val studentMap = remember(students) {
+        students.associateBy { it.studentId }
+    }
+    val employeeMap = remember(employees) {
+        employees.associateBy { it.uid }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.initialiseHistoryChannel()
+    }
+    LazyColumn(
+        modifier = Modifier.fillMaxSize().padding(top = 12.dp, bottom = 12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        val groupedByDay = groupHistoriesByDay(histories)
+
+        items(groupedByDay) { dayList ->
+            val day = formatDateToDayMonth(dayList[0].date)
+
+            HistoryComponent(
+                day = day,
+                data = dayList,
+                studentMap = studentMap,
+                employeeMap = employeeMap
             )
-        )
-        HistoryComponent(
-            day = "Monday",
-            data = testHistoryList
-        )
+        }
+
+
+
+//        groupedByDay.forEach { dayList ->
+//
+//            val day = formatDateToDayMonth(dayList[0].date)
+//
+//            HistoryComponent(
+//                day = day,
+//                data = dayList,
+//                studentMap = studentMap,
+//                employeeMap = employeeMap
+//            )
+//        }
     }
 }
 

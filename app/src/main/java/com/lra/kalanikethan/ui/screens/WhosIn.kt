@@ -99,7 +99,7 @@ fun WhosIn(viewModel: SignInViewModel) {
                 StudentInfoCard(
                     studentData = student,
                     onSignInToggle = {
-                        viewModel.signIn(it)
+                        viewModel.updateStudentAttendance(it, currentSignInStatus = !it.signedIn)
                     },
                     onAbsentClick = { },
                     onEditClick = {
