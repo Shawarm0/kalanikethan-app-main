@@ -77,7 +77,11 @@ import com.lra.kalanikethan.util.imeBottomPaddingFraction
 import io.github.jan.supabase.auth.SignOutScope
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.status.SessionStatus
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
 import kotlin.math.sign
 
 /**
@@ -100,15 +104,16 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val repository = Repository()
-        val signInViewModel = SignInViewModel(repository)
-        val addViewModel = AddViewModel(repository)
-        val dashboardViewModel = DashBoardViewModel(repository, signInViewModel)
 
         setContent {
             val context = LocalContext.current
             val authState = client.auth.sessionStatus.collectAsState()
             Log.i("Auth-Main", "Auth state: $authState")
+
+            val repository = remember { Repository() }
+            val signInViewModel = remember { SignInViewModel(repository) }
+            val addViewModel = remember  { AddViewModel(repository) }
+            val dashboardViewModel = remember { DashBoardViewModel(repository, signInViewModel) }
 
             LaunchedEffect(Unit) {
                 if (!SupabaseClientProvider.isUserStillValid()) {

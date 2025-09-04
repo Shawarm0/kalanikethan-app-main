@@ -1,5 +1,6 @@
 package com.lra.kalanikethan.ui.screens.SignIn
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -16,15 +17,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
+import java.time.LocalDate
 
 /**
  * ViewModel for managing student sign-in data and search functionality.
@@ -37,7 +37,7 @@ import kotlinx.serialization.json.decodeFromJsonElement
  * @param repository Data source for student information.
  */
 class SignInViewModel(
-    private val repository: Repository
+    private val repository: Repository,
 ) : ViewModel() {
 
     //Holds the complete list of students retrieved from the repository.
@@ -119,7 +119,7 @@ class SignInViewModel(
 
                 val history = History(
                     studentID = updatedStudent.studentId,
-                    date = "2025-09-01",
+                    date = "${LocalDate.now().year}-${LocalDate.now().month}-${LocalDate.now().dayOfMonth}",
                     signInTime = System.currentTimeMillis(),
                     signOutTime = null,
                     uid = sessionPermissions.value.uid
@@ -183,7 +183,7 @@ class SignInViewModel(
      */
     fun initialiseStudentsChannel() {
         debounceJob?.cancel()
-        debounceJob = viewModelScope.launch {
+        debounceJob = viewModelScope.launch() {
             val channel = ChannelManager.subscribeToStudentsChannel()
 
             channel.collect { action ->
@@ -217,8 +217,7 @@ class SignInViewModel(
     }
 
     fun initialiseHistoryChannel() {
-        debounceJob?.cancel()
-        debounceJob = viewModelScope.launch {
+        viewModelScope.launch {
             val channel = ChannelManager.subscribeToHistoryChannel()
 
             channel.collect { action ->

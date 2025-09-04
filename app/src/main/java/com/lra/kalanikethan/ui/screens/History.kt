@@ -39,6 +39,7 @@ fun History(viewModel: SignInViewModel) {
     LaunchedEffect(Unit) {
         viewModel.initialiseHistoryChannel()
     }
+
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(top = 12.dp, bottom = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
