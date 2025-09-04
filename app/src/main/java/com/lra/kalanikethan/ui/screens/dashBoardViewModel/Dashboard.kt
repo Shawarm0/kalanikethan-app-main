@@ -1,4 +1,4 @@
-package com.lra.kalanikethan.ui.screens.DashBoardViewModel
+package com.lra.kalanikethan.ui.screens.dashBoardViewModel
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,7 +16,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,15 +35,26 @@ import com.lra.kalanikethan.util.isManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+/**
+ * Composable function that displays a dashboard of classes for the current day.
+ *
+ * Shows a horizontal list of class boxes that can be clicked to navigate to class details
+ * or edited (for managers). Features a dynamically sized title with matching divider.
+ *
+ * @param viewModel The [DashBoardViewModel] that provides class data
+ * @param navController The [NavHostController] for navigation between screens
+ * @param selectedIconChange Callback function to update the selected icon in the navigation
+ */
 @Composable
-fun Dashboard(viewModel: DashBoardViewModel, navController: NavHostController, selectedIconChange: (ImageVector) -> Unit = {}) {
+fun Dashboard(
+    viewModel: DashBoardViewModel,
+    navController: NavHostController,
+    selectedIconChange: (ImageVector) -> Unit = {}
+) {
     val classes = viewModel.allClasses.collectAsState(emptyList())
     var textWidth by remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
     val scope = rememberCoroutineScope()
-
-
-
 
     Column( // This is the Title
         modifier = Modifier
@@ -70,19 +80,19 @@ fun Dashboard(viewModel: DashBoardViewModel, navController: NavHostController, s
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start,
         ) {
-            items(classes.value) {thisclass ->
+            items(classes.value) {thisClass ->
                 ClassBox(
-                    classData = thisclass,
+                    classData = thisClass,
                     isManager = isManager(),
-                    onEditClick = { thisclass ->
-                        viewModel.thisClass.value = thisclass
+                    onEditClick = { thisClass ->
+                        viewModel.thisClass.value = thisClass
                         viewModel.resetPendingUpdates()
-                        selectedIconChange(Screen.EditClass.filledicon)
+                        selectedIconChange(Screen.EditClass.filledIcon)
                         navController.navigate(Screen.EditClass.route)
                     },
-                    onClassClick = { thisclass ->
-                        viewModel.thisClass.value = thisclass
-                        selectedIconChange(Screen.Class.filledicon)
+                    onClassClick = { thisClass ->
+                        viewModel.thisClass.value = thisClass
+                        selectedIconChange(Screen.Class.filledIcon)
                         navController.navigate(Screen.Class.route)
                         scope.launch {
                             viewModel.isLoading.value = true
@@ -92,7 +102,6 @@ fun Dashboard(viewModel: DashBoardViewModel, navController: NavHostController, s
                     },
                 )
                 Spacer(modifier = Modifier.width(16.dp))
-
             }
         }
     }

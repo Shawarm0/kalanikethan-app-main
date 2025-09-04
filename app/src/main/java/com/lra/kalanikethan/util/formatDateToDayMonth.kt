@@ -1,5 +1,12 @@
 package com.lra.kalanikethan.util
 
+
+/**
+ * Formats a date string to a day and month name.
+ *
+ * @param dateString The date string to format.
+ * @return A formatted string containing the day and month name.
+ */
 fun formatDateToDayMonth(dateString: String): String {
     val parts = dateString.split("-")
     if (parts.size != 3) return dateString // Return original if format is invalid

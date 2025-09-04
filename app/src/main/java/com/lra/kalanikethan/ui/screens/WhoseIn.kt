@@ -25,7 +25,7 @@ import com.lra.kalanikethan.data.remote.ChannelManager
 import com.lra.kalanikethan.ui.components.InfoBox
 import com.lra.kalanikethan.ui.components.SimpleDecoratedTextField
 import com.lra.kalanikethan.ui.components.StudentInfoCard
-import com.lra.kalanikethan.ui.screens.SignIn.SignInViewModel
+import com.lra.kalanikethan.ui.screens.signIn.SignInViewModel
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -36,12 +36,15 @@ import kotlinx.coroutines.launch
  * This screen shows a list of students who are currently signed in, along with a search bar
  * to filter students by first name, ID, or last name.
  *
+ *
  * @param viewModel The [SignInViewModel] that provides student data and handles business logic
  * for sign-in operations, search queries, and student management.
  *
  */
 @Composable
-fun WhosIn(viewModel: SignInViewModel) {
+fun WhoseIn(
+    viewModel: SignInViewModel
+) {
     val students = viewModel.displayedStudents
         .map { studentList ->
             studentList.filter { student -> student.signedIn }
@@ -49,7 +52,6 @@ fun WhosIn(viewModel: SignInViewModel) {
         .collectAsState(emptyList())
     val searchQuery = viewModel.searchQuery.value
     val coroutineScope = rememberCoroutineScope()
-
 
     LaunchedEffect(Unit) {
         viewModel.initialiseStudentsChannel()
@@ -84,8 +86,6 @@ fun WhosIn(viewModel: SignInViewModel) {
                 text = "Total Students: ${students.value.size}",
                 fontSize = 16.sp
             )
-
-
         }
 
         LazyColumn(

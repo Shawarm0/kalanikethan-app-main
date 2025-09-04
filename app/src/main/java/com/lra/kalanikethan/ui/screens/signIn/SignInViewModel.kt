@@ -1,6 +1,7 @@
-package com.lra.kalanikethan.ui.screens.SignIn
+@file:Suppress("SpellCheckingInspection")
 
-import android.content.Context
+package com.lra.kalanikethan.ui.screens.signIn
+
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -21,7 +22,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
 import java.time.LocalDate
@@ -59,11 +59,12 @@ class SignInViewModel(
     private val _searchQuery = mutableStateOf("")
     val searchQuery: State<String> = _searchQuery
 
-    private val signInDebounceJobs = mutableMapOf<Int?, Job>()
-    private var debounceJob: Job? = null
+    private val signInDebounceMap = mutableMapOf<Int?, Job>()
+    private var signInDebounceJob: Job? = null
+    private var historyDebounceJob: Job? = null
 
     /**
-     * Loads all students from the repository and applies the initial filter.
+     * Loads all students [_allStudents], employees [_allEmployees], and histories [_allHistories] from the repository and applies the initial filter.
      */
     fun initializeStudents() {
         viewModelScope.launch {
@@ -87,8 +88,17 @@ class SignInViewModel(
      *
      * @return A [StateFlow] containing the list of students.
      */
-    fun getAllStudentsFlow(): StateFlow<List<Student>> = allStudents
+//    fun getAllStudentsFlow(): StateFlow<List<Student>> = allStudents
 
+    /**
+     * Updates student attendance with debounced database operations.
+     *
+     * Immediately updates UI state, then schedules a database update after a delay
+     * to prevent spam. Cancels any pending updates for the same student.
+     *
+     * @param updatedStudent The student with updated attendance status
+     * @param currentSignInStatus True if signing in, false if signing out
+     */
     fun updateStudentAttendance(updatedStudent: Student, currentSignInStatus: Boolean) {
         Log.i("Database-Attendance", "Student: $updatedStudent, Action: ${if (currentSignInStatus) "SignIn" else "SignOut"}")
 
@@ -100,7 +110,7 @@ class SignInViewModel(
 
 
         // Cancel any pending DB update for this student
-        signInDebounceJobs[updatedStudent.studentId]?.cancel()
+        signInDebounceMap[updatedStudent.studentId]?.cancel()
 
         // Schedule a new DB update after 1 second of inactivity
         val job = viewModelScope.launch {
@@ -111,7 +121,7 @@ class SignInViewModel(
                 val history = _allHistories.value.find {
                     it.studentID == updatedStudent.studentId && it.signOutTime == null
                 }
-                Log.i("History-SignIn", "History: $history")
+                Log.i("History-SignOut", "History: $history")
                 repository.signOutStudent(updatedStudent, history) // Handle sign-out specifically
                 delay(10)
                 syncAllHistories()
@@ -124,18 +134,15 @@ class SignInViewModel(
                     signOutTime = null,
                     uid = sessionPermissions.value.uid
                 )
+                Log.i("History-SignIn", "History: $history")
                 repository.signInStudent(updatedStudent, history) // Handle sign-in specifically
                 delay(10)
                 syncAllHistories()
             }
-
-            signInDebounceJobs.remove(updatedStudent.studentId) // cleanup
+            signInDebounceMap.remove(updatedStudent.studentId) // cleanup
         }
-
-        signInDebounceJobs[updatedStudent.studentId] = job
+        signInDebounceMap[updatedStudent.studentId] = job
     }
-
-
 
     /**
      * Updates the current search query and triggers filtering.
@@ -152,7 +159,7 @@ class SignInViewModel(
     }
 
     /**
-     * Filters the list of students based on the current [searchQuery].
+     * Filters the list of students based on the current [searchQue ry].
      *
      * Matching is done against:
      * - First name (case-insensitive)
@@ -181,16 +188,19 @@ class SignInViewModel(
      *
      * Note: Don't need to worry about unsubscription to a realTime Channel as that is done in ChannelManager
      */
+    @Suppress("SpellCheckingInspection")
     fun initialiseStudentsChannel() {
-        debounceJob?.cancel()
-        debounceJob = viewModelScope.launch() {
+        signInDebounceJob?.cancel()
+        signInDebounceJob = viewModelScope.launch {
             val channel = ChannelManager.subscribeToStudentsChannel()
 
             channel.collect { action ->
                 when (action) {
-                    is PostgresAction.Delete -> TODO()
-                    is PostgresAction.Insert -> TODO()
-                    is PostgresAction.Select -> TODO()
+                    is PostgresAction.Insert -> {
+                        val student = Json.decodeFromJsonElement<Student>(action.record)
+                        _allStudents.update { list -> list + student }
+                        filterStudents()
+                    }
                     is PostgresAction.Update -> {
                         val student = Json.decodeFromJsonElement<Student>(action.record)
                         _allStudents.update { list ->
@@ -198,13 +208,60 @@ class SignInViewModel(
                         }
                         filterStudents()
                     }
+                    is PostgresAction.Delete -> {
+                        val student = Json.decodeFromJsonElement<Student>(action.oldRecord)
+                        _allStudents.update { list -> list - student }
+                        filterStudents()
+                    }
+                    else -> {
+                        Log.i("StudentSync-SignInViewModel", "Unknown action: $action")
+                    }
                 }
             }
         }
     }
 
+    /**
+     * Subscribes to the real-time Supabase students channel.
+     *
+     * Handles updates by replacing the affected student in [_allHistories]
+     * and reapplying the current filter.
+     *
+     * Note: Don't need to worry about unsubscription to a realTime Channel as that is done in ChannelManager
+     */
+    fun initialiseHistoryChannel() {
+        historyDebounceJob?.cancel()
+        historyDebounceJob = viewModelScope.launch {
+            val channel = ChannelManager.subscribeToHistoryChannel()
 
-    // In ViewModel
+            channel.collect { action ->
+                when (action) {
+                    is PostgresAction.Insert -> {
+                        val history = Json.decodeFromJsonElement<History>(action.record)
+                        _allHistories.update { list -> list + history }
+                    }
+                    is PostgresAction.Update -> {
+                        val history = Json.decodeFromJsonElement<History>(action.record)
+                        _allHistories.update { list ->
+                            list.map { if (it.historyID == history.historyID) history else it }
+                        }
+                    }
+                    is PostgresAction.Delete -> {
+                        val history = Json.decodeFromJsonElement<History>(action.oldRecord)
+                        _allHistories.update { list -> list - history }
+                    }
+                    else -> {
+                        Log.i("HistorySync-SignInViewModel", "Unknown action: $action")
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Syncs all histories from the repository to the local state.
+     * Handles any exceptions during the sync process.
+     */
     private fun syncAllHistories() {
         viewModelScope.launch {
             try {
@@ -215,34 +272,5 @@ class SignInViewModel(
             }
         }
     }
-
-    fun initialiseHistoryChannel() {
-        viewModelScope.launch {
-            val channel = ChannelManager.subscribeToHistoryChannel()
-
-            channel.collect { action ->
-                when (action) {
-                    is PostgresAction.Delete -> {
-                        val history = Json.decodeFromJsonElement<History>(action.oldRecord)
-                        _allHistories.update { list -> list - history }
-                    }
-                    is PostgresAction.Insert -> {
-                        val history = Json.decodeFromJsonElement<History>(action.record)
-                        _allHistories.update { list -> list + history }
-                    }
-                    is PostgresAction.Select -> {}
-                    is PostgresAction.Update -> {
-                        val history = Json.decodeFromJsonElement<History>(action.record)
-                        _allHistories.update { list ->
-                            list.map { if (it.historyID == history.historyID) history else it }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-
-
 
 }

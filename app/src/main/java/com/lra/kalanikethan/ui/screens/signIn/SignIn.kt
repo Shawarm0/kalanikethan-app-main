@@ -1,6 +1,5 @@
-package com.lra.kalanikethan.ui.screens.SignIn
+package com.lra.kalanikethan.ui.screens.signIn
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,19 +31,15 @@ import kotlinx.coroutines.launch
  *
  * @param viewModel The view model for the sign in screen.
  */
-
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun SignIn(viewModel: SignInViewModel) {
+fun SignIn(
+    viewModel: SignInViewModel
+) {
     val students = viewModel.displayedStudents.collectAsState(emptyList())
     val searchQuery = viewModel.searchQuery.value
     val coroutineScope = rememberCoroutineScope()
 
-
-
-    // Use DisposableEffect to handle channel lifecycle
     LaunchedEffect(Unit) {
-        // Create the channel when the composable enters composition
         viewModel.initialiseStudentsChannel()
     }
 
@@ -60,8 +55,6 @@ fun SignIn(viewModel: SignInViewModel) {
             onValueChange = { viewModel.updateSearchQuery(it) },
             placeholder = "Search by firstname, ID or lastname...",
             leadingIcon = Icons.Default.Search,
-//            bringIntoViewRequester = bringIntoViewRequester,
-//            coroutineScope = coroutineScope,
             modifier = Modifier.width(1075.dp),
             clearButton = true,
         )

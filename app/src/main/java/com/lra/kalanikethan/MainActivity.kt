@@ -62,27 +62,22 @@ import com.lra.kalanikethan.ui.components.TopAppBar
 import com.lra.kalanikethan.ui.screens.Add.Add
 import com.lra.kalanikethan.ui.screens.Add.AddViewModel
 import com.lra.kalanikethan.ui.screens.Auth.AuthActivity
-import com.lra.kalanikethan.ui.screens.DashBoardViewModel.Classes
-import com.lra.kalanikethan.ui.screens.DashBoardViewModel.DashBoardViewModel
-import com.lra.kalanikethan.ui.screens.DashBoardViewModel.Dashboard
-import com.lra.kalanikethan.ui.screens.DashBoardViewModel.EditClass
+import com.lra.kalanikethan.ui.screens.dashBoardViewModel.Classes
+import com.lra.kalanikethan.ui.screens.dashBoardViewModel.DashBoardViewModel
+import com.lra.kalanikethan.ui.screens.dashBoardViewModel.Dashboard
+import com.lra.kalanikethan.ui.screens.dashBoardViewModel.EditClass
 import com.lra.kalanikethan.ui.screens.History
 import com.lra.kalanikethan.ui.screens.Payments
-import com.lra.kalanikethan.ui.screens.SignIn.SignIn
-import com.lra.kalanikethan.ui.screens.SignIn.SignInViewModel
-import com.lra.kalanikethan.ui.screens.WhosIn
+import com.lra.kalanikethan.ui.screens.signIn.SignIn
+import com.lra.kalanikethan.ui.screens.signIn.SignInViewModel
+import com.lra.kalanikethan.ui.screens.WhoseIn
 import com.lra.kalanikethan.ui.theme.Background
 import com.lra.kalanikethan.ui.theme.KalanikethanTheme
 import com.lra.kalanikethan.util.imeBottomPaddingFraction
 import io.github.jan.supabase.auth.SignOutScope
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.status.SessionStatus
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
-import kotlin.math.sign
 
 /**
  * The main entry point of the app
@@ -206,14 +201,18 @@ class MainActivity : ComponentActivity() {
  *
  * Each screen is defined as a sealed object with,
  * - [route] a unique string,
- * - [filledicon] which is the icon when selected =
+ * - [filledIcon] which is the icon when selected =
  * - [outlinedIcon] which is the icon when not selected.
  */
-sealed class Screen(val route: String, val filledicon: ImageVector, val outlinedIcon: ImageVector) {
+sealed class Screen(
+    val route: String,
+    val filledIcon: ImageVector,
+    val outlinedIcon: ImageVector
+) {
     object Dashboard : Screen("dashboard", Icons.Filled.Home, Icons.Outlined.Home)
     object SignIn : Screen("sign_in", Icons.Filled.PersonAdd, Icons.Outlined.PersonAdd)
     object Add : Screen("add", Icons.Filled.AddCircle, Icons.Outlined.AddCircleOutline)
-    object WhosIn : Screen("whos_in", Icons.Filled.PersonSearch, Icons.Outlined.PersonSearch)
+    object WhoseIn : Screen("who's_in", Icons.Filled.PersonSearch, Icons.Outlined.PersonSearch)
     object History : Screen("history", Icons.Filled.History, Icons.Outlined.HistoryToggleOff)
     object Payments : Screen("payments", Icons.Filled.Payment, Icons.Outlined.Payment)
     object Account : Screen("account", Icons.Filled.AccountCircle, Icons.Outlined.AccountCircle)
@@ -240,7 +239,11 @@ sealed class Screen(val route: String, val filledicon: ImageVector, val outlined
  * The selected screen is derived from the current back stack, and updated when a drawer item is clicked.
  */
 @Composable
-fun KalanikethanApp(signInViewModel: SignInViewModel, addViewModel: AddViewModel, dashboardViewModel: DashBoardViewModel) {
+fun KalanikethanApp(
+    signInViewModel: SignInViewModel,
+    addViewModel: AddViewModel,
+    dashboardViewModel: DashBoardViewModel
+) {
     // This stores the state of the navigation drawer
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     // This is required to handle the the navigation drawer not on the main thread
@@ -250,7 +253,7 @@ fun KalanikethanApp(signInViewModel: SignInViewModel, addViewModel: AddViewModel
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val selectedScreen = navBackStackEntry?.destination?.route ?: Screen.Dashboard.route
-    var selectedIcon by remember { mutableStateOf(Screen.Dashboard.filledicon) }
+    var selectedIcon by remember { mutableStateOf(Screen.Dashboard.filledIcon) }
     // This is to clear focus
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
@@ -272,7 +275,7 @@ fun KalanikethanApp(signInViewModel: SignInViewModel, addViewModel: AddViewModel
                         launchSingleTop = true
                         restoreState = true
                     }
-                    selectedIcon = newScreen.filledicon
+                    selectedIcon = newScreen.filledIcon
 
                 }
             )
@@ -302,13 +305,13 @@ fun KalanikethanApp(signInViewModel: SignInViewModel, addViewModel: AddViewModel
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() }
             )
-        ) { innerpadding ->
+        ) { innerPadding ->
             NavHost(navController,
                 startDestination = selectedScreen,
                 modifier = Modifier
                     .fillMaxSize()
                     .background(color = Background)
-                    .padding(innerpadding)
+                    .padding(innerPadding)
                     .imeBottomPaddingFraction(0.9f),
 
             ) {
@@ -317,7 +320,7 @@ fun KalanikethanApp(signInViewModel: SignInViewModel, addViewModel: AddViewModel
                 }) }
                 composable(route = Screen.SignIn.route) { SignIn(signInViewModel) }
                 composable(route = Screen.Add.route) { Add(addViewModel) }
-                composable(route = Screen.WhosIn.route) { WhosIn(signInViewModel) }
+                composable(route = Screen.WhoseIn.route) { WhoseIn(signInViewModel) }
                 composable(route = Screen.History.route) { History(signInViewModel) }
                 composable(route = Screen.Payments.route) { Payments() }
                 composable(route = Screen.Account.route) { }

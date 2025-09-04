@@ -108,7 +108,7 @@ fun KalanikethanAppDrawer(
                 Screen.Dashboard,
                 Screen.SignIn,
                 Screen.Add,
-                Screen.WhosIn,
+                Screen.WhoseIn,
                 Screen.History,
                 Screen.Payments,
             )
@@ -116,7 +116,7 @@ fun KalanikethanAppDrawer(
             Column {
                 drawerScreens.forEach { screen ->
                     AppDrawerItem(
-                        icon = if (selectedScreen == screen.route) screen.filledicon else screen.outlinedIcon,
+                        icon = if (selectedScreen == screen.route) screen.filledIcon else screen.outlinedIcon,
                         text = screen.route.replaceFirstChar { it.uppercaseChar() }.replace("_", " "),
                         isSelected = selectedScreen == screen.route,
                         onClick = { onScreenSelected(screen) }

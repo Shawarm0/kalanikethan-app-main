@@ -1,4 +1,4 @@
-package com.lra.kalanikethan.ui.screens.DashBoardViewModel
+package com.lra.kalanikethan.ui.screens.dashBoardViewModel
 
 
 import androidx.compose.foundation.layout.Arrangement
@@ -28,9 +28,18 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.lra.kalanikethan.ui.components.StudentInfoCard
-import com.lra.kalanikethan.ui.screens.SignIn.SignInViewModel
+import com.lra.kalanikethan.ui.screens.signIn.SignInViewModel
 
-
+/**
+ * Composable function that displays a class roster with student information and attendance controls.
+ *
+ * Shows a loading indicator while data is being fetched, then displays the class teacher's name
+ * and a list of students with sign-in/out functionality. The layout features consistent left padding
+ * for title and student list alignment.
+ *
+ * @param viewModel The [DashBoardViewModel] that provides class and student data
+ * @param signInViewModel The [SignInViewModel] that handles attendance update operations
+ */
 @Composable
 fun Classes(
     viewModel: DashBoardViewModel,
@@ -83,7 +92,6 @@ fun Classes(
                     StudentInfoCard(
                         studentData = student,
                         onSignInToggle = {
-
                             signInViewModel.updateStudentAttendance(it, currentSignInStatus = !it.signedIn)
                         },
                         onAbsentClick = { },

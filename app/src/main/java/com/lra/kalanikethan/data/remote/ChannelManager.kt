@@ -45,7 +45,7 @@ object ChannelManager {
 
     suspend fun subscribeToHistoryChannel(): Flow<PostgresAction> {
         delay(10)
-        Log.i("ChannelManager", "Attempting to connect to students channel")
+        Log.i("ChannelManager", "Attempting to connect to history channel")
         historyChannel.subscribe()
         return historyChannel.getFlow()
     }

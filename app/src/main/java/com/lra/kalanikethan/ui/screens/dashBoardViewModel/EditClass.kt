@@ -1,4 +1,4 @@
-package com.lra.kalanikethan.ui.screens.DashBoardViewModel
+package com.lra.kalanikethan.ui.screens.dashBoardViewModel
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -28,7 +27,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,54 +42,57 @@ import com.lra.kalanikethan.ui.components.Button
 import com.lra.kalanikethan.ui.components.ClassStudentComposable
 import com.lra.kalanikethan.ui.components.ClassStudentDisplay
 import com.lra.kalanikethan.ui.components.SimpleDecoratedTextField
-import com.lra.kalanikethan.ui.screens.SignIn.SignInViewModel
+import com.lra.kalanikethan.ui.screens.signIn.SignInViewModel
 import com.lra.kalanikethan.ui.theme.SuccessColor
-import io.ktor.util.Hash.combine
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlin.collections.mutableListOf
-import kotlin.math.sign
 
+/**
+ * Composable function for editing class details and managing student assignments.
+ *
+ * This screen allows editing of class information (teacher name, type, start/end times)
+ * and managing which students are assigned to the class. Features a split layout with
+ * current class students on the left and a searchable list of all students on the right.
+ *
+ * @param viewModel The [DashBoardViewModel] that provides class data and manages student selections
+ * @param signInViewModel The [SignInViewModel] that provides student data and search functionality
+ * @param navController The [NavHostController] for navigation back to the dashboard
+ */
 @Composable
 fun EditClass(
     viewModel: DashBoardViewModel,
     signInViewModel: SignInViewModel,
     navController: NavHostController
-)
-{
+) {
     val thisClass = viewModel.thisClass.value
     var students by remember { mutableStateOf<List<Student>>(emptyList()) }
     val allStudents = signInViewModel.displayedStudents.collectAsState(emptyList())
 
+    // Initialize state and load class students
     LaunchedEffect(Unit) {
         signInViewModel.removeSearchQuery()
         viewModel.getStudentsForClassFlow(thisClass.classId).collect {
             students = it
             for (student in it) {
-                viewModel.toggleStudentSelection(thisClass.classId,student.studentId ?: return@collect, isSelected = true)
+                viewModel.toggleStudentSelection(
+                    thisClass.classId,
+                    student.studentId ?: return@collect,
+                    isSelected = true
+                )
             }
         }
     }
 
     val searchQuery = signInViewModel.searchQuery.value
-    val coroutineScope = rememberCoroutineScope()
     var textWidth by remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
 
-
-
-
-    // Title Section with 113.dp padding from left
-
     Row(
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-
+        // Left Section: Class Details and Current Students
         Column {
-
+            // Class Title Section
             Column(
                 modifier = Modifier
                     .padding(start = 53.dp, top = 14.dp)
@@ -109,84 +110,72 @@ fun EditClass(
                 Spacer(modifier = Modifier.height(14.dp))
             }
 
+            // Class Information Form
             Column(
                 modifier = Modifier
-                    .wrapContentWidth().padding(top = 15.dp),
+                    .wrapContentWidth()
+                    .padding(top = 15.dp),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start
             ) {
-
-                Column(
-                    modifier = Modifier.wrapContentHeight().wrapContentWidth()
-                        .padding(start = 53.dp),
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.Start,
+                // Class Details Row 1: Teacher Name and Start Time
+                Row(
+                    modifier = Modifier.wrapContentSize(),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        modifier = Modifier.wrapContentSize(),
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        SimpleDecoratedTextField(
-                            modifier = Modifier.width(328.dp).height(60.dp),
-                            text = thisClass.teacherName,
-                            placeholder = "Enter Teacher Name",
-                            label = "Teacher Name",
-                            onValueChange = {
-
-                            },
-                        )
-                        Spacer(modifier = Modifier.width(25.dp))
-                        SimpleDecoratedTextField(
-                            modifier = Modifier.width(328.dp).height(60.dp),
-                            text = thisClass.startTime.toString(),
-                            placeholder = "Enter Start Time",
-                            label = "Start Time",
-                            onValueChange = {
-
-                            },
-                        )
-
-                    }
-
-
-                    Spacer(modifier = Modifier.height(13.dp))
-                    Row(
-                        modifier = Modifier.wrapContentSize(),
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        SimpleDecoratedTextField(
-                            modifier = Modifier.width(328.dp).height(60.dp),
-                            text = thisClass.type,
-                            placeholder = "Enter Type",
-                            label = "Type",
-                            onValueChange = {
-
-                            },
-                        )
-                        Spacer(modifier = Modifier.width(25.dp))
-                        SimpleDecoratedTextField(
-                            modifier = Modifier.width(328.dp).height(60.dp),
-                            text = thisClass.endTime.toString(),
-                            placeholder = "Enter End Time",
-                            label = "End Time",
-                            onValueChange = {
-
-                            },
-                        )
-
-                    }
+                    SimpleDecoratedTextField(
+                        modifier = Modifier.width(328.dp).height(60.dp),
+                        text = thisClass.teacherName,
+                        placeholder = "Enter Teacher Name",
+                        label = "Teacher Name",
+                        onValueChange = { /* Handle teacher name change */ },
+                    )
+                    Spacer(modifier = Modifier.width(25.dp))
+                    SimpleDecoratedTextField(
+                        modifier = Modifier.width(328.dp).height(60.dp),
+                        text = thisClass.startTime.toString(),
+                        placeholder = "Enter Start Time",
+                        label = "Start Time",
+                        onValueChange = { /* Handle start time change */ },
+                    )
                 }
 
-                // Title Section with 113.dp padding from left
+                Spacer(modifier = Modifier.height(13.dp))
+
+                // Class Details Row 2: Type and End Time
+                Row(
+                    modifier = Modifier.wrapContentSize(),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    SimpleDecoratedTextField(
+                        modifier = Modifier.width(328.dp).height(60.dp),
+                        text = thisClass.type,
+                        placeholder = "Enter Type",
+                        label = "Type",
+                        onValueChange = { /* Handle type change */ },
+                    )
+                    Spacer(modifier = Modifier.width(25.dp))
+                    SimpleDecoratedTextField(
+                        modifier = Modifier.width(328.dp).height(60.dp),
+                        text = thisClass.endTime.toString(),
+                        placeholder = "Enter End Time",
+                        label = "End Time",
+                        onValueChange = { /* Handle end time change */ },
+                    )
+                }
+
+                // Current Students Section
                 Column(
                     modifier = Modifier
                         .padding(start = 53.dp, top = 19.dp)
                         .wrapContentSize()
                 ) {
+                    // Students Title
                     Column(
-                        modifier = Modifier.wrapContentHeight().wrapContentWidth(),
+                        modifier = Modifier
+                            .wrapContentSize(),
                         verticalArrangement = Arrangement.Top,
                         horizontalAlignment = Alignment.Start,
                     ) {
@@ -202,9 +191,11 @@ fun EditClass(
                         Spacer(modifier = Modifier.height(14.dp))
                     }
 
+                    // Current Students List
                     LazyColumn(
                         modifier = Modifier
-                            .fillMaxHeight().wrapContentWidth()
+                            .fillMaxHeight()
+                            .wrapContentWidth()
                             .padding(top = 5.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -214,30 +205,25 @@ fun EditClass(
                                 modifier = Modifier.width(681.dp).wrapContentHeight(),
                                 name = "${student.firstName} ${student.lastName}"
                             )
-
                         }
-
                     }
                 }
-
-
             }
         }
 
-        VerticalDivider(
-            modifier = Modifier.height(400.dp)
+        // Vertical Divider separating sections
+        VerticalDivider(modifier = Modifier.height(400.dp))
 
-        )
-
-
+        // Right Section: Student Search and Selection
         Column(
             modifier = Modifier
-                .fillMaxHeight().wrapContentWidth()
+                .fillMaxHeight()
+                .wrapContentWidth()
                 .padding(top = 100.dp, end = 70.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-
+            // Search Field
             SimpleDecoratedTextField(
                 text = searchQuery,
                 onValueChange = { signInViewModel.updateSearchQuery(it) },
@@ -247,13 +233,14 @@ fun EditClass(
                 clearButton = true,
             )
 
+            // All Students List (Searchable)
             LazyColumn(
                 modifier = Modifier
-                    .weight(1f).wrapContentWidth(),
+                    .weight(1f)
+                    .wrapContentWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-
                 items(allStudents.value) { student ->
                     ClassStudentComposable(
                         modifier = Modifier.width(367.dp).wrapContentHeight(),
@@ -261,16 +248,15 @@ fun EditClass(
                         isSelected = students.any { it.studentId == student.studentId },
                         onClickListener = {
                             if (students.any { it.studentId == student.studentId }) {
-
+                                // Remove student from class
                                 students = students.filter { it.studentId != student.studentId }
-
                                 viewModel.toggleStudentSelection(
                                     thisClass.classId,
                                     student.studentId ?: return@ClassStudentComposable,
                                     isSelected = false
                                 )
-
                             } else {
+                                // Add student to class
                                 students += student
                                 viewModel.toggleStudentSelection(
                                     thisClass.classId,
@@ -283,6 +269,7 @@ fun EditClass(
                 }
             }
 
+            // Save Button
             Button(
                 text = "Save",
                 symbol = Icons.Default.Check,

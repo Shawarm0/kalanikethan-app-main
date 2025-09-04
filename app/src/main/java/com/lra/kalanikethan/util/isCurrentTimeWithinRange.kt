@@ -1,12 +1,16 @@
 package com.lra.kalanikethan.util
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import java.time.Instant
 import java.time.LocalTime
 import java.time.ZoneId
 
-@RequiresApi(Build.VERSION_CODES.O)
+/**
+ * Checks if the current time is within the specified range.
+ *
+ * @param startMillis The start time in milliseconds.
+ * @param endMillis The end time in milliseconds.
+ * @return `true` if the current time is within the specified range, `false` otherwise.
+ */
 fun isCurrentTimeWithinRange(startMillis: Long, endMillis: Long): Boolean {
     val zoneId = ZoneId.systemDefault()
 
