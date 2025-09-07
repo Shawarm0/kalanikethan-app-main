@@ -42,7 +42,7 @@ fun History(
     viewModel: SignInViewModel
 ) {
 
-    val students by viewModel.allStudents. collectAsState(emptyList())
+    val students by viewModel.allStudents.collectAsState(emptyList())
     val employees by viewModel.employees.collectAsState(emptyList())
     val histories by viewModel.histories.collectAsState(emptyList())
 

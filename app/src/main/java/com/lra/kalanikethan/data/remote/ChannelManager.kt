@@ -28,6 +28,8 @@ object ChannelManager {
     // Channel listening for history-related realtime updates.
     private val historyChannel = Channel(client.channel("history-listener"), "history", managerScope)
 
+    private val paymentChannel = Channel(client.channel("payment-listener"), "payment_history", managerScope)
+
     /**
      * Subscribes to the students channel.
      *

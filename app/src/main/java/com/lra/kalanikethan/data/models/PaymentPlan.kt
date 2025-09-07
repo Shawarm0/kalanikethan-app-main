@@ -12,3 +12,10 @@ data class PaymentPlan(
     val payment_date : LocalDate,
     val family_payment_id : String
 )
+
+data class FamilyPayments(
+    val family : FamilyWithID,
+    val currentPayment : PaymentHistory,
+    val pastPayments : List<PaymentHistory>? = null,
+    val paymentPlan : PaymentPlan
+)

@@ -8,6 +8,7 @@ import com.lra.kalanikethan.data.models.Family
 import com.lra.kalanikethan.data.models.FamilyWithID
 import com.lra.kalanikethan.data.models.History
 import com.lra.kalanikethan.data.models.Parent
+import com.lra.kalanikethan.data.models.PaymentHistory
 import com.lra.kalanikethan.data.models.PaymentPlan
 import com.lra.kalanikethan.data.models.Student
 import com.lra.kalanikethan.data.models.StudentClass
@@ -34,6 +35,30 @@ class Repository {
         return count.toInt()
     }
 
+    suspend fun getPlanFromID(id : String) : PaymentPlan{
+        return client.from("payment_plan").select {
+            filter {
+                PaymentPlan::family_payment_id eq id
+            }
+        }.decodeSingle<PaymentPlan>()
+    }
+
+    suspend fun getFamilyFromID(id : String) : FamilyWithID{
+        return client.from("families").select {
+            filter {
+                FamilyWithID::familyID eq id
+            }
+        }.decodeSingle<FamilyWithID>()
+    }
+
+    suspend fun getUnpaidPayments() : List<PaymentHistory>{
+        return client.from("payment_history").select{
+            filter {
+                PaymentHistory::paid eq false
+            }
+        }.decodeList<PaymentHistory>()
+    }
+
     suspend fun signInStudent(student: Student, history: History) {
         Log.i("Repository-SignIn", "Student: $student")
         try {
@@ -47,7 +72,6 @@ class Repository {
             e.printStackTrace()
         }
     }
-
 
     suspend fun signOutStudent(student: Student, history: History?) {
         Log.i("Repository-SignOut", "Student: $student")

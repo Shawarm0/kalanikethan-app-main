@@ -151,7 +151,7 @@ fun PaymentComponent(
 
                 InfoBox(
                     modifier = Modifier.wrapContentWidth().wrapContentHeight().clip(RoundedCornerShape(16.dp)),
-                    text = "DD/MM/YYYY",
+                    text = data.paymentDate,
                     fontSize = 14.sp,
                 )
             }

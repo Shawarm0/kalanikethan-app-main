@@ -67,7 +67,8 @@ import com.lra.kalanikethan.ui.screens.dashBoardViewModel.DashBoardViewModel
 import com.lra.kalanikethan.ui.screens.dashBoardViewModel.Dashboard
 import com.lra.kalanikethan.ui.screens.dashBoardViewModel.EditClass
 import com.lra.kalanikethan.ui.screens.History
-import com.lra.kalanikethan.ui.screens.Payments
+import com.lra.kalanikethan.ui.screens.Payments.PaymentViewModel
+import com.lra.kalanikethan.ui.screens.Payments.Payments
 import com.lra.kalanikethan.ui.screens.signIn.SignIn
 import com.lra.kalanikethan.ui.screens.signIn.SignInViewModel
 import com.lra.kalanikethan.ui.screens.WhoseIn
@@ -109,6 +110,7 @@ class MainActivity : ComponentActivity() {
             val signInViewModel = remember { SignInViewModel(repository) }
             val addViewModel = remember  { AddViewModel(repository) }
             val dashboardViewModel = remember { DashBoardViewModel(repository, signInViewModel) }
+            val paymentViewModel = remember { PaymentViewModel(repository) }
 
             LaunchedEffect(Unit) {
                 if (!SupabaseClientProvider.isUserStillValid()) {
@@ -122,7 +124,7 @@ class MainActivity : ComponentActivity() {
                         // User is authenticated
                         signInViewModel.initializeStudents()
                         dashboardViewModel.loadClasses()
-                        KalanikethanApp(signInViewModel, addViewModel, dashboardViewModel)
+                        KalanikethanApp(signInViewModel, addViewModel, dashboardViewModel, paymentViewModel)
                     }
                     SessionStatus.Initializing -> {
                         // Still loading, show loading UI
@@ -242,7 +244,8 @@ sealed class Screen(
 fun KalanikethanApp(
     signInViewModel: SignInViewModel,
     addViewModel: AddViewModel,
-    dashboardViewModel: DashBoardViewModel
+    dashboardViewModel: DashBoardViewModel,
+    paymentViewModel: PaymentViewModel
 ) {
     // This stores the state of the navigation drawer
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -322,7 +325,7 @@ fun KalanikethanApp(
                 composable(route = Screen.Add.route) { Add(addViewModel) }
                 composable(route = Screen.WhoseIn.route) { WhoseIn(signInViewModel) }
                 composable(route = Screen.History.route) { History(signInViewModel) }
-                composable(route = Screen.Payments.route) { Payments() }
+                composable(route = Screen.Payments.route) { Payments(paymentViewModel) }
                 composable(route = Screen.Account.route) { }
                 composable(route = Screen.Class.route) { Classes(dashboardViewModel, signInViewModel) }
                 composable(route = Screen.EditClass.route) { EditClass(dashboardViewModel, signInViewModel, navController) }
