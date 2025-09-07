@@ -31,9 +31,9 @@ fun Payments(paymentViewModel: PaymentViewModel) {
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(5.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        contentPadding = PaddingValues(vertical = 5.dp)
+        contentPadding = PaddingValues(vertical = 14.dp)
     ) {
         items(unpaidFamilies){ family ->
             val paymentData = PaymentData(
@@ -44,7 +44,10 @@ fun Payments(paymentViewModel: PaymentViewModel) {
                 amount = family.paymentPlan.amount.toString()
             )
             PaymentComponent(
-                data = paymentData
+                data = paymentData,
+                onConfirmClick = {
+                    paymentViewModel.confirmPayment(family.currentPayment.payment_id as Int)
+                }
             )
         }
     }

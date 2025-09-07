@@ -3,14 +3,8 @@ package com.lra.kalanikethan.ui.screens.Payments
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.lra.kalanikethan.data.models.Family
 import com.lra.kalanikethan.data.models.FamilyPayments
-import com.lra.kalanikethan.data.models.FamilyWithID
-import com.lra.kalanikethan.data.models.PaymentHistory
-import com.lra.kalanikethan.data.models.PaymentPlan
-import com.lra.kalanikethan.data.remote.SupabaseClientProvider
 import com.lra.kalanikethan.data.repository.Repository
-import io.github.jan.supabase.postgrest.from
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,8 +31,40 @@ class PaymentViewModel(
                 Log.i("Database", "Added due payment of ${payment.family_payment_id}")
             }
             _unpaidFamilies.update {
-                    list -> (list + finalList.toList()).distinctBy { it.currentPayment.payment_id }
+                    payments -> filterPayments(payments, finalList)
+            //(list + finalList.toList()).distinctBy { it.currentPayment.payment_id }
             }
         }
+    }
+
+    fun confirmPayment(id : Int){
+        viewModelScope.launch {
+            try{
+                repository.confirmPayment(id)
+                _unpaidFamilies.update { list -> removePaymentFromList(id, list) }
+            } catch (e : Exception){
+                Log.e("Database", "Failed to confirm payment with id $id : $e")
+            }
+
+        }
+    }
+
+    private fun removePaymentFromList(id: Int, list: List<FamilyPayments>) : List<FamilyPayments>{
+        val mutable = list.toMutableList()
+        for (payment in mutable){
+            if(payment.currentPayment.payment_id == id){
+                mutable.remove(payment)
+            }
+        }
+        return mutable.toList()
+    }
+
+    private fun filterPayments(original : List<FamilyPayments>, new : MutableList<FamilyPayments>) : List<FamilyPayments>{
+        val mutable = original.toMutableList()
+
+        mutable.clear()
+        mutable.addAll(new)
+
+        return mutable.toList()
     }
 }

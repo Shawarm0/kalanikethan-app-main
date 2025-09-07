@@ -59,6 +59,18 @@ class Repository {
         }.decodeList<PaymentHistory>()
     }
 
+    suspend fun confirmPayment(id : Int){
+        client.from("payment_history").update(
+            {
+                PaymentHistory::paid setTo true
+            }
+        ){
+            filter {
+                PaymentHistory::payment_id eq id
+            }
+        }
+    }
+
     suspend fun signInStudent(student: Student, history: History) {
         Log.i("Repository-SignIn", "Student: $student")
         try {
