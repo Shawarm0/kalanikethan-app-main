@@ -16,6 +16,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import com.lra.kalanikethan.Screen
 import com.lra.kalanikethan.data.models.FamilyPayments
 import com.lra.kalanikethan.ui.components.PaymentComponent
 import com.lra.kalanikethan.ui.screens.Add.PaymentData
@@ -28,7 +30,10 @@ import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 @Composable
-fun Payments(paymentViewModel: PaymentViewModel) {
+fun Payments(
+    paymentViewModel: PaymentViewModel,
+    navController : NavHostController
+) {
     val unpaidFamilies by paymentViewModel.unpaidFamilies.collectAsState(emptyList())
     val instant = Clock.System.now()
     val localDate = instant.toLocalDateTime(TimeZone.currentSystemDefault()).date
@@ -57,7 +62,8 @@ fun Payments(paymentViewModel: PaymentViewModel) {
                     paymentViewModel.confirmPayment(family.currentPayment.payment_id as Int, family.currentPayment.family_payment_id)
                 },
                 onViewHistoryClick = {
-                    println(family)
+                    paymentViewModel.updateCurrentFamily(family.currentPayment.family_payment_id, family.family.familyName, family.paymentPlan.amount.toString())
+                    navController.navigate(Screen.PaymentHistory.route)
                 },
                 overdue = localDate > family.currentPayment.due_date
             )

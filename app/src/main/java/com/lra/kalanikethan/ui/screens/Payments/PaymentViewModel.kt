@@ -1,8 +1,10 @@
 package com.lra.kalanikethan.ui.screens.Payments
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.lra.kalanikethan.Screen
 import com.lra.kalanikethan.data.models.FamilyPayments
 import com.lra.kalanikethan.data.repository.Repository
 import kotlinx.coroutines.Job
@@ -21,6 +23,9 @@ class PaymentViewModel(
     private val _unpaidFamilies = MutableStateFlow<List<FamilyPayments>>(emptyList())
     val unpaidFamilies : StateFlow<List<FamilyPayments>> = _unpaidFamilies
     private var unpaidDebounceJob: Job? = null
+
+    private val _currentFamily = mutableStateOf(PaymentHistoryData())
+    val currentFamily = _currentFamily
 
     fun getUnpaidPayments(){
         unpaidDebounceJob?.cancel()
@@ -61,6 +66,13 @@ class PaymentViewModel(
         }
     }
 
+    fun updateCurrentFamily(familyId: String, familyName : String, amount : String){
+        viewModelScope.launch {
+            val list = repository.getFamilyPaymentHistory(familyId)
+            _currentFamily.value = PaymentHistoryData(history = list, familyName = familyName, familyID = familyId, amount = amount)
+        }
+    }
+
     private fun removePaymentFromList(id: Int, list: List<FamilyPayments>) : List<FamilyPayments>{
         val mutable = list.toMutableList()
         val toRemove : MutableList<FamilyPayments> = mutableListOf()
@@ -80,9 +92,5 @@ class PaymentViewModel(
         mutable.addAll(new)
 
         return mutable.toList()
-    }
-
-    private fun addMonth(date: LocalDate) : LocalDate{
-        return date.plus(1, DateTimeUnit.MONTH)
     }
 }

@@ -28,6 +28,7 @@ import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.AddCircleOutline
 import androidx.compose.material.icons.outlined.Class
 import androidx.compose.material.icons.outlined.EditNote
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.HistoryToggleOff
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Payment
@@ -67,6 +68,7 @@ import com.lra.kalanikethan.ui.screens.dashBoardViewModel.DashBoardViewModel
 import com.lra.kalanikethan.ui.screens.dashBoardViewModel.Dashboard
 import com.lra.kalanikethan.ui.screens.dashBoardViewModel.EditClass
 import com.lra.kalanikethan.ui.screens.History
+import com.lra.kalanikethan.ui.screens.Payments.PaymentHistory
 import com.lra.kalanikethan.ui.screens.Payments.PaymentViewModel
 import com.lra.kalanikethan.ui.screens.Payments.Payments
 import com.lra.kalanikethan.ui.screens.signIn.SignIn
@@ -221,6 +223,7 @@ sealed class Screen(
     object Class : Screen("class", Icons.Filled.Class, Icons.Outlined.Class)
     object EditClass : Screen("edit_class", Icons.Filled.EditNote, Icons.Outlined.EditNote)
     object EditFamily: Screen("edit_family", Icons.Filled.EditNote, Icons.Outlined.EditNote)
+    object PaymentHistory: Screen("payment_history", Icons.Filled.History, Icons.Outlined.History)
 }
 
 
@@ -325,11 +328,12 @@ fun KalanikethanApp(
                 composable(route = Screen.Add.route) { Add(addViewModel) }
                 composable(route = Screen.WhoseIn.route) { WhoseIn(signInViewModel) }
                 composable(route = Screen.History.route) { History(signInViewModel) }
-                composable(route = Screen.Payments.route) { Payments(paymentViewModel) }
+                composable(route = Screen.Payments.route) { Payments(paymentViewModel, navController) }
                 composable(route = Screen.Account.route) { }
                 composable(route = Screen.Class.route) { Classes(dashboardViewModel, signInViewModel) }
                 composable(route = Screen.EditClass.route) { EditClass(dashboardViewModel, signInViewModel, navController) }
                 composable(route = Screen.EditFamily.route) {  }
+                composable(route = Screen.PaymentHistory.route) { PaymentHistory(paymentViewModel, navController) }
             }
         }
     }

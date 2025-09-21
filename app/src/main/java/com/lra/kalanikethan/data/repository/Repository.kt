@@ -5,6 +5,7 @@ import android.util.Log
 import com.lra.kalanikethan.data.models.Class
 import com.lra.kalanikethan.data.models.Employee
 import com.lra.kalanikethan.data.models.Family
+import com.lra.kalanikethan.data.models.FamilyPayments
 import com.lra.kalanikethan.data.models.FamilyWithID
 import com.lra.kalanikethan.data.models.History
 import com.lra.kalanikethan.data.models.Parent
@@ -85,6 +86,15 @@ class Repository {
         payment.paid = false
         payment.payment_id = null
         client.from("payment_history").insert(payment)
+    }
+
+    suspend fun getFamilyPaymentHistory(familyID : String) : List<PaymentHistory>{
+        return client.from("payment_history").select {
+            filter {
+                PaymentHistory::family_payment_id eq familyID
+            }
+            order(column = "due_date", order = Order.DESCENDING)
+        }.decodeList<PaymentHistory>()
     }
 
     suspend fun signInStudent(student: Student, history: History) {
