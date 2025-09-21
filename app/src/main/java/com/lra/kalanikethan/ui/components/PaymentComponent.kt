@@ -56,6 +56,7 @@ fun PaymentComponent(
     onSendReminderClick: () -> Unit = {},
     onIncorrectClick: () -> Unit = {},
     onViewHistoryClick: () -> Unit = {},
+    overdue : Boolean = false
 ) {
     Box(
         modifier = modifier,
@@ -116,6 +117,17 @@ fun PaymentComponent(
                                     indication = null,
                                 )
                             )
+
+                            if (overdue){
+                                Text(
+                                    text = "OVERDUE",
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        color = Color.Red,
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.ExtraBold
+                                    )
+                                )
+                            }
                         }
 
                         Row(
@@ -207,6 +219,7 @@ fun PaymentComponentPreview(
                 paymentId = "NV14LLG",
                 amount = "12.00"
             ),
+            overdue = true
         )
     }
 }

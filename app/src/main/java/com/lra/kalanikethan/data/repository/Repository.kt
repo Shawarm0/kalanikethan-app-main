@@ -16,15 +16,13 @@ import com.lra.kalanikethan.data.models.sessionPermissions
 import com.lra.kalanikethan.data.remote.SupabaseClientProvider
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Count
+import io.github.jan.supabase.postgrest.query.Order
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.plus
 
 class Repository {
     // Defines the client
     private val client = SupabaseClientProvider.client
-
-
-
-
-
 
     suspend fun getLastFamilyID(): Int {
         val count = client.from("families")
@@ -53,6 +51,7 @@ class Repository {
 
     suspend fun getUnpaidPayments() : List<PaymentHistory>{
         return client.from("payment_history").select{
+            order(column = "due_date", order = Order.ASCENDING)
             filter {
                 PaymentHistory::paid eq false
             }
@@ -69,6 +68,23 @@ class Repository {
                 PaymentHistory::payment_id eq id
             }
         }
+    }
+
+    suspend fun getLatestPaymentFromFamilyID(id : String) : PaymentHistory{
+        Log.i("Database", "Filtering history with ID : $id")
+        return client.from("payment_history").select {
+            filter {
+                PaymentHistory::family_payment_id eq id
+            }
+            order(column = "due_date", order = Order.DESCENDING)
+        }.decodeSingle<PaymentHistory>()
+    }
+
+    suspend fun addPaymentToFamily(payment : PaymentHistory){
+        payment.due_date = payment.due_date.plus(1, DateTimeUnit.MONTH)
+        payment.paid = false
+        payment.payment_id = null
+        client.from("payment_history").insert(payment)
     }
 
     suspend fun signInStudent(student: Student, history: History) {

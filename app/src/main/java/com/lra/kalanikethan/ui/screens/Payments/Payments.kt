@@ -19,11 +19,19 @@ import androidx.compose.ui.unit.dp
 import com.lra.kalanikethan.data.models.FamilyPayments
 import com.lra.kalanikethan.ui.components.PaymentComponent
 import com.lra.kalanikethan.ui.screens.Add.PaymentData
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 @Composable
 fun Payments(paymentViewModel: PaymentViewModel) {
     val unpaidFamilies by paymentViewModel.unpaidFamilies.collectAsState(emptyList())
+    val instant = Clock.System.now()
+    val localDate = instant.toLocalDateTime(TimeZone.currentSystemDefault()).date
 
     LaunchedEffect(true) {
         paymentViewModel.getUnpaidPayments()
@@ -46,8 +54,12 @@ fun Payments(paymentViewModel: PaymentViewModel) {
             PaymentComponent(
                 data = paymentData,
                 onConfirmClick = {
-                    paymentViewModel.confirmPayment(family.currentPayment.payment_id as Int)
-                }
+                    paymentViewModel.confirmPayment(family.currentPayment.payment_id as Int, family.currentPayment.family_payment_id)
+                },
+                onViewHistoryClick = {
+                    println(family)
+                },
+                overdue = localDate > family.currentPayment.due_date
             )
         }
     }

@@ -10,6 +10,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.number
+import kotlinx.datetime.plus
 
 class PaymentViewModel(
     val repository: Repository
@@ -32,30 +36,40 @@ class PaymentViewModel(
             }
             _unpaidFamilies.update {
                     payments -> filterPayments(payments, finalList)
-            //(list + finalList.toList()).distinctBy { it.currentPayment.payment_id }
             }
         }
     }
 
-    fun confirmPayment(id : Int){
+    fun confirmPayment(id : Int, familyId : String){
         viewModelScope.launch {
             try{
                 repository.confirmPayment(id)
+                addNewPayment(familyId)
                 _unpaidFamilies.update { list -> removePaymentFromList(id, list) }
             } catch (e : Exception){
                 Log.e("Database", "Failed to confirm payment with id $id : $e")
             }
+        }
+    }
 
+    fun addNewPayment(familyId: String){
+        viewModelScope.launch {
+            val payment = repository.getLatestPaymentFromFamilyID(familyId)
+            if(payment.paid){
+                repository.addPaymentToFamily(payment)
+            }
         }
     }
 
     private fun removePaymentFromList(id: Int, list: List<FamilyPayments>) : List<FamilyPayments>{
         val mutable = list.toMutableList()
+        val toRemove : MutableList<FamilyPayments> = mutableListOf()
         for (payment in mutable){
             if(payment.currentPayment.payment_id == id){
-                mutable.remove(payment)
+                toRemove.add(payment)
             }
         }
+        mutable.removeAll(toRemove)
         return mutable.toList()
     }
 
@@ -66,5 +80,9 @@ class PaymentViewModel(
         mutable.addAll(new)
 
         return mutable.toList()
+    }
+
+    private fun addMonth(date: LocalDate) : LocalDate{
+        return date.plus(1, DateTimeUnit.MONTH)
     }
 }
