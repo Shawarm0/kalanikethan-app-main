@@ -2,6 +2,8 @@ package com.lra.kalanikethan.util
 
 import android.util.Log
 import com.lra.kalanikethan.data.models.History
+import com.lra.kalanikethan.data.models.PaymentHistory
+import kotlinx.datetime.YearMonth
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -28,5 +30,19 @@ fun groupHistoriesByDay(histories: List<History>): List<List<History>> {
             dayHistories.sortedByDescending { history ->
                 history.signOutTime ?: Long.MAX_VALUE
             }
+        }
+}
+
+
+fun groupPaymentHistoriesByMonth(histories: List<PaymentHistory>): List<List<PaymentHistory>> {
+    return histories
+        .groupBy { history ->
+            // Format: "YYYY-MM" for proper alphabetical sorting
+            "${history.due_date.year}-${history.due_date.monthNumber.toString().padStart(2, '0')}"
+        }
+        .toList()
+        .sortedByDescending { (monthKey, _) -> monthKey } // "YYYY-MM" format sorts correctly
+        .map { (_, monthHistories) ->
+            monthHistories.sortedByDescending { it.due_date }
         }
 }

@@ -1,5 +1,6 @@
 package com.lra.kalanikethan.ui.screens.Payments
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,12 +15,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.lra.kalanikethan.data.models.PaymentHistory
+import com.lra.kalanikethan.ui.components.PaymentHistoryComponent
+import com.lra.kalanikethan.util.groupHistoriesByDay
+import com.lra.kalanikethan.util.groupPaymentHistoriesByMonth
 import kotlinx.datetime.LocalDate
 
 
@@ -39,17 +44,23 @@ fun PaymentHistory(
     val history = data.history
     val familyName = data.familyName
     val familyID = data.familyID
+
     Column(
-        modifier = Modifier
-        .wrapContentSize().padding(start = 53.dp, top = 14.dp).fillMaxSize()) {
-        Text("$familyName Payment History", style = MaterialTheme.typography.displayLarge)
-        Text("ID : $familyID", style = MaterialTheme.typography.displaySmall)
-        LazyColumn {
-            items(history){ payment ->
-                PaymentHistoryBox(
-                    due = payment.due_date,
-                    amount = payment.amount.toString(),
-                    paid = payment.paid
+        modifier = Modifier.fillMaxSize()
+
+    ) {
+
+        LazyColumn(
+            modifier = Modifier.fillMaxSize().padding(top = 12.dp, bottom = 12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            val groupedByMonth = groupPaymentHistoriesByMonth(history)
+
+            items(1) {
+                PaymentHistoryComponent(
+                    data = history,
+                    month = "${data.familyName} Family's Payment History"
                 )
             }
         }

@@ -1,5 +1,6 @@
 package com.lra.kalanikethan.data.models
 
+import kotlinx.datetime.LocalDate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -14,3 +15,4 @@ data class History (
     @SerialName("sign_out_time") val signOutTime: Long? = null,
     @SerialName("uid") val uid: String? = null,
 )
+
