@@ -148,3 +148,39 @@ fun ButtonInfo(){
     }
 }
 
+
+
+@Composable
+fun SelectionButton2(
+    text: String,
+    onClick: () -> Unit = {},
+    width: Dp = 164.dp,
+    color: Color,
+    textColor: Color
+) {
+    Box (
+        modifier = Modifier
+            .clip(RoundedCornerShape(20.dp))
+            .background(color = color)
+            .height(36.dp)
+            .width(width)
+            .wrapContentSize(Alignment.Center)
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() },
+                onClick = {
+                    onClick()
+                }
+            )
+            .padding(horizontal = 8.dp)
+    ) {
+        // This is the content
+        Row (
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ){
+            Text(text = text, style = MaterialTheme.typography.titleSmall, color = textColor)
+        }
+    }
+}
