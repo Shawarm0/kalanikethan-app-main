@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -118,33 +119,6 @@ fun PaymentComponent(
                                 )
                             )
 
-                            if (overdue){
-                                Text(
-                                    text = "OVERDUE",
-                                    style = MaterialTheme.typography.bodyMedium.copy(
-                                        color = Color.Red,
-                                        fontSize = 15.sp,
-                                        fontWeight = FontWeight.ExtraBold
-                                    )
-                                )
-                            }
-                        }
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth().wrapContentHeight(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ){
-                            if (overdue){
-                                Text(
-                                    text = "OVERDUE",
-                                    style = MaterialTheme.typography.bodyMedium.copy(
-                                        color = Color.Red,
-                                        fontSize = 15.sp,
-                                        fontWeight = FontWeight.ExtraBold
-                                    )
-                                )
-                            }
                         }
 
 
@@ -176,6 +150,19 @@ fun PaymentComponent(
                                 )
                             )
                         }
+                    }
+
+                    Spacer(modifier = Modifier.width(30.dp))
+                    if (overdue){
+                        Text(
+                            text = "OVERDUE",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                color = Color.Red,
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.ExtraBold
+                            ),
+                            maxLines = 1
+                        )
                     }
                 }
 
