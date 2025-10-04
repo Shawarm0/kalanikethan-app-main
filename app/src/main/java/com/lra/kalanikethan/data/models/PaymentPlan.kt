@@ -8,8 +8,7 @@ import kotlinx.serialization.Serializable
 data class PaymentPlan(
     val family_id : String,
     val amount : Float,
-    @Serializable(with = LocalDateSerializer::class)
-    val payment_date : LocalDate,
+    val payment_date : Int,
     val family_payment_id : String
 )
 

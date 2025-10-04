@@ -134,6 +134,24 @@ fun PaymentComponent(
                             modifier = Modifier.fillMaxWidth().wrapContentHeight(),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
+                        ){
+                            if (overdue){
+                                Text(
+                                    text = "OVERDUE",
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        color = Color.Red,
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.ExtraBold
+                                    )
+                                )
+                            }
+                        }
+
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
 
                             Text(

@@ -45,10 +45,10 @@ class PaymentViewModel(
         }
     }
 
-    fun confirmPayment(id : Int, familyId : String){
+    fun confirmPayment(id : Int, familyId : String, amount : Float){
         viewModelScope.launch {
             try{
-                repository.confirmPayment(id)
+                repository.confirmPayment(id, amount)
                 addNewPayment(familyId)
                 _unpaidFamilies.update { list -> removePaymentFromList(id, list) }
             } catch (e : Exception){
@@ -61,7 +61,7 @@ class PaymentViewModel(
         viewModelScope.launch {
             val payment = repository.getLatestPaymentFromFamilyID(familyId)
             if(payment.paid){
-                repository.addPaymentToFamily(payment)
+                repository.addPaymentToFamily(payment, familyId)
             }
         }
     }

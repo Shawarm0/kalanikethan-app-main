@@ -19,6 +19,7 @@ import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Count
 import io.github.jan.supabase.postgrest.query.Order
 import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
 
 class Repository {
@@ -59,10 +60,11 @@ class Repository {
         }.decodeList<PaymentHistory>()
     }
 
-    suspend fun confirmPayment(id : Int){
+    suspend fun confirmPayment(id : Int, amount : Float){
         client.from("payment_history").update(
             {
                 PaymentHistory::paid setTo true
+                PaymentHistory::amount setTo amount
             }
         ){
             filter {
@@ -81,8 +83,11 @@ class Repository {
         }.decodeSingle<PaymentHistory>()
     }
 
-    suspend fun addPaymentToFamily(payment : PaymentHistory){
+    suspend fun addPaymentToFamily(payment : PaymentHistory, familyID: String){
+        val amount = getPlanFromID(familyID)
+        payment.due_date = LocalDate(payment.due_date.year, payment.due_date.month, amount.payment_date)
         payment.due_date = payment.due_date.plus(1, DateTimeUnit.MONTH)
+        payment.amount = amount.amount
         payment.paid = false
         payment.payment_id = null
         client.from("payment_history").insert(payment)

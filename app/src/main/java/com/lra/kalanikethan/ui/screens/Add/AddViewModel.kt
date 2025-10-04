@@ -27,7 +27,7 @@ class AddViewModel(
         viewModelScope.launch {
             try{
                 id = repository.addFamily(family)
-                val plan = PaymentPlan(id as String, paymentData.amount.toFloat(), LocalDate.parse(paymentData.paymentDate, formatter), paymentData.paymentId)
+                val plan = PaymentPlan(id as String, paymentData.amount.toFloat(), LocalDate.parse(paymentData.paymentDate, formatter).day, paymentData.paymentId)
                 repository.addPaymentData(plan)
                 for (parent in parents) {
                     parent.familyId = id as String

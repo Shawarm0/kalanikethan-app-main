@@ -10,5 +10,6 @@ data class PaymentHistory(
     val family_payment_id : String,
     var paid : Boolean,
     @Serializable(with = LocalDateSerializer::class)
-    var due_date : LocalDate
+    var due_date : LocalDate,
+    var amount : Float
 )

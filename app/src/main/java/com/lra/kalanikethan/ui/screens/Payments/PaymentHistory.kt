@@ -39,7 +39,6 @@ fun PaymentHistory(
     val history = data.history
     val familyName = data.familyName
     val familyID = data.familyID
-    val amount = data.amount
     Column(
         modifier = Modifier
         .wrapContentSize().padding(start = 53.dp, top = 14.dp).fillMaxSize()) {
@@ -49,7 +48,7 @@ fun PaymentHistory(
             items(history){ payment ->
                 PaymentHistoryBox(
                     due = payment.due_date,
-                    amount = amount,
+                    amount = payment.amount.toString(),
                     paid = payment.paid
                 )
             }
