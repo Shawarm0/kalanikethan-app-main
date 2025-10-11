@@ -58,16 +58,14 @@ fun StudentBox2(
     onMusicChange: (Boolean) -> Unit = {},
     onWalkAloneChange: (Boolean) -> Unit = {},
     deleteStudent: () -> Unit = {},
+    dateInvalid : Boolean = false,
+    index : Int? = null
 ){
     var currentData by remember { mutableStateOf(initialData) }
 
     val formatter = LocalDate.Format { day(); char('/'); monthNumber(); char('/') ; year() }
 
     val birthdate = remember {mutableStateOf(currentData.birthdate.format(formatter))}
-
-    val dateError = remember { mutableStateOf(false) }
-    val firstNameError = remember { mutableStateOf(false) }
-    val lastNameError = remember { mutableStateOf(false) }
 
     val dateErrorMsg = remember { mutableStateOf("") }
     val firstNameErrorMsg = remember { mutableStateOf("") }
@@ -99,6 +97,7 @@ fun StudentBox2(
             }
 
             HorizontalDivider(color = Color.Gray, modifier = Modifier.fillMaxWidth())
+            Text("Local ID: $index")
 
 
                 Row(horizontalArrangement = Arrangement.spacedBy(30.dp)) { // Typing in data
@@ -111,7 +110,7 @@ fun StudentBox2(
                             onFirstNameChange(it)
                         },
                         label = "First Name",
-                        error = firstNameError.value,
+                        error = currentData.firstName.isBlank(),
                         errorMessage = firstNameErrorMsg.value
                     )
 
@@ -123,7 +122,7 @@ fun StudentBox2(
                             onLastNameChange(it)
                         },
                         label = "Last Name",
-                        error = lastNameError.value,
+                        error = currentData.lastName.isBlank(),
                         errorMessage = lastNameErrorMsg.value
                     )
 
@@ -137,7 +136,7 @@ fun StudentBox2(
                         isLeadingIconClickable = true,
                         leadingIcon = Icons.Default.CalendarMonth,
                         label = "Birthday",
-                        error = dateError.value,
+                        error = dateInvalid,
                         errorMessage = dateErrorMsg.value
                     )
                 }

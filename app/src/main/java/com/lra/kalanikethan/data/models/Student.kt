@@ -19,5 +19,7 @@ data class Student(
     val dance: Boolean,
     val singing: Boolean,
     val music: Boolean,
-    @SerialName("signed_in") val signedIn: Boolean
+    @SerialName("signed_in") val signedIn: Boolean,
+    @Transient
+    val internalID : Int? = null
 )

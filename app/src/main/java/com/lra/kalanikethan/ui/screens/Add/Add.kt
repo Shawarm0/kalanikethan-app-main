@@ -4,7 +4,9 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -13,8 +15,11 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
@@ -23,7 +28,9 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +49,7 @@ import com.lra.kalanikethan.ui.components.Button
 import com.lra.kalanikethan.ui.components.ParentBox
 import com.lra.kalanikethan.ui.components.SimpleDecoratedTextField
 import com.lra.kalanikethan.ui.components.StudentBox
+import com.lra.kalanikethan.ui.components.StudentBox2
 import com.lra.kalanikethan.ui.components.Tab
 import com.lra.kalanikethan.ui.components.TabBar
 import com.lra.kalanikethan.ui.theme.SuccessColor
@@ -59,173 +67,97 @@ data class PaymentData(
 
 @Composable
 fun Add(addViewModel: AddViewModel) {
-
-    val students = remember { mutableStateListOf<Student>() }
+    val students by addViewModel.students.collectAsState(emptyList())
     val parents = remember { mutableStateListOf<Parent>() }
-    var tab by remember { mutableStateOf(Tab.Student) }
-
+    val formatter = LocalDate.Format { day(); char('/'); monthNumber(); char('/') ; year() }
     // Single state object for payment data
     var paymentData by remember { mutableStateOf(PaymentData()) }
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Box(modifier = Modifier.weight(1f)) {
-            when (tab) {
-                Tab.Student -> StudentContent(
-                    students = students,
-                    onAddStudent = { students.add(it) }
-                )
-                Tab.Parents -> ParentContent(
-                    parents = parents,
-                    onAddParent = { parents.add(it) }
-                )
-                Tab.Payments -> PaymentContent(
-                    paymentData = paymentData,
-                    onPaymentDataChanged = { paymentData = it },
-                    createFamily = {
-                        addViewModel.createFamily(paymentData, parents, students)
-                    }
-                )
-            }
-        }
-        TabBar(onTabSelected = { tab = it })
-    }
-}
-
-
-
-@Composable
-private fun StudentContent(
-    students: MutableList<Student>,  // Changed to MutableList for adding items
-    onAddStudent: (Student) -> Unit  // Callback for adding students
-) {
-
-    Box(modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.TopCenter,
-        ) {
-        LazyColumn(
-            modifier = Modifier
-                .padding(14.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(14.dp)
-        ) {
-            items(students) { student ->
-                StudentBox(
+    Column(modifier = Modifier.padding(start = 106.dp, top = 14.dp, bottom = 14.dp)) {
+        Text(
+            "Students",
+            style = MaterialTheme.typography.displayLarge
+        )
+        Spacer(Modifier.height(5.dp))
+        LazyColumn(horizontalAlignment = Alignment.CenterHorizontally, contentPadding = PaddingValues(vertical = 5.dp)) {
+            items(students, key = {student -> student.internalID!! }){ student ->
+                val dateError = remember { mutableStateOf(false) }
+                StudentBox2(
                     initialData = student,
-                    onConfirm = { updatedStudent ->
+                    onFirstNameChange = {
+                        val updatedStudent = student.copy(firstName = it)
                         val index = students.indexOf(student)
-                        students[index] = updatedStudent
+
+                        addViewModel.updateStudent(index, updatedStudent)
+                    },
+                    onLastNameChange = {
+                        val updatedStudent = student.copy(lastName = it)
+                        val index = students.indexOf(student)
+                        addViewModel.updateStudent(index, updatedStudent)
+                    },
+                    onBirthDateChange = {
+                        val date : LocalDate
+                        try {
+                            date = LocalDate.parse(it, formatter)
+                            val updatedStudent = student.copy(birthdate = date)
+                            val index = students.indexOf(student)
+                            dateError.value = false
+                            addViewModel.updateStudent(index, updatedStudent)
+                        } catch (e : Exception){
+                            dateError.value = true
+                        }
+                    },
+                    onDanceChange = {
+                        val updatedStudent = student.copy(dance = it)
+                        val index = students.indexOf(student)
+                        addViewModel.updateStudent(index, updatedStudent)
+                    },
+                    onSingingChange = {
+                        val updatedStudent = student.copy(singing = it)
+                        val index = students.indexOf(student)
+                        addViewModel.updateStudent(index, updatedStudent)
+                    },
+                    onMusicChange = {
+                        val updatedStudent = student.copy(music = it)
+                        val index = students.indexOf(student)
+                        addViewModel.updateStudent(index, updatedStudent)
+                    },
+                    onWalkAloneChange = {
+                        val updatedStudent = student.copy(canWalkAlone = it)
+                        val index = students.indexOf(student)
+                        addViewModel.updateStudent(index, updatedStudent)
                     },
                     deleteStudent = {
-                        students.remove(student)
+                        addViewModel.deleteStudent(student)
                     },
-                    editable = student.firstName == "" && student.lastName == "",
-                    deleteIfCancelledOnFirstEdit = true
+                    index = student.internalID,
+                    dateInvalid = dateError.value
                 )
             }
         }
-
-        // Floating Action Button
-        FloatingActionButton(
+        Spacer(Modifier.height(5.dp))
+        Button(
+            text = "Add student",
             onClick = {
-            },
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp).height(30.dp).wrapContentWidth().clip(RoundedCornerShape(15.dp))
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(5.dp)
-            ) {
-                Button(
-                    text = "Add Student",
-                    symbol = Icons.Default.Add,
-                    onClick = {
-                        val newStudent = Student(
-                            familyId = "",
-                            firstName = "",
-                            lastName = "",
-                            birthdate = LocalDate(2000, 1, 1),
-                            canWalkAlone = false,
-                            dance = false,
-                            singing = false,
-                            music = false,
-                            signedIn = false,
-                        )
-                        onAddStudent(newStudent)
-                    }
-                )
+                addViewModel.createStudent()
             }
+        )
+        Spacer(Modifier.height(5.dp))
+        Text(
+            "Parents",
+            style = MaterialTheme.typography.displayLarge
+        )
+        Spacer(Modifier.height(5.dp))
+        LazyColumn(horizontalAlignment = Alignment.CenterHorizontally, contentPadding = PaddingValues(vertical = 5.dp)) {
+
         }
+        Spacer(Modifier.height(5.dp))
+        Text(
+            "Details",
+            style = MaterialTheme.typography.displayLarge
+        )
     }
 }
-
-@Composable
-private fun ParentContent(
-    parents: MutableList<Parent>,  // Changed to MutableList for adding items
-    onAddParent: (Parent) -> Unit  // Callback for adding students
-) {
-    Box(modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.TopCenter,
-    ) {
-        LazyColumn(
-            modifier = Modifier
-                .padding(14.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(14.dp)
-        ) {
-            items(parents) { parent ->
-                ParentBox(
-                    initialData = parent,
-                    onConfirm = { updatedParent ->
-                        val index = parents.indexOf(parent)
-                        parents[index] = updatedParent
-                    },
-                    deleteParent = {
-                        parents.remove(parent)
-                    },
-                    editable = parent.firstName == "" && parent.lastName == "",
-                )
-            }
-        }
-
-        // Floating Action Button
-        FloatingActionButton(
-            onClick = {
-            },
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp).height(30.dp).wrapContentWidth().clip(RoundedCornerShape(15.dp))
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(5.dp)
-            ) {
-                Button(
-                    text = "Add Parent",
-                    symbol = Icons.Default.Add,
-                    onClick = {
-                        val parent = Parent(
-                            familyId = "",
-                            firstName = "",
-                            lastName = "",
-                            phoneNumber = ""
-                        )
-
-                        onAddParent(parent)
-                    }
-                )
-            }
-        }
-    }
-}
-
-
-
-
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
