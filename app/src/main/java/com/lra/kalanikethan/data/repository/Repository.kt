@@ -43,6 +43,10 @@ class Repository {
         }.decodeSingle<PaymentPlan>()
     }
 
+    suspend fun addFirstFamilyPayment(paymentID : String, date : LocalDate, amount : Float){
+        client.from("payment_history").insert(PaymentHistory(family_payment_id = paymentID, paid = false, due_date = date, amount = amount))
+    }
+
     suspend fun getFamilyFromID(id : String) : FamilyWithID{
         return client.from("families").select {
             filter {

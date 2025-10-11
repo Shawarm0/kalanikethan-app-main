@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import com.lra.kalanikethan.util.LocalDateSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import java.time.LocalDate
 
 @Immutable
@@ -20,6 +21,5 @@ data class Student(
     val singing: Boolean,
     val music: Boolean,
     @SerialName("signed_in") val signedIn: Boolean,
-    @Transient
-    val internalID : Int? = null
+    @Transient val internalID : Int? = null
 )

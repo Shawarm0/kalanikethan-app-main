@@ -67,11 +67,6 @@ fun StudentBox2(
 
     val birthdate = remember {mutableStateOf(currentData.birthdate.format(formatter))}
 
-    val dateErrorMsg = remember { mutableStateOf("") }
-    val firstNameErrorMsg = remember { mutableStateOf("") }
-    val lastNameErrorMsg = remember { mutableStateOf("") }
-
-
     Box(modifier = Modifier
         .shadow(
             elevation = 4.dp, // Figma blur roughly maps to elevation
@@ -111,7 +106,7 @@ fun StudentBox2(
                         },
                         label = "First Name",
                         error = currentData.firstName.isBlank(),
-                        errorMessage = firstNameErrorMsg.value
+                        errorMessage = "Cannot be empty"
                     )
 
                     SimpleDecoratedTextField(
@@ -123,7 +118,7 @@ fun StudentBox2(
                         },
                         label = "Last Name",
                         error = currentData.lastName.isBlank(),
-                        errorMessage = lastNameErrorMsg.value
+                        errorMessage = "Cannot be empty"
                     )
 
                     SimpleDecoratedTextField(
@@ -137,12 +132,9 @@ fun StudentBox2(
                         leadingIcon = Icons.Default.CalendarMonth,
                         label = "Birthday",
                         error = dateInvalid,
-                        errorMessage = dateErrorMsg.value
+                        errorMessage = "Invalid Date (DD/MM/YYYY)"
                     )
                 }
-
-
-
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     Text("Classes: ", style = MaterialTheme.typography.titleSmall)
                     SelectionButton(

@@ -48,6 +48,7 @@ import com.lra.kalanikethan.data.models.Parent
 import com.lra.kalanikethan.data.models.Student
 import com.lra.kalanikethan.ui.components.Button
 import com.lra.kalanikethan.ui.components.ParentBox
+import com.lra.kalanikethan.ui.components.ParentBox2
 import com.lra.kalanikethan.ui.components.SimpleDecoratedTextField
 import com.lra.kalanikethan.ui.components.StudentBox
 import com.lra.kalanikethan.ui.components.StudentBox2
@@ -71,17 +72,19 @@ data class PaymentData(
 @Composable
 fun Add(addViewModel: AddViewModel) {
     val students by addViewModel.students.collectAsState(emptyList())
-    val parents = remember { mutableStateListOf<Parent>() }
+    val parents by addViewModel.parents.collectAsState(emptyList())
     val formatter = LocalDate.Format { day(); char('/'); monthNumber(); char('/') ; year() }
     // Single state object for payment data
     var paymentData by remember { mutableStateOf(PaymentData()) }
 
-    Column(modifier = Modifier.padding(start = 106.dp, top = 14.dp, bottom = 14.dp)) {
+    val dateError = remember { mutableStateOf(false) }
+    val invalid = remember {mutableStateOf(false)}
 
+    Column(modifier = Modifier.padding(start = 106.dp, top = 14.dp, bottom = 14.dp, end = 106.dp)) {
         LazyColumn() {
             stickyHeader {
                 Box(Modifier.background(Background).fillMaxWidth()) {
-                    Row {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             "Students",
                             style = MaterialTheme.typography.displayLarge
@@ -97,7 +100,6 @@ fun Add(addViewModel: AddViewModel) {
                 }
             }
             items(students, key = {student -> student.internalID!! }){ student ->
-                val dateError = remember { mutableStateOf(false) }
                 StudentBox2(
                     initialData = student,
                     onFirstNameChange = {
@@ -149,10 +151,11 @@ fun Add(addViewModel: AddViewModel) {
                     index = student.internalID,
                     dateInvalid = dateError.value
                 )
+                Spacer(Modifier.height(14.dp))
             }
             stickyHeader {
-                Box(Modifier.background(Background)) {
-                    Row {
+                Box(Modifier.background(Background).fillMaxWidth()) {
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
                         Text(
                             "Parents",
                             style = MaterialTheme.typography.displayLarge
@@ -160,15 +163,39 @@ fun Add(addViewModel: AddViewModel) {
                         Button(
                             text = "Add parent",
                             onClick = {
-
+                                addViewModel.createParent()
                             }
                         )
                     }
                     Spacer(Modifier.height(5.dp))
                 }
             }
+            items(parents, key = { it.internalID!! }){ parent ->
+                ParentBox2(
+                    initialData = parent,
+                    onFirstNameChange = {
+                        val updatedParent = parent.copy(firstName = it)
+                        val index = parents.indexOf(parent)
+                        addViewModel.updateParent(index, updatedParent)
+                    },
+                    onLastNameChange = {
+                        val updatedParent = parent.copy(lastName = it)
+                        val index = parents.indexOf(parent)
+                        addViewModel.updateParent(index, updatedParent)
+                    },
+                    onPhoneNumberChange = {
+                        val updatedParent = parent.copy(phoneNumber = it)
+                        val index = parents.indexOf(parent)
+                        addViewModel.updateParent(index, updatedParent)
+                    },
+                    deleteParent = {
+                        addViewModel.deleteParent(parent)
+                    }
+                )
+                Spacer(Modifier.height(14.dp))
+            }
             stickyHeader {
-                Box(Modifier.background(Background)) {
+                Box(Modifier.background(Background).fillMaxWidth()) {
                     Row {
                         Text(
                             "Details",
@@ -177,198 +204,167 @@ fun Add(addViewModel: AddViewModel) {
                     }
                     Spacer(Modifier.height(5.dp))
                 }
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        modifier = Modifier.wrapContentSize(),
+                        verticalArrangement = Arrangement.spacedBy(20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Column(
+                            modifier = Modifier.wrapContentSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "Enter the details below to proceed.",
+                                style = MaterialTheme.typography.titleSmall.copy(
+                                    fontWeight = FontWeight.Normal,
+                                    fontSize = 14.sp,
+                                    lineHeight = 20.sp
+                                ),
+                                color = UnselectedButtonText,
+                            )
+
+                        }
+
+
+                        Column(
+                            modifier = Modifier.wrapContentSize(),
+                            verticalArrangement = Arrangement.spacedBy(13.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+
+
+                            Row(
+                                modifier = Modifier.wrapContentSize(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(25.dp)
+                            ) {
+
+                                SimpleDecoratedTextField(
+                                    text = paymentData.familyName,
+                                    placeholder = "Enter Family Name",
+                                    label = "Family Name",
+                                    onValueChange = {
+                                        paymentData = paymentData.copy(familyName = it)
+                                    },
+                                    error = paymentData.familyName.isBlank(),
+                                    errorMessage = "Cannot be empty"
+                                )
+
+                                SimpleDecoratedTextField(
+                                    text = paymentData.paymentId,
+                                    placeholder = "Enter Payment ID",
+                                    label = "Payment ID",
+                                    onValueChange = {
+                                        paymentData = paymentData.copy(paymentId = it)
+                                    },
+                                    error = paymentData.paymentId.isBlank(),
+                                    errorMessage = "Cannot be empty"
+                                )
+
+                                SimpleDecoratedTextField(
+                                    text = paymentData.email,
+                                    placeholder = "Enter Email",
+                                    label = "Email",
+                                    onValueChange = {
+                                        paymentData = paymentData.copy(email = it)
+                                    },
+                                    error = paymentData.email.isBlank(),
+                                    errorMessage = "Cannot be empty"
+                                )
+                            }
+
+
+                            Row(
+                                modifier = Modifier.wrapContentSize(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(25.dp)
+                            ) {
+
+                                SimpleDecoratedTextField(
+                                    text = paymentData.paymentDate,
+                                    placeholder = "DD/MM/YYYY",
+                                    label = "Enter Payment Date",
+                                    isLeadingIconClickable = true,
+                                    leadingIcon = Icons.Default.CalendarMonth,
+                                    onValueChange = {
+                                        if (it.isBlank()){
+                                            dateError.value = true
+                                        }
+                                        try {
+                                            LocalDate.parse(it, formatter)
+                                            paymentData = paymentData.copy(paymentDate = it)
+                                            dateError.value = false
+                                        } catch (e : Exception){
+                                            dateError.value = true
+                                        }
+                                    },
+                                    error = dateError.value,
+                                    errorMessage = "Invalid Data (DD/MM/YYYY)"
+                                )
+
+                                SimpleDecoratedTextField(
+                                    text = paymentData.amount,
+                                    placeholder = "Enter Amount",
+                                    label = "Amount",
+                                    onValueChange = {
+                                        paymentData = paymentData.copy(amount = it)
+                                    },
+                                    error = paymentData.amount.isBlank(),
+                                    errorMessage = "Cannot be empty",
+                                    floatsOnly = true
+                                )
+                            }
+                        }
+
+
+                        Button(
+                            text = "Create Family",
+                            symbol = Icons.Default.Check,
+                            onClick = {
+                                if(checkError(students, parents, paymentData, dateError.value)){
+                                    addViewModel.createFamily(paymentData, parents, students)
+                                } else {
+                                    invalid.value = true
+                                }
+                            },
+                            color = SuccessColor
+                        )
+                        if(invalid.value){
+                            Text("Couldn't create family, some values are missing or invalid", color = Color.Red)
+                        }
+                    }
+                }
             }
         }
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun PaymentContent(
-    paymentData: PaymentData,
-    onPaymentDataChanged: (PaymentData) -> Unit,
-    createFamily: () -> Unit,
-) {
-    // For the text boxes
-    val bringIntoViewRequester = remember { BringIntoViewRequester() }
-    val coroutineScope = rememberCoroutineScope()
-
-    val nameError = remember { mutableStateOf(false) }
-    val idError = remember { mutableStateOf(false) }
-    val emailError = remember { mutableStateOf(false) }
-    val dateError = remember { mutableStateOf(false) }
-    val amountError = remember { mutableStateOf(false) }
-
-    val emptyErrorMsg = "Cannot be empty"
-    val invalidDateMsg = "Invalid date (DD/MM/YYYY)"
-    val amountTypeMsg = "Input a number"
-
-
-    Box(
-         modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            modifier = Modifier.wrapContentSize(),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Column(
-                modifier = Modifier.wrapContentSize(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Payment Details",
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 40.sp,
-                        lineHeight = 40.sp
-                    ),
-                    color = Color.Black
-                )
-
-                Text(
-                    text = "Enter the details below to proceed.",
-                    style = MaterialTheme.typography.titleSmall.copy(
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 14.sp,
-                        lineHeight = 20.sp
-                    ),
-                    color = UnselectedButtonText,
-                )
-
-            }
-
-
-            Column(
-                modifier = Modifier.wrapContentSize(),
-                verticalArrangement = Arrangement.spacedBy(13.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-
-
-                Row(
-                    modifier = Modifier.wrapContentSize(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(25.dp)
-                ) {
-
-                        SimpleDecoratedTextField(
-                            text = paymentData.paymentId,
-                            placeholder = "Enter Family Name",
-                            label = "Family Name",
-                            onValueChange = {
-                                onPaymentDataChanged(paymentData.copy(familyName = it))
-                            },
-//                            bringIntoViewRequester = bringIntoViewRequester,
-//                            coroutineScope = coroutineScope,
-                            error = nameError.value,
-                            errorMessage = emptyErrorMsg
-                        )
-
-                    SimpleDecoratedTextField(
-                        text = paymentData.paymentId,
-                        placeholder = "Enter Payment ID",
-                        label = "Payment ID",
-                        onValueChange = {
-                            onPaymentDataChanged(paymentData.copy(paymentId = it))
-                        },
-//                        bringIntoViewRequester = bringIntoViewRequester,
-//                        coroutineScope = coroutineScope,
-                        error = idError.value,
-                        errorMessage = emptyErrorMsg
-                    )
-
-                    SimpleDecoratedTextField(
-                        text = paymentData.email,
-                        placeholder = "Enter Email",
-                        label = "Email",
-                        onValueChange = {
-                            onPaymentDataChanged(paymentData.copy(email = it))
-                        },
-//                        bringIntoViewRequester = bringIntoViewRequester,
-//                        coroutineScope = coroutineScope,
-                        error = emailError.value,
-                        errorMessage = emptyErrorMsg
-                    )
-                }
-
-
-                Row(
-                    modifier = Modifier.wrapContentSize(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(25.dp)
-                ) {
-
-                    SimpleDecoratedTextField(
-                        text = paymentData.paymentDate,
-                        placeholder = "DD/MM/YYYY",
-                        label = "Enter Payment Date",
-                        isLeadingIconClickable = true,
-                        leadingIcon = Icons.Default.CalendarMonth,
-                        onValueChange = {
-                            onPaymentDataChanged(paymentData.copy(paymentDate = it))
-                        },
-//                        bringIntoViewRequester = bringIntoViewRequester,
-//                        coroutineScope = coroutineScope,
-                        error = dateError.value,
-                        errorMessage = invalidDateMsg
-                    )
-
-                    SimpleDecoratedTextField(
-                        text = paymentData.amount,
-                        placeholder = "Enter Amount",
-                        label = "Amount",
-                        onValueChange = {
-                            onPaymentDataChanged(paymentData.copy(amount = it))
-                        },
-//                        bringIntoViewRequester = bringIntoViewRequester,
-//                        coroutineScope = coroutineScope,
-                        error = amountError.value,
-                        errorMessage = emptyErrorMsg,
-                        floatsOnly = true
-                    )
-                }
-            }
-
-
-            Button(
-                text = "Create Family",
-                symbol = Icons.Default.Check,
-                onClick = {
-                    if (paymentData.familyName == ""){
-                        nameError.value = true
-                    } else {
-                        nameError.value = false
-                    }
-                    if (paymentData.paymentId == ""){
-                        idError.value = true
-                    } else {
-                        idError.value = false
-                    }
-                    if (paymentData.email == ""){
-                        emailError.value = true
-                    } else {
-                        emailError.value = false
-                    }
-                    try{
-                        LocalDate.parse(paymentData.paymentDate, LocalDate.Format { day(); char('/'); monthNumber(); char('/') ; year() })
-                        dateError.value = false
-                    } catch (e: Exception) {
-                        dateError.value = true
-                    }
-                    if (paymentData.amount == ""){
-                        amountError.value = true
-                    } else {
-                        amountError.value = false
-                    }
-                    if(!nameError.value && !idError.value && !emailError.value && !dateError.value && !amountError.value) createFamily()
-                },
-                color = SuccessColor,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-
+fun checkError(students : List<Student>, parents : List<Parent>, paymentData: PaymentData, dateError : Boolean) : Boolean{
+    if (dateError) return false
+    for (student in students){
+        if(student.firstName.isBlank()){
+            return false
+        }
+        if(student.firstName.isBlank()){
+            return false
         }
     }
+    for(parent in parents){
+        if(parent.firstName.isBlank()){
+            return false
+        }
+        if(parent.lastName.isBlank()){
+            return false
+        }
+    }
+    if (paymentData.familyName.isBlank()) return false
+    if (paymentData.paymentId.isBlank()) return false
+    if (paymentData.amount.isBlank()) return false
+    if (paymentData.email.isBlank()) return false
+
+    return true
 }
