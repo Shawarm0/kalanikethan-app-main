@@ -1,6 +1,7 @@
 package com.lra.kalanikethan.ui.screens.Add
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -52,6 +53,7 @@ import com.lra.kalanikethan.ui.components.StudentBox
 import com.lra.kalanikethan.ui.components.StudentBox2
 import com.lra.kalanikethan.ui.components.Tab
 import com.lra.kalanikethan.ui.components.TabBar
+import com.lra.kalanikethan.ui.theme.Background
 import com.lra.kalanikethan.ui.theme.SuccessColor
 import com.lra.kalanikethan.ui.theme.UnselectedButtonText
 import kotlinx.datetime.LocalDate
@@ -65,6 +67,7 @@ data class PaymentData(
     val amount: String = ""
 )
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Add(addViewModel: AddViewModel) {
     val students by addViewModel.students.collectAsState(emptyList())
@@ -74,12 +77,25 @@ fun Add(addViewModel: AddViewModel) {
     var paymentData by remember { mutableStateOf(PaymentData()) }
 
     Column(modifier = Modifier.padding(start = 106.dp, top = 14.dp, bottom = 14.dp)) {
-        Text(
-            "Students",
-            style = MaterialTheme.typography.displayLarge
-        )
-        Spacer(Modifier.height(5.dp))
-        LazyColumn(horizontalAlignment = Alignment.CenterHorizontally, contentPadding = PaddingValues(vertical = 5.dp)) {
+
+        LazyColumn() {
+            stickyHeader {
+                Box(Modifier.background(Background).fillMaxWidth()) {
+                    Row {
+                        Text(
+                            "Students",
+                            style = MaterialTheme.typography.displayLarge
+                        )
+                        Button(
+                            text = "Add student",
+                            onClick = {
+                                addViewModel.createStudent()
+                            }
+                        )
+                    }
+                    Spacer(Modifier.height(5.dp))
+                }
+            }
             items(students, key = {student -> student.internalID!! }){ student ->
                 val dateError = remember { mutableStateOf(false) }
                 StudentBox2(
@@ -134,28 +150,35 @@ fun Add(addViewModel: AddViewModel) {
                     dateInvalid = dateError.value
                 )
             }
-        }
-        Spacer(Modifier.height(5.dp))
-        Button(
-            text = "Add student",
-            onClick = {
-                addViewModel.createStudent()
-            }
-        )
-        Spacer(Modifier.height(5.dp))
-        Text(
-            "Parents",
-            style = MaterialTheme.typography.displayLarge
-        )
-        Spacer(Modifier.height(5.dp))
-        LazyColumn(horizontalAlignment = Alignment.CenterHorizontally, contentPadding = PaddingValues(vertical = 5.dp)) {
+            stickyHeader {
+                Box(Modifier.background(Background)) {
+                    Row {
+                        Text(
+                            "Parents",
+                            style = MaterialTheme.typography.displayLarge
+                        )
+                        Button(
+                            text = "Add parent",
+                            onClick = {
 
+                            }
+                        )
+                    }
+                    Spacer(Modifier.height(5.dp))
+                }
+            }
+            stickyHeader {
+                Box(Modifier.background(Background)) {
+                    Row {
+                        Text(
+                            "Details",
+                            style = MaterialTheme.typography.displayLarge
+                        )
+                    }
+                    Spacer(Modifier.height(5.dp))
+                }
+            }
         }
-        Spacer(Modifier.height(5.dp))
-        Text(
-            "Details",
-            style = MaterialTheme.typography.displayLarge
-        )
     }
 }
 
