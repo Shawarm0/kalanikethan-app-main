@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -167,6 +168,7 @@ fun Add(addViewModel: AddViewModel) {
                             }
                         )
                     }
+                    HorizontalDivider()
                     Spacer(Modifier.height(5.dp))
                 }
             }
@@ -202,6 +204,7 @@ fun Add(addViewModel: AddViewModel) {
                             style = MaterialTheme.typography.displayLarge
                         )
                     }
+                    HorizontalDivider()
                     Spacer(Modifier.height(5.dp))
                 }
                 Box(

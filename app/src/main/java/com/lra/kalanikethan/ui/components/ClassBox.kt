@@ -53,9 +53,9 @@ fun ClassBox(
     val darkTheme = false
 
     // Convert Long timestamps to formatted time strings
-    val startTime = convertLongToTime(classData.startTime) // You'll need the extension function we discussed
-    val endTime = convertLongToTime(classData.endTime)
-    val istime = isCurrentTimeWithinRange(classData.startTime, classData.endTime)
+    val startTime = classData.startTime // You'll need the extension function we discussed
+    val endTime = classData.endTime
+    val istime = false
 
     Box(
         modifier = modifier

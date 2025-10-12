@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.HorizontalDivider
@@ -44,6 +45,7 @@ import com.lra.kalanikethan.ui.components.Button
 import com.lra.kalanikethan.ui.components.ClassStudentComposable
 import com.lra.kalanikethan.ui.components.ClassStudentDisplay
 import com.lra.kalanikethan.ui.components.SimpleDecoratedTextField
+import com.lra.kalanikethan.ui.components.SimpleDecoratedTextField2
 import com.lra.kalanikethan.ui.screens.signIn.SignInViewModel
 import com.lra.kalanikethan.ui.theme.SuccessColor
 
@@ -67,6 +69,7 @@ fun EditClass(
     val thisClass = viewModel.thisClass.value
     var students by remember { mutableStateOf<List<Student>>(emptyList()) }
     val allStudents = signInViewModel.displayedStudents.collectAsState(emptyList())
+    var editedClass = thisClass.copy()
 
     // Initialize state and load class students
     LaunchedEffect(Unit) {
@@ -125,7 +128,7 @@ fun EditClass(
             ) {
                 // Class Details Row 1: Teacher Name and Start Time
                 Row(
-                    modifier = Modifier.wrapContentSize(),
+                    modifier = Modifier.wrapContentSize().padding(start = 53.dp),
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -134,15 +137,18 @@ fun EditClass(
                         text = thisClass.teacherName,
                         placeholder = "Enter Teacher Name",
                         label = "Teacher Name",
-                        onValueChange = { /* Handle teacher name change */ },
+                        onValueChange = { thisClass.teacherName = it },
                     )
                     Spacer(modifier = Modifier.width(25.dp))
-                    SimpleDecoratedTextField(
+                    SimpleDecoratedTextField2(
                         modifier = Modifier.width(328.dp).height(60.dp),
-                        text = thisClass.startTime.toString(),
+                        text = thisClass.startTime,
+                        leadingIcon = Icons.Default.AccessTime,
+                        isLeadingIconClickable = true,
+
                         placeholder = "Enter Start Time",
                         label = "Start Time",
-                        onValueChange = { /* Handle start time change */ },
+                        onValueChange = { thisClass.startTime = it },
                     )
                 }
 
@@ -150,7 +156,7 @@ fun EditClass(
 
                 // Class Details Row 2: Type and End Time
                 Row(
-                    modifier = Modifier.wrapContentSize(),
+                    modifier = Modifier.wrapContentSize().padding(start = 53.dp),
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -159,15 +165,17 @@ fun EditClass(
                         text = thisClass.type,
                         placeholder = "Enter Type",
                         label = "Type",
-                        onValueChange = { /* Handle type change */ },
+                        onValueChange = { thisClass.type = it },
                     )
                     Spacer(modifier = Modifier.width(25.dp))
-                    SimpleDecoratedTextField(
+                    SimpleDecoratedTextField2(
                         modifier = Modifier.width(328.dp).height(60.dp),
-                        text = thisClass.endTime.toString(),
+                        text = thisClass.endTime,
+                        leadingIcon = Icons.Default.AccessTime,
+                        isLeadingIconClickable = true,
                         placeholder = "Enter End Time",
                         label = "End Time",
-                        onValueChange = { /* Handle end time change */ },
+                        onValueChange = { thisClass.endTime = it},
                     )
                 }
 
@@ -279,8 +287,8 @@ fun EditClass(
                 text = "Save",
                 symbol = Icons.Default.Check,
                 onClick = {
-                    viewModel.updateClassState(thisClass.classId)
                     viewModel.thisClass.value = thisClass
+                    viewModel.updateClassState(thisClass.classId)
                     navController.navigate(Screen.Dashboard.route)
                 },
                 color = SuccessColor,

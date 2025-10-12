@@ -6,8 +6,8 @@ import kotlinx.serialization.SerialName
 @Serializable
 data class Class(
     @SerialName("class_id") val classId: Int,
-    @SerialName("teacher_name") val teacherName: String,
-    @SerialName("type") val type: String,
-    @SerialName("start_time") val startTime: Long,
-    @SerialName("end_time") val endTime: Long
+    @SerialName("teacher_name") var teacherName: String,
+    @SerialName("type") var type: String,
+    @SerialName("start_time") var startTime: String,
+    @SerialName("end_time") var endTime: String
 )

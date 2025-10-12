@@ -2,6 +2,7 @@ package com.lra.kalanikethan.data.repository
 
 
 import android.util.Log
+import androidx.compose.runtime.MutableState
 import com.lra.kalanikethan.data.models.Class
 import com.lra.kalanikethan.data.models.Employee
 import com.lra.kalanikethan.data.models.Family
@@ -41,6 +42,13 @@ class Repository {
                 PaymentPlan::family_payment_id eq id
             }
         }.decodeSingle<PaymentPlan>()
+    }
+
+    suspend fun updateClass(updatedClass: Class) {
+        println(updatedClass)
+        client.from("classes").upsert(updatedClass) {
+            onConflict = "class_id"
+        }
     }
 
     suspend fun addFirstFamilyPayment(paymentID : String, date : LocalDate, amount : Float){

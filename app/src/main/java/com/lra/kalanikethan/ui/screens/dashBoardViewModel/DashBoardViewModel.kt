@@ -43,7 +43,7 @@ class DashBoardViewModel (
     var isLoading = mutableStateOf(false)
 
 
-    private val _class = mutableStateOf<Class>(Class(classId = 0, teacherName = "", type = "", startTime = 0, endTime = 0))
+    private val _class = mutableStateOf<Class>(Class(classId = 0, teacherName = "", type = "", startTime = "", endTime = ""))
 
     //Currently selected class state
     val thisClass: MutableState<Class> = _class
@@ -136,6 +136,7 @@ class DashBoardViewModel (
         viewModelScope.launch {
             val pendingSelections = _pendingStudentSelections.value[classId] ?: emptySet()
             repository.updateClassState(classId, pendingSelections)
+            repository.updateClass(thisClass.value)
         }
     }
 }

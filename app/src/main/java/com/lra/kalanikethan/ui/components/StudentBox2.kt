@@ -92,7 +92,6 @@ fun StudentBox2(
             }
 
             HorizontalDivider(color = Color.Gray, modifier = Modifier.fillMaxWidth())
-            Text("Local ID: $index")
 
 
                 Row(horizontalArrangement = Arrangement.spacedBy(30.dp)) { // Typing in data
