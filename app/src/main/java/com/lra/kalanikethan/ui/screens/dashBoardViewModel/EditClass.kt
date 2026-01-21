@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -40,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.lra.kalanikethan.Screen
+import com.lra.kalanikethan.StudentsViewModel
 import com.lra.kalanikethan.data.models.Student
 import com.lra.kalanikethan.ui.components.Button
 import com.lra.kalanikethan.ui.components.ClassStudentComposable
@@ -62,31 +64,26 @@ import com.lra.kalanikethan.ui.theme.SuccessColor
  */
 @Composable
 fun EditClass(
-    viewModel: DashBoardViewModel,
-    signInViewModel: SignInViewModel,
+    viewModel: StudentsViewModel,
     navController: NavHostController
 ) {
-    val thisClass = viewModel.thisClass.value
-    var students by remember { mutableStateOf<List<Student>>(emptyList()) }
-    val allStudents = signInViewModel.displayedStudents.collectAsState(emptyList())
-    var editedClass = thisClass.copy()
+    val thisClass = viewModel.thisClass.value ?: return
 
-    // Initialize state and load class students
-    LaunchedEffect(Unit) {
-        signInViewModel.removeSearchQuery()
-        viewModel.getStudentsForClassFlow(thisClass.classId).collect {
-            students = it
-            for (student in it) {
-                viewModel.toggleStudentSelection(
-                    thisClass.classId,
-                    student.studentId ?: return@collect,
-                    isSelected = true
-                )
-            }
-        }
+    // --- students state ---
+    val studentsInClass =
+        viewModel.selectedStudentsForActiveClass.collectAsState().value
+
+
+    val allStudents = viewModel.displayedStudents.collectAsState(emptyList())
+    val searchQuery = viewModel.searchQuery.value
+
+    // --- load students for class ONCE ---
+    LaunchedEffect(thisClass.classId) {
+        viewModel.removeSearchQuery()
+        viewModel.resetPendingUpdates()
+        viewModel.loadStudentsForClass(thisClass.classId)
     }
 
-    val searchQuery = signInViewModel.searchQuery.value
     var textWidth by remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
 
@@ -95,204 +92,170 @@ fun EditClass(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Left Section: Class Details and Current Students
+
+        /* ───────────────────────── LEFT SECTION ───────────────────────── */
+
         Column {
-            // Class Title Section
+
+            // Title
             Column(
-                modifier = Modifier
-                    .padding(start = 53.dp, top = 14.dp)
-                    .wrapContentWidth()
+                modifier = Modifier.padding(start = 53.dp, top = 14.dp)
             ) {
                 Text(
                     "${thisClass.teacherName}'s Class",
                     style = MaterialTheme.typography.displayLarge,
-                    modifier = Modifier.widthIn(max = 500.dp).onGloballyPositioned { coordinates ->
-                        textWidth = with(density) { coordinates.size.width.toDp() }
-                    },
+                    modifier = Modifier
+                        .widthIn(max = 500.dp)
+                        .onGloballyPositioned {
+                            textWidth = with(density) { it.size.width.toDp() }
+                        },
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-
+                    overflow = TextOverflow.Ellipsis
                 )
-                Spacer(modifier = Modifier.height(10.dp))
-                HorizontalDivider(modifier = Modifier.width(textWidth))
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(Modifier.height(10.dp))
+                HorizontalDivider(Modifier.width(textWidth))
+                Spacer(Modifier.height(14.dp))
             }
 
-            // Class Information Form
-            Column(
-                modifier = Modifier
-                    .wrapContentWidth()
-                    .padding(top = 15.dp),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.Start
-            ) {
-                // Class Details Row 1: Teacher Name and Start Time
+            // Class Details
+            Column(modifier = Modifier.padding(top = 15.dp)) {
+
                 Row(
-                    modifier = Modifier.wrapContentSize().padding(start = 53.dp),
-                    horizontalArrangement = Arrangement.Start,
+                    modifier = Modifier.padding(start = 53.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     SimpleDecoratedTextField(
                         modifier = Modifier.width(328.dp).height(60.dp),
                         text = thisClass.teacherName,
-                        placeholder = "Enter Teacher Name",
                         label = "Teacher Name",
-                        onValueChange = { thisClass.teacherName = it },
+                        placeholder = "Enter Teacher Name",
+                        onValueChange = { thisClass.teacherName = it }
                     )
-                    Spacer(modifier = Modifier.width(25.dp))
+
+                    Spacer(Modifier.width(25.dp))
+
                     SimpleDecoratedTextField2(
                         modifier = Modifier.width(328.dp).height(60.dp),
                         text = thisClass.startTime,
-                        leadingIcon = Icons.Default.AccessTime,
-                        isLeadingIconClickable = true,
-
-                        placeholder = "Enter Start Time",
                         label = "Start Time",
-                        onValueChange = { thisClass.startTime = it },
+                        placeholder = "Enter Start Time",
+                        leadingIcon = Icons.Default.AccessTime,
+                        onValueChange = { thisClass.startTime = it }
                     )
                 }
 
-                Spacer(modifier = Modifier.height(13.dp))
+                Spacer(Modifier.height(13.dp))
 
-                // Class Details Row 2: Type and End Time
                 Row(
-                    modifier = Modifier.wrapContentSize().padding(start = 53.dp),
-                    horizontalArrangement = Arrangement.Start,
+                    modifier = Modifier.padding(start = 53.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     SimpleDecoratedTextField(
                         modifier = Modifier.width(328.dp).height(60.dp),
                         text = thisClass.type,
-                        placeholder = "Enter Type",
                         label = "Type",
-                        onValueChange = { thisClass.type = it },
+                        placeholder = "Enter Type",
+                        onValueChange = { thisClass.type = it }
                     )
-                    Spacer(modifier = Modifier.width(25.dp))
+
+                    Spacer(Modifier.width(25.dp))
+
                     SimpleDecoratedTextField2(
                         modifier = Modifier.width(328.dp).height(60.dp),
                         text = thisClass.endTime,
-                        leadingIcon = Icons.Default.AccessTime,
-                        isLeadingIconClickable = true,
-                        placeholder = "Enter End Time",
                         label = "End Time",
-                        onValueChange = { thisClass.endTime = it},
+                        placeholder = "Enter End Time",
+                        leadingIcon = Icons.Default.AccessTime,
+                        onValueChange = { thisClass.endTime = it }
                     )
                 }
+            }
 
-                // Current Students Section
-                Column(
+            // Students in Class
+            Column(
+                modifier = Modifier.padding(start = 53.dp, top = 19.dp)
+            ) {
+                Text(
+                    "Students",
+                    style = MaterialTheme.typography.displayLarge.copy(
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 20.sp
+                    )
+                )
+                Spacer(Modifier.height(10.dp))
+                HorizontalDivider(Modifier.width(textWidth))
+                Spacer(Modifier.height(14.dp))
+
+                LazyColumn(
                     modifier = Modifier
-                        .padding(start = 53.dp, top = 19.dp)
-                        .wrapContentSize()
+                        .fillMaxHeight()
+                        .width(681.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    // Students Title
-                    Column(
-                        modifier = Modifier
-                            .wrapContentSize(),
-                        verticalArrangement = Arrangement.Top,
-                        horizontalAlignment = Alignment.Start,
-                    ) {
-                        Text(
-                            "Students",
-                            style = MaterialTheme.typography.displayLarge.copy(
-                                fontWeight = FontWeight.ExtraBold,
-                                fontSize = 20.sp
-                            ),
+                    items(studentsInClass.sortedBy { it.firstName }) { student ->
+                        ClassStudentDisplay(
+                            modifier = Modifier.fillMaxWidth(),
+                            name = "${student.firstName} ${student.lastName}"
                         )
-                        Spacer(modifier = Modifier.height(10.dp))
-                        HorizontalDivider(modifier = Modifier.width(textWidth))
-                        Spacer(modifier = Modifier.height(14.dp))
-                    }
-
-                    // Current Students List
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .wrapContentWidth()
-                            .padding(top = 5.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                    ) {
-                        items(students.sortedBy { it.firstName }) { student ->
-                            ClassStudentDisplay(
-                                modifier = Modifier.width(681.dp).wrapContentHeight(),
-                                name = "${student.firstName} ${student.lastName}"
-                            )
-                        }
                     }
                 }
             }
         }
 
-        // Vertical Divider separating sections
         VerticalDivider(modifier = Modifier.height(400.dp))
 
-        // Right Section: Student Search and Selection
+        /* ───────────────────────── RIGHT SECTION ───────────────────────── */
+
         Column(
             modifier = Modifier
                 .fillMaxHeight()
-                .wrapContentWidth()
                 .padding(top = 100.dp, end = 70.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Search Field
+
             SimpleDecoratedTextField(
                 text = searchQuery,
-                onValueChange = { signInViewModel.updateSearchQuery(it) },
+                onValueChange = { viewModel.updateSearchQuery(it) },
                 placeholder = "Search by firstname, ID or lastname...",
                 leadingIcon = Icons.Default.Search,
                 modifier = Modifier.width(367.dp),
-                clearButton = true,
+                clearButton = true
             )
 
-            // All Students List (Searchable)
             LazyColumn(
-                modifier = Modifier
-                    .weight(1f)
-                    .wrapContentWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(allStudents.value) { student ->
+                    val isSelected =
+                        studentsInClass.any { it.studentId == student.studentId }
+
                     ClassStudentComposable(
-                        modifier = Modifier.width(367.dp).wrapContentHeight(),
+                        modifier = Modifier.width(367.dp),
                         name = "${student.firstName} ${student.lastName}",
-                        isSelected = students.any { it.studentId == student.studentId },
+                        isSelected = isSelected,
                         onClickListener = {
-                            if (students.any { it.studentId == student.studentId }) {
-                                // Remove student from class
-                                students = students.filter { it.studentId != student.studentId }
-                                viewModel.toggleStudentSelection(
-                                    thisClass.classId,
-                                    student.studentId ?: return@ClassStudentComposable,
-                                    isSelected = false
-                                )
-                            } else {
-                                // Add student to class
-                                students += student
-                                viewModel.toggleStudentSelection(
-                                    thisClass.classId,
-                                    student.studentId ?: return@ClassStudentComposable,
-                                    isSelected = true
-                                )
-                            }
+                            viewModel.toggleStudentSelection(
+                                thisClass.classId,
+                                student.studentId ?: return@ClassStudentComposable,
+                                isSelected = !isSelected
+                            )
                         }
                     )
                 }
             }
 
-            // Save Button
             Button(
                 text = "Save",
                 symbol = Icons.Default.Check,
+                color = SuccessColor,
+                modifier = Modifier.width(367.dp),
                 onClick = {
+                    navController.navigate(Screen.Dashboard.route)
                     viewModel.thisClass.value = thisClass
                     viewModel.updateClassState(thisClass.classId)
-                    navController.navigate(Screen.Dashboard.route)
-                },
-                color = SuccessColor,
-                modifier = Modifier.width(367.dp)
+                }
             )
         }
     }

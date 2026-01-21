@@ -16,6 +16,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.lra.kalanikethan.StudentsViewModel
 import com.lra.kalanikethan.data.remote.ChannelManager
 import com.lra.kalanikethan.ui.components.SimpleDecoratedTextField
 import com.lra.kalanikethan.ui.components.StudentInfoCard
@@ -33,7 +34,7 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun SignIn(
-    viewModel: SignInViewModel
+    viewModel: StudentsViewModel
 ) {
     val students = viewModel.displayedStudents.collectAsState(emptyList())
     val searchQuery = viewModel.searchQuery.value

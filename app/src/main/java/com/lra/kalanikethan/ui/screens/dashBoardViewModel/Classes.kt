@@ -17,6 +17,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import com.lra.kalanikethan.StudentsViewModel
 import com.lra.kalanikethan.ui.components.StudentInfoCard
 import com.lra.kalanikethan.ui.screens.signIn.SignInViewModel
 
@@ -42,14 +44,23 @@ import com.lra.kalanikethan.ui.screens.signIn.SignInViewModel
  */
 @Composable
 fun Classes(
-    viewModel: DashBoardViewModel,
-    signInViewModel: SignInViewModel
+    viewModel: StudentsViewModel
 ) {
+    
     val isLoading = viewModel.isLoading.value
     val thisClass = viewModel.thisClass.value
-    val students = viewModel.getStudentsForClassFlow(thisClass.classId).collectAsState(emptyList())
+
+    val studentsByClassState = viewModel.studentsByClass.collectAsState()
+    val students = studentsByClassState.value[thisClass?.classId] ?: emptyList()
+
     var textWidth by remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
+
+    LaunchedEffect(thisClass?.classId) {
+        thisClass?.classId?.let { classId ->
+            viewModel.loadStudentsForClass(classId)
+        }
+    }
 
     if (isLoading) {
         Box(
@@ -69,7 +80,7 @@ fun Classes(
                     .fillMaxWidth()
             ) {
                 Text(
-                    "${thisClass.teacherName}'s Class",
+                    "${thisClass?.teacherName}'s Class",
                     style = MaterialTheme.typography.displayLarge,
                     modifier = Modifier.onGloballyPositioned { coordinates ->
                         textWidth = with(density) { coordinates.size.width.toDp() }
@@ -88,11 +99,11 @@ fun Classes(
                     .padding(top = 14.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
-                items(students.value.sortedBy { it.firstName }) { student ->
+                items(students.sortedBy { it.firstName }) { student ->
                     StudentInfoCard(
                         studentData = student,
                         onSignInToggle = {
-                            signInViewModel.updateStudentAttendance(it, currentSignInStatus = !it.signedIn)
+                            viewModel.updateStudentAttendance(it, currentSignInStatus = !it.signedIn)
                         },
                         onAbsentClick = { },
                         onEditClick = { }

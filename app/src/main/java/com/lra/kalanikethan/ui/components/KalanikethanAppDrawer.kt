@@ -110,7 +110,7 @@ fun KalanikethanAppDrawer(
                 Screen.Add,
                 Screen.WhoseIn,
                 Screen.History,
-                Screen.Payments,
+//                Screen.Payments,
             )
 
             Column {

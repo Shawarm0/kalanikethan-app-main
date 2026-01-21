@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.lra.kalanikethan.StudentsViewModel
 import com.lra.kalanikethan.data.remote.ChannelManager
 import com.lra.kalanikethan.ui.components.InfoBox
 import com.lra.kalanikethan.ui.components.SimpleDecoratedTextField
@@ -43,7 +44,7 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun WhoseIn(
-    viewModel: SignInViewModel
+    viewModel: StudentsViewModel
 ) {
     val students = viewModel.displayedStudents
         .map { studentList ->

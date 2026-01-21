@@ -8,6 +8,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -55,6 +56,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.lra.kalanikethan.Factories.AddViewModelFactory
+import com.lra.kalanikethan.Factories.StudentsViewModelFactory
 import com.lra.kalanikethan.data.remote.SupabaseClientProvider
 import com.lra.kalanikethan.data.remote.SupabaseClientProvider.client
 import com.lra.kalanikethan.data.repository.Repository
@@ -63,16 +66,14 @@ import com.lra.kalanikethan.ui.components.TopAppBar
 import com.lra.kalanikethan.ui.screens.Add.Add
 import com.lra.kalanikethan.ui.screens.Add.AddViewModel
 import com.lra.kalanikethan.ui.screens.Auth.AuthActivity
+import com.lra.kalanikethan.ui.screens.History
 import com.lra.kalanikethan.ui.screens.dashBoardViewModel.Classes
-import com.lra.kalanikethan.ui.screens.dashBoardViewModel.DashBoardViewModel
 import com.lra.kalanikethan.ui.screens.dashBoardViewModel.Dashboard
 import com.lra.kalanikethan.ui.screens.dashBoardViewModel.EditClass
-import com.lra.kalanikethan.ui.screens.History
 import com.lra.kalanikethan.ui.screens.Payments.PaymentHistory
 import com.lra.kalanikethan.ui.screens.Payments.PaymentViewModel
 import com.lra.kalanikethan.ui.screens.Payments.Payments
 import com.lra.kalanikethan.ui.screens.signIn.SignIn
-import com.lra.kalanikethan.ui.screens.signIn.SignInViewModel
 import com.lra.kalanikethan.ui.screens.WhoseIn
 import com.lra.kalanikethan.ui.theme.Background
 import com.lra.kalanikethan.ui.theme.KalanikethanTheme
@@ -98,6 +99,28 @@ class MainActivity : ComponentActivity() {
      * @param savedInstanceState If the activity is being re-initialized after previously
      * being shut down, this contains the most recent state; otherwise, it is `null`.
      */
+
+    private val repository by lazy {
+        Repository()
+    }
+
+//    private val signInViewModel: SignInViewModel by viewModels {
+//        SignInViewModelFactory(repository)
+//    }
+
+    private val addViewModel: AddViewModel by viewModels {
+        AddViewModelFactory(repository)
+    }
+//    private val dashboardViewModel: DashBoardViewModel by viewModels {
+//        DashBoardViewModelFactory(repository, signInViewModel)
+//    }
+
+    private val studentsViewModel: StudentsViewModel by viewModels {
+        StudentsViewModelFactory(repository)
+    }
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -107,11 +130,6 @@ class MainActivity : ComponentActivity() {
             val context = LocalContext.current
             val authState = client.auth.sessionStatus.collectAsState()
             Log.i("Auth-Main", "Auth state: $authState")
-
-            val repository = remember { Repository() }
-            val signInViewModel = remember { SignInViewModel(repository) }
-            val addViewModel = remember  { AddViewModel(repository) }
-            val dashboardViewModel = remember { DashBoardViewModel(repository, signInViewModel) }
             val paymentViewModel = remember { PaymentViewModel(repository) }
 
             LaunchedEffect(Unit) {
@@ -123,10 +141,7 @@ class MainActivity : ComponentActivity() {
             KalanikethanTheme {
                 when (authState.value) {
                     is SessionStatus.Authenticated -> {
-                        // User is authenticated
-                        signInViewModel.initializeStudents()
-                        dashboardViewModel.loadClasses()
-                        KalanikethanApp(signInViewModel, addViewModel, dashboardViewModel, paymentViewModel)
+                        KalanikethanApp(addViewModel = addViewModel, paymentViewModel =  paymentViewModel, studentsViewModel = studentsViewModel)
                     }
                     SessionStatus.Initializing -> {
                         // Still loading, show loading UI
@@ -245,9 +260,10 @@ sealed class Screen(
  */
 @Composable
 fun KalanikethanApp(
-    signInViewModel: SignInViewModel,
+//    signInViewModel: SignInViewModel,
     addViewModel: AddViewModel,
-    dashboardViewModel: DashBoardViewModel,
+    studentsViewModel: StudentsViewModel,
+//    dashboardViewModel: DashBoardViewModel,
     paymentViewModel: PaymentViewModel
 ) {
     // This stores the state of the navigation drawer
@@ -321,19 +337,19 @@ fun KalanikethanApp(
                     .imeBottomPaddingFraction(0.9f),
 
             ) {
-                composable(route = Screen.Dashboard.route) { Dashboard(dashboardViewModel, navController, selectedIconChange = { icon ->
+                composable(route = Screen.Dashboard.route) { Dashboard(studentsViewModel, navController, selectedIconChange = { icon ->
                     selectedIcon = icon
                 }) }
-                composable(route = Screen.SignIn.route) { SignIn(signInViewModel) }
+                composable(route = Screen.SignIn.route) { SignIn(studentsViewModel) }
                 composable(route = Screen.Add.route) { Add(addViewModel) }
-                composable(route = Screen.WhoseIn.route) { WhoseIn(signInViewModel) }
-                composable(route = Screen.History.route) { History(signInViewModel, dashboardViewModel) }
-                composable(route = Screen.Payments.route) { Payments(paymentViewModel, navController) }
+                composable(route = Screen.WhoseIn.route) { WhoseIn(studentsViewModel) }
+                composable(route = Screen.History.route) { History(studentsViewModel) }
+//                composable(route = Screen.Payments.route) { Payments(paymentViewModel, navController) }
                 composable(route = Screen.Account.route) { }
-                composable(route = Screen.Class.route) { Classes(dashboardViewModel, signInViewModel) }
-                composable(route = Screen.EditClass.route) { EditClass(dashboardViewModel, signInViewModel, navController) }
+                composable(route = Screen.Class.route) { Classes(studentsViewModel) }
+                composable(route = Screen.EditClass.route) { EditClass(studentsViewModel, navController) }
                 composable(route = Screen.EditFamily.route) {  }
-                composable(route = Screen.PaymentHistory.route) { PaymentHistory(paymentViewModel, navController) }
+//                composable(route = Screen.PaymentHistory.route) { PaymentHistory(paymentViewModel, navController) }
             }
         }
     }

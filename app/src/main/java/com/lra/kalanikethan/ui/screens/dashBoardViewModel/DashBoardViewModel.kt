@@ -132,11 +132,11 @@ class DashBoardViewModel (
      *
      * @param classId The ID of the class to update
      */
-    fun updateClassState(classId: Int) {
-        viewModelScope.launch {
-            val pendingSelections = _pendingStudentSelections.value[classId] ?: emptySet()
-            repository.updateClassState(classId, pendingSelections)
-            repository.updateClass(thisClass.value)
-        }
-    }
+//    fun updateClassState(classId: Int) {
+//        viewModelScope.launch {
+//            val pendingSelections = _pendingStudentSelections.value[classId] ?: emptySet()
+//            repository.updateClassState(classId, pendingSelections)
+//            repository.updateClass(thisClass.value)
+//        }
+//    }
 }

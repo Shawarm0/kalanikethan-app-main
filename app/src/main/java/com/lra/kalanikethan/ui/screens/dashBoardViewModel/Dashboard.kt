@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.lra.kalanikethan.Screen
+import com.lra.kalanikethan.StudentsViewModel
 import com.lra.kalanikethan.ui.components.ClassBox
 import com.lra.kalanikethan.util.isManager
 import kotlinx.coroutines.delay
@@ -47,7 +48,7 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun Dashboard(
-    viewModel: DashBoardViewModel,
+    viewModel: StudentsViewModel,
     navController: NavHostController,
     selectedIconChange: (ImageVector) -> Unit = {}
 ) {

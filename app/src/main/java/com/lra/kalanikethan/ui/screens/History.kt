@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.lra.kalanikethan.StudentsViewModel
 import com.lra.kalanikethan.ui.components.HistoryComponent
 import com.lra.kalanikethan.ui.components.SelectionButton
 import com.lra.kalanikethan.ui.components.SelectionButton2
@@ -54,36 +55,17 @@ import io.github.jan.supabase.realtime.Column
  */
 @Composable
 fun History(
-    viewModel: SignInViewModel,
-    dashBoardViewModel: DashBoardViewModel
+    viewModel: StudentsViewModel
 ) {
-
+    val histories by viewModel.histories.collectAsState(emptyList())
     val students by viewModel.allStudents.collectAsState(emptyList())
     val employees by viewModel.employees.collectAsState(emptyList())
-    val histories by viewModel.histories.collectAsState(emptyList())
-    val classes by dashBoardViewModel.allClasses.collectAsState(emptyList())
-
+    val classes by viewModel.allClasses.collectAsState(emptyList())
+    val studentsByClass by viewModel.studentsByClass.collectAsState()
 
     var selectedClassId by remember { mutableStateOf<Int?>(null) }
 
-    val filteredStudents by dashBoardViewModel.getStudentsForClassFlow(selectedClassId ?: -5)
-        .collectAsState(initial = emptyList())
-
-    val filteredHistories = remember(histories, filteredStudents, selectedClassId) {
-        if (selectedClassId != null) {
-            // Only show histories for students in the filtered list
-            histories.filter { history ->
-                filteredStudents.any { student ->
-                    student.studentId == history.studentID
-                }
-            }
-        } else {
-            // Show all histories when no class is selected
-            histories
-        }
-    }
-
-    // Create a map for quick student lookup by ID
+    // Build lookup maps once
     val studentMap = remember(students) {
         students.associateBy { it.studentId }
     }
@@ -91,64 +73,78 @@ fun History(
         employees.associateBy { it.uid }
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.initialiseHistoryChannel()
+    // ✅ FAST filtering using IDs only
+    val filteredHistories = remember(
+        histories,
+        studentsByClass,
+        selectedClassId
+    ) {
+        if (selectedClassId == null) {
+            histories
+        } else {
+            val allowedIds =
+                studentsByClass[selectedClassId].orEmpty()
+                    .mapNotNull { it.studentId }
+                    .toSet()
+
+            histories.filter { it.studentID in allowedIds }
+        }
     }
 
-
     Column(
-        modifier = Modifier.fillMaxSize().padding(top = 12.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         LazyRow(
             modifier = Modifier.width(1075.dp)
         ) {
-            // Add "All Classes" option
             item {
                 SelectionButton2(
                     text = "All Classes",
-                    onClick = {
-                        selectedClassId = null
-                    },
+                    onClick = { selectedClassId = null },
                     color = if (selectedClassId == null) AccentColor else Color(0xFFE7EEF5),
-                    textColor = if (selectedClassId == null) Color(0xFFFFFFFF) else UnselectedButtonText
+                    textColor = if (selectedClassId == null) Color.White else UnselectedButtonText
                 )
             }
-            items(classes) { eachclass ->
+
+            items(classes) { eachClass ->
                 SelectionButton2(
-                    text = eachclass.teacherName,
+                    text = eachClass.teacherName,
                     onClick = {
-                        selectedClassId = eachclass.classId
+                        selectedClassId = eachClass.classId
+                        viewModel.loadStudentsForClass(eachClass.classId)
                     },
-                    color = if (selectedClassId == eachclass.classId) AccentColor else Color(0xFFE7EEF5),
-                    textColor = if (selectedClassId == eachclass.classId) Color(0xFFFFFFFF) else UnselectedButtonText
+                    color = if (selectedClassId == eachClass.classId) AccentColor else Color(0xFFE7EEF5),
+                    textColor = if (selectedClassId == eachClass.classId) Color.White else UnselectedButtonText
                 )
             }
         }
+
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(top = 12.dp, bottom = 12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             val groupedByDay = groupHistoriesByDay(filteredHistories)
 
             if (groupedByDay.isEmpty()) {
                 item {
                     Text(
-                        text = if (selectedClassId != null) {
+                        text = if (selectedClassId != null)
                             "No history records for selected class"
-                        } else {
-                            "No history records found"
-                        },
+                        else
+                            "No history records found",
                         modifier = Modifier.padding(16.dp)
                     )
                 }
             } else {
                 items(groupedByDay) { dayList ->
-                    val day = formatDateToDayMonth(dayList[0].date)
                     HistoryComponent(
-                        day = day,
+                        day = formatDateToDayMonth(dayList.first().date),
                         data = dayList,
                         studentMap = studentMap,
                         employeeMap = employeeMap
@@ -158,4 +154,5 @@ fun History(
         }
     }
 }
+
 
