@@ -35,7 +35,11 @@ object SupabaseClientProvider {
     ) {
         install(Postgrest)
         install(Realtime)
-        install(Auth)
+        install(Auth) {
+            autoLoadFromStorage = true
+            alwaysAutoRefresh = true
+        }
+
 
         httpEngine = CIO.create()
     }

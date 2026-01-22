@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import com.lra.kalanikethan.StudentsViewModel
 import com.lra.kalanikethan.ui.components.StudentInfoCard
 import com.lra.kalanikethan.ui.screens.signIn.SignInViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 
 /**
  * Composable function that displays a class roster with student information and attendance controls.
@@ -49,9 +50,11 @@ fun Classes(
     
     val isLoading = viewModel.isLoading.value
     val thisClass = viewModel.thisClass.value
+    val students by remember(thisClass?.classId) {
+        thisClass?.classId?.let { viewModel.studentsForClass(it) }
+            ?: MutableStateFlow(emptyList())
+    }.collectAsState()
 
-    val studentsByClassState = viewModel.studentsByClass.collectAsState()
-    val students = studentsByClassState.value[thisClass?.classId] ?: emptyList()
 
     var textWidth by remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
@@ -103,7 +106,7 @@ fun Classes(
                     StudentInfoCard(
                         studentData = student,
                         onSignInToggle = {
-                            viewModel.updateStudentAttendance(it, currentSignInStatus = !it.signedIn)
+                            viewModel.updateStudentAttendance(it, currentSignInStatus = !it.signedIn, classId = thisClass?.classId)
                         },
                         onAbsentClick = { },
                         onEditClick = { }

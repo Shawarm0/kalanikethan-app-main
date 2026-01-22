@@ -71,7 +71,7 @@ fun SignIn(
                 StudentInfoCard(
                     studentData = student,
                     onSignInToggle = {
-                        viewModel.updateStudentAttendance(it, currentSignInStatus = !it.signedIn)
+                        viewModel.updateStudentAttendance(it, currentSignInStatus = !it.signedIn, classId = null)
                     },
                     onAbsentClick = { },
                     onEditClick = {

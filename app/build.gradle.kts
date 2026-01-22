@@ -24,7 +24,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = true
+            isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -53,7 +53,7 @@ dependencies {
     implementation(platform("io.github.jan-tennert.supabase:bom:3.2.2"))
     implementation("io.github.jan-tennert.supabase:postgrest-kt")
     implementation("io.github.jan-tennert.supabase:realtime-kt")
-    implementation("io.github.jan-tennert.supabase:auth-kt")
+    implementation("io.github.jan-tennert.supabase:auth-kt:3.2.2")
     // Ktor client import
     implementation("io.ktor:ktor-client-cio:3.2.2")
 

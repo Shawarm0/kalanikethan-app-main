@@ -14,6 +14,7 @@ import com.lra.kalanikethan.data.models.Employee
 import com.lra.kalanikethan.data.models.History
 import com.lra.kalanikethan.data.models.sessionPermissions
 import com.lra.kalanikethan.data.remote.ChannelManager
+import com.lra.kalanikethan.util.PdfExporter
 import io.github.jan.supabase.realtime.PostgresAction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -67,7 +68,11 @@ class StudentsViewModel(
     private val _studentsByClass =
         MutableStateFlow<Map<Int, List<Student>>>(emptyMap())
 
-    val studentsByClass: StateFlow<Map<Int, List<Student>>> = _studentsByClass
+    private val _studentIdsByClass =
+        MutableStateFlow<Map<Int, Set<Int>>>(emptyMap())
+
+    val studentIdsByClass: StateFlow<Map<Int, Set<Int>>> = _studentIdsByClass
+
 
 
     val thisClass = mutableStateOf<Class?>(null)
@@ -80,17 +85,15 @@ class StudentsViewModel(
 
     val selectedStudentsForActiveClass: StateFlow<List<Student>> =
         combine(
-            studentsByClass,
+            studentIdsByClass,          // ✅ IDs only
             _pendingStudentSelections,
-            allStudents
-        ) { byClass, pending, allStudents ->
+            allStudents                 // ✅ single source of truth
+        ) { idsByClass, pending, allStudents ->
 
             val classId = thisClass.value?.classId ?: return@combine emptyList()
 
-            val baseStudents = byClass[classId].orEmpty()
+            val baseIds = idsByClass[classId].orEmpty()
             val pendingIds = pending[classId].orEmpty()
-
-            val baseIds = baseStudents.mapNotNull { it.studentId }.toSet()
 
             val finalIds =
                 baseIds
@@ -104,6 +107,7 @@ class StudentsViewModel(
                 started = SharingStarted.WhileSubscribed(5_000),
                 initialValue = emptyList()
             )
+
 
 
 
@@ -145,7 +149,7 @@ class StudentsViewModel(
      * @param updatedStudent The student with updated attendance status
      * @param currentSignInStatus True if signing in, false if signing out
      */
-    fun updateStudentAttendance(updatedStudent: Student, currentSignInStatus: Boolean) {
+    fun updateStudentAttendance(updatedStudent: Student, currentSignInStatus: Boolean, classId: Int?) {
         Log.i("Database-Attendance", "Student: $updatedStudent, Action: ${if (currentSignInStatus) "SignIn" else "SignOut"}")
 
         // Always update UI immediately
@@ -175,6 +179,7 @@ class StudentsViewModel(
 
                 val history = History(
                     studentID = updatedStudent.studentId,
+                    classID = classId,
                     date = "${LocalDate.now().year}-${LocalDate.now().month}-${LocalDate.now().dayOfMonth}",
                     signInTime = System.currentTimeMillis(),
                     signOutTime = null,
@@ -319,19 +324,30 @@ class StudentsViewModel(
         }
     }
 
+    fun studentsForClass(classId: Int): StateFlow<List<Student>> =
+        combine(
+            allStudents,
+            studentIdsByClass
+        ) { allStudents, idsByClass ->
+            val ids = idsByClass[classId].orEmpty()
+            allStudents.filter { it.studentId in ids }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList()
+        )
 
 
     fun loadStudentsForClass(classId: Int) {
         viewModelScope.launch {
             val studentIds = repository.getStudentIdsForClass(classId)
 
-            _studentsByClass.update { current ->
-                current + (classId to _allStudents.value.filter {
-                    it.studentId in studentIds
-                })
+            _studentIdsByClass.update { current ->
+                current + (classId to studentIds.toSet())
             }
         }
     }
+
 
 
     /**
@@ -407,6 +423,26 @@ class StudentsViewModel(
             }
         }
     }
+
+
+
+
+    fun exportHistoryPdf(from: LocalDate, to: LocalDate) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val filtered = _allHistories.value.filter {
+                val date = LocalDate.parse(it.date)
+                !date.isBefore(from) && !date.isAfter(to)
+            }
+
+            PdfExporter.exportHistory(
+                histories = filtered,
+                students = _allStudents.value,
+                classes = _allClasses.value,
+                employees = _allEmployees.value
+            )
+        }
+    }
+
 
 
 }

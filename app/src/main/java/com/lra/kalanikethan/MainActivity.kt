@@ -13,6 +13,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -48,6 +49,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -127,37 +129,47 @@ class MainActivity : ComponentActivity() {
 
 
         setContent {
-            val context = LocalContext.current
-            val authState = client.auth.sessionStatus.collectAsState()
-            Log.i("Auth-Main", "Auth state: $authState")
-            val paymentViewModel = remember { PaymentViewModel(repository) }
-
-            LaunchedEffect(Unit) {
-                if (!SupabaseClientProvider.isUserStillValid()) {
-                    client.auth.signOut(SignOutScope.GLOBAL)
-                }
-            }
-
             KalanikethanTheme {
-                when (authState.value) {
+
+                val sessionStatus by client.auth.sessionStatus.collectAsState()
+
+                LaunchedEffect(sessionStatus) {
+                    when (sessionStatus) {
+                        is SessionStatus.Authenticated -> {
+                            SupabaseClientProvider.isUserStillValid()
+                        }
+
+                        is SessionStatus.NotAuthenticated -> {
+                            val intent = Intent(this@MainActivity, AuthActivity::class.java)
+                            startActivity(intent)
+                            finish()
+                        }
+
+                        else -> Unit // Initializing / LoadingFromStorage / Refreshing
+                    }
+                }
+
+                when (sessionStatus) {
                     is SessionStatus.Authenticated -> {
-                        KalanikethanApp(addViewModel = addViewModel, paymentViewModel =  paymentViewModel, studentsViewModel = studentsViewModel)
-                    }
-                    SessionStatus.Initializing -> {
-                        // Still loading, show loading UI
-                        CircularProgressIndicator()
-                    }
-                    else -> {
-                        // Not authenticated, redirect to AuthActivity
-                        context.startActivity(
-                            Intent(context, AuthActivity::class.java),
-                            ActivityOptions.makeCustomAnimation(context, 0, 0).toBundle()
+                        KalanikethanApp(
+                            addViewModel = addViewModel,
+                            studentsViewModel = studentsViewModel,
+                            paymentViewModel = remember { PaymentViewModel(repository) }
                         )
-                        finish()
+                    }
+
+                    SessionStatus.Initializing -> {
+                        FullscreenLoader()
+                        FullscreenLoader()
+                    }
+
+                    else -> {
+                        // UI empty – navigation handled above
                     }
                 }
             }
         }
+
     }
 
     /**
@@ -318,6 +330,7 @@ fun KalanikethanApp(
                         context.startActivity(intent)
                     }
                 )
+
             },
             modifier = Modifier
             .fillMaxSize()
@@ -352,5 +365,17 @@ fun KalanikethanApp(
 //                composable(route = Screen.PaymentHistory.route) { PaymentHistory(paymentViewModel, navController) }
             }
         }
+    }
+}
+
+
+
+@Composable
+fun FullscreenLoader() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator()
     }
 }
