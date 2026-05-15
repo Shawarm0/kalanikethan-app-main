@@ -1,4 +1,4 @@
-package com.lra.kalanikethan.ui.screens.dashBoardViewModel
+package com.lra.kalanikethan.ui.screens.dashboard
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,9 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -40,48 +37,39 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.lra.kalanikethan.Screen
-import com.lra.kalanikethan.StudentsViewModel
-import com.lra.kalanikethan.data.models.Student
+import com.lra.kalanikethan.navigation.Screen
+import com.lra.kalanikethan.viewmodel.AttendanceViewModel
+import com.lra.kalanikethan.viewmodel.ClassManagementViewModel
 import com.lra.kalanikethan.ui.components.Button
 import com.lra.kalanikethan.ui.components.ClassStudentComposable
 import com.lra.kalanikethan.ui.components.ClassStudentDisplay
 import com.lra.kalanikethan.ui.components.SimpleDecoratedTextField
 import com.lra.kalanikethan.ui.components.SimpleDecoratedTextField2
-import com.lra.kalanikethan.ui.screens.signIn.SignInViewModel
 import com.lra.kalanikethan.ui.theme.SuccessColor
 
-/**
- * Composable function for editing class details and managing student assignments.
- *
- * This screen allows editing of class information (teacher name, type, start/end times)
- * and managing which students are assigned to the class. Features a split layout with
- * current class students on the left and a searchable list of all students on the right.
- *
- * @param viewModel The [DashBoardViewModel] that provides class data and manages student selections
- * @param signInViewModel The [SignInViewModel] that provides student data and search functionality
- * @param navController The [NavHostController] for navigation back to the dashboard
- */
 @Composable
 fun EditClass(
-    viewModel: StudentsViewModel,
+    classViewModel: ClassManagementViewModel,
+    attendanceViewModel: AttendanceViewModel,
     navController: NavHostController
 ) {
-    val thisClass = viewModel.thisClass.value ?: return
+    val thisClass = classViewModel.thisClass.collectAsState().value ?: return
 
-    // --- students state ---
+    var teacherName by remember(thisClass.classId) { mutableStateOf(thisClass.teacherName) }
+    var classType by remember(thisClass.classId) { mutableStateOf(thisClass.type) }
+    var startTime by remember(thisClass.classId) { mutableStateOf(thisClass.startTime) }
+    var endTime by remember(thisClass.classId) { mutableStateOf(thisClass.endTime) }
+
     val studentsInClass =
-        viewModel.selectedStudentsForActiveClass.collectAsState().value
+        classViewModel.selectedStudentsForActiveClass.collectAsState().value
 
+    val allStudents = attendanceViewModel.displayedStudents.collectAsState(emptyList())
+    val searchQuery by attendanceViewModel.searchQuery.collectAsState()
 
-    val allStudents = viewModel.displayedStudents.collectAsState(emptyList())
-    val searchQuery = viewModel.searchQuery.value
-
-    // --- load students for class ONCE ---
     LaunchedEffect(thisClass.classId) {
-        viewModel.removeSearchQuery()
-        viewModel.resetPendingUpdates()
-        viewModel.loadStudentsForClass(thisClass.classId)
+        attendanceViewModel.removeSearchQuery()
+        classViewModel.resetPendingUpdates()
+        classViewModel.loadStudentsForClass(thisClass.classId)
     }
 
     var textWidth by remember { mutableStateOf(0.dp) }
@@ -93,16 +81,13 @@ fun EditClass(
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        /* ───────────────────────── LEFT SECTION ───────────────────────── */
-
         Column {
 
-            // Title
             Column(
                 modifier = Modifier.padding(start = 53.dp, top = 14.dp)
             ) {
                 Text(
-                    "${thisClass.teacherName}'s Class",
+                    "${teacherName}'s Class",
                     style = MaterialTheme.typography.displayLarge,
                     modifier = Modifier
                         .widthIn(max = 500.dp)
@@ -117,7 +102,6 @@ fun EditClass(
                 Spacer(Modifier.height(14.dp))
             }
 
-            // Class Details
             Column(modifier = Modifier.padding(top = 15.dp)) {
 
                 Row(
@@ -126,21 +110,21 @@ fun EditClass(
                 ) {
                     SimpleDecoratedTextField(
                         modifier = Modifier.width(328.dp).height(60.dp),
-                        text = thisClass.teacherName,
+                        text = teacherName,
                         label = "Teacher Name",
                         placeholder = "Enter Teacher Name",
-                        onValueChange = { thisClass.teacherName = it }
+                        onValueChange = { teacherName = it }
                     )
 
                     Spacer(Modifier.width(25.dp))
 
                     SimpleDecoratedTextField2(
                         modifier = Modifier.width(328.dp).height(60.dp),
-                        text = thisClass.startTime,
+                        text = startTime,
                         label = "Start Time",
                         placeholder = "Enter Start Time",
                         leadingIcon = Icons.Default.AccessTime,
-                        onValueChange = { thisClass.startTime = it }
+                        onValueChange = { startTime = it }
                     )
                 }
 
@@ -152,26 +136,25 @@ fun EditClass(
                 ) {
                     SimpleDecoratedTextField(
                         modifier = Modifier.width(328.dp).height(60.dp),
-                        text = thisClass.type,
+                        text = classType,
                         label = "Type",
                         placeholder = "Enter Type",
-                        onValueChange = { thisClass.type = it }
+                        onValueChange = { classType = it }
                     )
 
                     Spacer(Modifier.width(25.dp))
 
                     SimpleDecoratedTextField2(
                         modifier = Modifier.width(328.dp).height(60.dp),
-                        text = thisClass.endTime,
+                        text = endTime,
                         label = "End Time",
                         placeholder = "Enter End Time",
                         leadingIcon = Icons.Default.AccessTime,
-                        onValueChange = { thisClass.endTime = it }
+                        onValueChange = { endTime = it }
                     )
                 }
             }
 
-            // Students in Class
             Column(
                 modifier = Modifier.padding(start = 53.dp, top = 19.dp)
             ) {
@@ -186,13 +169,15 @@ fun EditClass(
                 HorizontalDivider(Modifier.width(textWidth))
                 Spacer(Modifier.height(14.dp))
 
+                val sortedClassStudents = remember(studentsInClass) { studentsInClass.sortedBy { it.firstName } }
+
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxHeight()
                         .width(681.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(studentsInClass.sortedBy { it.firstName }) { student ->
+                    items(sortedClassStudents, key = { it.studentId ?: 0 }) { student ->
                         ClassStudentDisplay(
                             modifier = Modifier.fillMaxWidth(),
                             name = "${student.firstName} ${student.lastName}"
@@ -204,8 +189,6 @@ fun EditClass(
 
         VerticalDivider(modifier = Modifier.height(400.dp))
 
-        /* ───────────────────────── RIGHT SECTION ───────────────────────── */
-
         Column(
             modifier = Modifier
                 .fillMaxHeight()
@@ -216,7 +199,7 @@ fun EditClass(
 
             SimpleDecoratedTextField(
                 text = searchQuery,
-                onValueChange = { viewModel.updateSearchQuery(it) },
+                onValueChange = { attendanceViewModel.updateSearchQuery(it) },
                 placeholder = "Search by firstname, ID or lastname...",
                 leadingIcon = Icons.Default.Search,
                 modifier = Modifier.width(367.dp),
@@ -227,7 +210,7 @@ fun EditClass(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(allStudents.value) { student ->
+                items(allStudents.value, key = { it.studentId ?: 0 }) { student ->
                     val isSelected =
                         studentsInClass.any { it.studentId == student.studentId }
 
@@ -236,7 +219,7 @@ fun EditClass(
                         name = "${student.firstName} ${student.lastName}",
                         isSelected = isSelected,
                         onClickListener = {
-                            viewModel.toggleStudentSelection(
+                            classViewModel.toggleStudentSelection(
                                 thisClass.classId,
                                 student.studentId ?: return@ClassStudentComposable,
                                 isSelected = !isSelected
@@ -252,9 +235,15 @@ fun EditClass(
                 color = SuccessColor,
                 modifier = Modifier.width(367.dp),
                 onClick = {
+                    val updatedClass = thisClass.copy(
+                        teacherName = teacherName,
+                        type = classType,
+                        startTime = startTime,
+                        endTime = endTime
+                    )
+                    classViewModel.thisClass.value = updatedClass
+                    classViewModel.updateClassState(thisClass.classId)
                     navController.navigate(Screen.Dashboard.route)
-                    viewModel.thisClass.value = thisClass
-                    viewModel.updateClassState(thisClass.classId)
                 }
             )
         }

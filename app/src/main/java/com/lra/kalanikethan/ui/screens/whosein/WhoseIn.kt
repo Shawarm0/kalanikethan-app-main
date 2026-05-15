@@ -1,4 +1,4 @@
-package com.lra.kalanikethan.ui.screens
+package com.lra.kalanikethan.ui.screens.whosein
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,47 +16,31 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.lra.kalanikethan.StudentsViewModel
-import com.lra.kalanikethan.data.remote.ChannelManager
+import com.lra.kalanikethan.viewmodel.AttendanceViewModel
 import com.lra.kalanikethan.ui.components.InfoBox
 import com.lra.kalanikethan.ui.components.SimpleDecoratedTextField
 import com.lra.kalanikethan.ui.components.StudentInfoCard
-import com.lra.kalanikethan.ui.screens.signIn.SignInViewModel
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 
-
-/**
- * A composable screen that displays signed-in students with search functionality.
- *
- * This screen shows a list of students who are currently signed in, along with a search bar
- * to filter students by first name, ID, or last name.
- *
- *
- * @param viewModel The [SignInViewModel] that provides student data and handles business logic
- * for sign-in operations, search queries, and student management.
- *
- */
 @Composable
 fun WhoseIn(
-    viewModel: StudentsViewModel
+    attendanceViewModel: AttendanceViewModel,
+    onEditFamily: (String) -> Unit = {}
 ) {
-    val students = viewModel.displayedStudents
-        .map { studentList ->
-            studentList.filter { student -> student.signedIn }
-        }
-        .collectAsState(emptyList())
-    val searchQuery = viewModel.searchQuery.value
-    val coroutineScope = rememberCoroutineScope()
+    val students by remember {
+        attendanceViewModel.displayedStudents
+            .map { it.filter { student -> student.signedIn } }
+    }.collectAsState(emptyList())
+    val searchQuery by attendanceViewModel.searchQuery.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.initialiseStudentsChannel()
-        viewModel.removeSearchQuery()
+        attendanceViewModel.removeSearchQuery()
     }
 
     Column(
@@ -73,7 +57,7 @@ fun WhoseIn(
         ) {
             SimpleDecoratedTextField(
                 text = searchQuery,
-                onValueChange = { viewModel.updateSearchQuery(it) },
+                onValueChange = { attendanceViewModel.updateSearchQuery(it) },
                 placeholder = "Search by firstname, ID or lastname...",
                 leadingIcon = Icons.Default.Search,
                 modifier = Modifier.width(875.dp),
@@ -84,7 +68,7 @@ fun WhoseIn(
 
             InfoBox(
                 modifier = Modifier.height(30.dp).wrapContentWidth(),
-                text = "Total Students: ${students.value.size}",
+                text = "Total Students: ${students.size}",
                 fontSize = 16.sp
             )
         }
@@ -96,18 +80,14 @@ fun WhoseIn(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            items(students.value) { student ->
+            items(students) { student ->
                 StudentInfoCard(
                     studentData = student,
                     onSignInToggle = {
-                        viewModel.updateStudentAttendance(it, currentSignInStatus = !it.signedIn, classId = null)
+                        attendanceViewModel.updateStudentAttendance(it, currentSignInStatus = !it.signedIn, classId = null)
                     },
                     onAbsentClick = { },
-                    onEditClick = {
-                        coroutineScope.launch {
-                            ChannelManager.unsubscribeFromAllChannels()
-                        }
-                    },
+                    onEditClick = { familyId -> onEditFamily(familyId) },
                 )
             }
         }

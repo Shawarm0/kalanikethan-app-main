@@ -45,7 +45,8 @@ fun ParentBox(
     deleteParent: () -> Unit = {},
     viewHistory: Boolean = false,
     editable: Boolean = false,
-    deleteIfCancelledOnFirstEdit: Boolean = false
+    deleteIfCancelledOnFirstEdit: Boolean = false,
+    title: String = "Parent Details"
 ) {
     // For the text boxes
     val bringIntoViewRequester = remember { BringIntoViewRequester() }
@@ -84,7 +85,7 @@ fun ParentBox(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ){
-                Text("Parent Details", style = MaterialTheme.typography.titleLarge)
+                Text(title, style = MaterialTheme.typography.titleLarge)
                 if(editableState){
                     Button("Delete", Icons.Default.Delete, color = ErrorColor, onClick = { deleteParent() })
                 }

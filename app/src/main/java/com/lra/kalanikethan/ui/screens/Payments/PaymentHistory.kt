@@ -15,6 +15,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,10 +31,10 @@ import kotlinx.datetime.LocalDate
 
 
 data class PaymentHistoryData (
-    var history : List<PaymentHistory> = emptyList<PaymentHistory>(),
-    var familyName : String = "",
-    var familyID : String = "",
-    var amount : String = "",
+    val history : List<PaymentHistory> = emptyList(),
+    val familyName : String = "",
+    val familyID : String = "",
+    val amount : String = "",
 )
 
 @Composable
@@ -40,7 +42,7 @@ fun PaymentHistory(
     viewModel: PaymentViewModel,
     navController : NavHostController
 ) {
-    val data = viewModel.currentFamily.value
+    val data by viewModel.currentFamily.collectAsState()
     val history = data.history
     val familyName = data.familyName
     val familyID = data.familyID

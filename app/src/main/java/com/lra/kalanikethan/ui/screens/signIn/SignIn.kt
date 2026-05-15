@@ -10,39 +10,22 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.lra.kalanikethan.StudentsViewModel
-import com.lra.kalanikethan.data.remote.ChannelManager
+import com.lra.kalanikethan.viewmodel.AttendanceViewModel
 import com.lra.kalanikethan.ui.components.SimpleDecoratedTextField
 import com.lra.kalanikethan.ui.components.StudentInfoCard
-import kotlinx.coroutines.launch
 
-
-/**
- * The sign in screen for the app.
- *
- * This screen displays a list of students and allows users to sign in or sign out.
- * It uses a [LazyColumn] to display the list of students and a [SimpleDecoratedTextField]
- * It uses [LaunchedEffect] to initialise the students realTime channel in the [SignInViewModel]
- *
- * @param viewModel The view model for the sign in screen.
- */
 @Composable
 fun SignIn(
-    viewModel: StudentsViewModel
+    attendanceViewModel: AttendanceViewModel,
+    onEditFamily: (String) -> Unit = {}
 ) {
-    val students = viewModel.displayedStudents.collectAsState(emptyList())
-    val searchQuery = viewModel.searchQuery.value
-    val coroutineScope = rememberCoroutineScope()
-
-    LaunchedEffect(Unit) {
-        viewModel.initialiseStudentsChannel()
-    }
+    val students = attendanceViewModel.displayedStudents.collectAsState(emptyList())
+    val searchQuery by attendanceViewModel.searchQuery.collectAsState()
 
     Column(
         modifier = Modifier
@@ -53,7 +36,7 @@ fun SignIn(
     ) {
         SimpleDecoratedTextField(
             text = searchQuery,
-            onValueChange = { viewModel.updateSearchQuery(it) },
+            onValueChange = { attendanceViewModel.updateSearchQuery(it) },
             placeholder = "Search by firstname, ID or lastname...",
             leadingIcon = Icons.Default.Search,
             modifier = Modifier.width(1075.dp),
@@ -71,14 +54,10 @@ fun SignIn(
                 StudentInfoCard(
                     studentData = student,
                     onSignInToggle = {
-                        viewModel.updateStudentAttendance(it, currentSignInStatus = !it.signedIn, classId = null)
+                        attendanceViewModel.updateStudentAttendance(it, currentSignInStatus = !it.signedIn, classId = null)
                     },
                     onAbsentClick = { },
-                    onEditClick = {
-                        coroutineScope.launch {
-                            ChannelManager.unsubscribeFromAllChannels()
-                        }
-                    },
+                    onEditClick = { familyId -> onEditFamily(familyId) },
                 )
             }
         }

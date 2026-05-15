@@ -1,6 +1,5 @@
 package com.lra.kalanikethan.ui.components
 
-import android.app.TimePickerDialog
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -28,9 +27,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -55,7 +51,6 @@ import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -64,19 +59,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lra.kalanikethan.ui.theme.Background
+import com.lra.kalanikethan.ui.theme.InputBorderDefault
+import com.lra.kalanikethan.ui.theme.InputBorderError
 import com.lra.kalanikethan.ui.theme.LightBoxBackground
 import com.lra.kalanikethan.ui.theme.PrimaryLightColor
-import com.lra.kalanikethan.util.convertLongToTime
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.datetime.LocalDate
-import java.text.SimpleDateFormat
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
-import kotlin.time.Instant
 
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
@@ -122,9 +109,6 @@ fun SimpleDecoratedTextField2(
     val bringIntoViewRequester = remember { BringIntoViewRequester() }
 
 
-    // Maintain text state internally
-    val text = remember { mutableStateOf(text) }
-
     // Used to observe interaction events such as focus
     val interactionSource = remember { MutableInteractionSource() }
 
@@ -134,7 +118,7 @@ fun SimpleDecoratedTextField2(
     var showDatePicker by remember { mutableStateOf(false) }
 
     // Adjust border and icon color based on focus state
-    val borderColor = if (isFocused && error) Color.Red else if (isFocused) Color.Black.copy(alpha = 0.7f) else if (error) Color(0xFFF19191) else Color(0xFFDCDEDD)
+    val borderColor = if (isFocused && error) Color.Red else if (isFocused) Color.Black.copy(alpha = 0.7f) else if (error) InputBorderError else InputBorderDefault
     val iconColor = if (isFocused) Color.Black.copy(alpha = 0.7f) else Color.Gray
 
     Column(
@@ -170,17 +154,15 @@ fun SimpleDecoratedTextField2(
 
         // Core text input field with customization
         BasicTextField(
-            value = text.value,
+            value = text,
             keyboardOptions = if (floatsOnly) KeyboardOptions(keyboardType = KeyboardType.Number) else KeyboardOptions(keyboardType = KeyboardType.Text),
             onValueChange = {
                 if(floatsOnly){
                     if(it.matches(Regex("^\\d*\\.?\\d*$"))){
-                        text.value = it
                         onValueChange(it)
                     }
                 } else {
-                    text.value = it
-                    onValueChange(it) // Propagate the change upstream
+                    onValueChange(it)
                 }
             },
             singleLine = true,
@@ -239,7 +221,7 @@ fun SimpleDecoratedTextField2(
 
                     // Input text field with placeholder fallback
                     Box {
-                        if (text.value.isEmpty()) {
+                        if (text.isEmpty()) {
                             Text(
                                 text = placeholder,
                                 color = if (!isFocused) Color.Gray else Color.Black,
@@ -252,10 +234,9 @@ fun SimpleDecoratedTextField2(
                     Spacer(modifier = Modifier.weight(1f))
 
                     // Optional clear button (X) to reset text
-                    if (clearButton && text.value.isNotEmpty()) {
+                    if (clearButton && text.isNotEmpty()) {
                         IconButton(
                             onClick = {
-                                text.value = ""
                                 onValueChange("")
                             },
                             modifier = Modifier
@@ -298,9 +279,8 @@ fun SimpleDecoratedTextField2(
                             showDatePicker = false
                         },
                         onConfirm = {
-                            text.value = "${timePickerState.hour}:${timePickerState.minute}"
+                            onValueChange("${timePickerState.hour}:${timePickerState.minute}")
                             showDatePicker = false
-                            onValueChange(text.value)
                         },
                     ) {
                         Surface( // <- sets the background for the whole dialog, including buttons

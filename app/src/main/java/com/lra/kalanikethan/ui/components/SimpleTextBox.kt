@@ -50,16 +50,12 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.lra.kalanikethan.ui.theme.InputBorderDefault
+import com.lra.kalanikethan.ui.theme.InputBorderError
 import com.lra.kalanikethan.ui.theme.LightBoxBackground
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.datetime.LocalDate
-import java.text.SimpleDateFormat
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.Date
-import java.util.Locale
-import kotlin.time.Instant
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -107,9 +103,6 @@ fun SimpleDecoratedTextField(
     val bringIntoViewRequester = remember { BringIntoViewRequester() }
 
 
-    // Maintain text state internally
-    val text = remember { mutableStateOf(text) }
-
     // Used to observe interaction events such as focus
     val interactionSource = remember { MutableInteractionSource() }
 
@@ -119,7 +112,7 @@ fun SimpleDecoratedTextField(
     var showDatePicker by remember { mutableStateOf(false) }
 
     // Adjust border and icon color based on focus state
-    val borderColor = if (isFocused && error) Color.Red else if (isFocused) Color.Black.copy(alpha = 0.7f) else if (error) Color(0xFFF19191) else Color(0xFFDCDEDD)
+    val borderColor = if (isFocused && error) Color.Red else if (isFocused) Color.Black.copy(alpha = 0.7f) else if (error) InputBorderError else InputBorderDefault
     val iconColor = if (isFocused) Color.Black.copy(alpha = 0.7f) else Color.Gray
 
     Column(
@@ -155,17 +148,15 @@ fun SimpleDecoratedTextField(
 
         // Core text input field with customization
         BasicTextField(
-            value = text.value,
+            value = text,
             keyboardOptions = if (floatsOnly) KeyboardOptions(keyboardType = KeyboardType.Number) else KeyboardOptions(keyboardType = KeyboardType.Text),
             onValueChange = {
                 if(floatsOnly){
                     if(it.matches(Regex("^\\d*\\.?\\d*$"))){
-                        text.value = it
                         onValueChange(it)
                     }
                 } else {
-                    text.value = it
-                    onValueChange(it) // Propagate the change upstream
+                    onValueChange(it)
                 }
             },
             singleLine = true,
@@ -224,7 +215,7 @@ fun SimpleDecoratedTextField(
 
                     // Input text field with placeholder fallback
                     Box {
-                        if (text.value.isEmpty()) {
+                        if (text.isEmpty()) {
                             Text(
                                 text = placeholder,
                                 color = if (!isFocused) Color.Gray else Color.Black,
@@ -237,10 +228,9 @@ fun SimpleDecoratedTextField(
                     Spacer(modifier = Modifier.weight(1f))
 
                     // Optional clear button (X) to reset text
-                    if (clearButton && text.value.isNotEmpty()) {
+                    if (clearButton && text.isNotEmpty()) {
                         IconButton(
                             onClick = {
-                                text.value = ""
                                 onValueChange("")
                             },
                             modifier = Modifier
@@ -282,10 +272,9 @@ fun SimpleDecoratedTextField(
                                     .toLocalDate()
 
                                 val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-                                text.value = date.format(formatter)
-                                onValueChange(text.value)
+                                onValueChange(date.format(formatter))
                             }
-                            showDatePicker = false // Hide the modal after selection
+                            showDatePicker = false
                         },
                         onDismiss = {
                             showDatePicker = false // Hide the modal if dismissed

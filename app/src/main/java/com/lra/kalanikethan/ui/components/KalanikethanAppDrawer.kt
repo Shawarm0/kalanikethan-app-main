@@ -39,7 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lra.kalanikethan.R
-import com.lra.kalanikethan.Screen
+import com.lra.kalanikethan.navigation.Screen
 import com.lra.kalanikethan.ui.theme.Background
 import com.lra.kalanikethan.ui.theme.PrimaryLightColor
 import com.lra.kalanikethan.ui.theme.UnselectedButtonText

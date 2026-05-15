@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.lra.kalanikethan.ui.theme.AccentColor
 import com.lra.kalanikethan.ui.theme.Background
+import com.lra.kalanikethan.ui.theme.BorderColor
 import com.lra.kalanikethan.util.topBorder
 
 @Composable
@@ -43,7 +44,7 @@ fun TabBar(
         modifier = modifier
             .wrapContentSize()
             .background(Background)
-            .topBorder(1.dp, Color(0xFFE5E8EB)),
+            .topBorder(1.dp, BorderColor),
         horizontalArrangement = Arrangement.Center
     ) {
         TabItem(
@@ -84,7 +85,7 @@ enum class Tab(val icon: ImageVector, val title: String) {
     ),
     Payments(
         icon = Icons.Default.Payment,
-        title = "com/lra/kalanikethan/ui/screens/Payments"
+        title = "Payments"
     )
 }
 

@@ -45,6 +45,7 @@ fun ParentBox2(
     onLastNameChange : (String) -> Unit = {},
     onPhoneNumberChange : (String) -> Unit = {},
     deleteParent: () -> Unit = {},
+    onConfirm: () -> Unit = {},
 ) {
     var currentData by remember { mutableStateOf(initialData) }
 
@@ -118,6 +119,12 @@ fun ParentBox2(
                         error = false, //TODO("Check if phone number is actually optional")
                         errorMessage = emptyErrorMsg
                     )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Button("Confirm", Icons.Default.Check, onClick = { onConfirm() }, color = SuccessColor)
                 }
             }
         }

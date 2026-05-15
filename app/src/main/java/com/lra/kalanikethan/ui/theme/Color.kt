@@ -35,6 +35,13 @@ val AccentColor = Color(0xFF20A4F3) // Bright pop color for highlights
 val ErrorColor = Color(0xFFD32F2F) // Standard red for errors
 val SuccessColor = Color(0xFF4CAF50) // Green for success states
 
+val UnselectedChipBackground = Color(0xFFE7EEF5)
+val BorderColor = Color(0xFFE5E8EB)
+val InputBorderDefault = Color(0xFFDCDEDD)
+val InputBorderError = Color(0xFFF19191)
+val SwitchUncheckedThumb = Color(0xFF79747E)
+val SwitchUncheckedTrack = Color(0xFFE7E0EC)
+
 
 // PrimaryLightColor: #144E88
 // SecondaryLightColor: #1E63A5

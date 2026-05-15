@@ -1,6 +1,5 @@
 package com.lra.kalanikethan.ui.components
 
-import android.icu.text.IDNA
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -36,7 +35,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lra.kalanikethan.data.models.Student
-import java.time.LocalDate
 
 @Composable
 /**
@@ -51,7 +49,7 @@ fun StudentInfoCard(
     studentData: Student,
     onSignInToggle: (Student) -> Unit,
     onAbsentClick: (studentId: Int?) -> Unit,
-    onEditClick: (studentId: Int?) -> Unit,
+    onEditClick: (familyId: String) -> Unit,
 ) {
 
     // Determine the label for the sign-in/sign-out button
@@ -193,20 +191,10 @@ fun StudentInfoCard(
                         text = "Edit Family",
                         symbol = Icons.Default.Edit,
                         onClick = {
-                            onEditClick(studentData.studentId)
+                            onEditClick(studentData.familyId)
                         },
                         modifier = Modifier.wrapContentSize(),
                     )
-
-//                    // Button to mark student as absent
-//                    Button(
-//                        text = "Sign Absent",
-//                        symbol = Icons.Default.Close,
-//                        onClick = {
-//                            onAbsentClick(studentData.studentId)
-//                        },
-//                        modifier = Modifier.wrapContentSize(),
-//                    )
 
                     // Sign in / Sign out button
                     Button(
@@ -233,7 +221,7 @@ fun StudentInfoCardPreview() {
             familyId = "",
             firstName = "John",
             lastName = "Doe",
-            birthdate = TODO(),
+            birthdate = kotlinx.datetime.LocalDate(2000, 1, 1),
             canWalkAlone = true,
             dance = true,
             singing = false,

@@ -1,7 +1,5 @@
 package com.lra.kalanikethan.data.models
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -11,7 +9,3 @@ data class User(
     val manager: Boolean,
     val uid: String
 )
-
-var sessionPermissions: MutableState<User> = mutableStateOf(User("None", "", false, ""))
-
-var authCompleted = false

@@ -1,5 +1,4 @@
-package com.lra.kalanikethan.ui.screens.dashBoardViewModel
-
+package com.lra.kalanikethan.ui.screens.dashboard
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,40 +27,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import com.lra.kalanikethan.StudentsViewModel
+import com.lra.kalanikethan.viewmodel.AttendanceViewModel
+import com.lra.kalanikethan.viewmodel.ClassManagementViewModel
 import com.lra.kalanikethan.ui.components.StudentInfoCard
-import com.lra.kalanikethan.ui.screens.signIn.SignInViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 
-/**
- * Composable function that displays a class roster with student information and attendance controls.
- *
- * Shows a loading indicator while data is being fetched, then displays the class teacher's name
- * and a list of students with sign-in/out functionality. The layout features consistent left padding
- * for title and student list alignment.
- *
- * @param viewModel The [DashBoardViewModel] that provides class and student data
- * @param signInViewModel The [SignInViewModel] that handles attendance update operations
- */
 @Composable
 fun Classes(
-    viewModel: StudentsViewModel
+    classViewModel: ClassManagementViewModel,
+    attendanceViewModel: AttendanceViewModel,
+    onEditFamily: (String) -> Unit = {}
 ) {
-    
-    val isLoading = viewModel.isLoading.value
-    val thisClass = viewModel.thisClass.value
+    val isLoading by classViewModel.isLoading.collectAsState()
+    val thisClass by classViewModel.thisClass.collectAsState()
     val students by remember(thisClass?.classId) {
-        thisClass?.classId?.let { viewModel.studentsForClass(it) }
+        thisClass?.classId?.let { classViewModel.studentsForClass(it) }
             ?: MutableStateFlow(emptyList())
     }.collectAsState()
-
 
     var textWidth by remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
 
     LaunchedEffect(thisClass?.classId) {
         thisClass?.classId?.let { classId ->
-            viewModel.loadStudentsForClass(classId)
+            classViewModel.loadStudentsForClass(classId)
         }
     }
 
@@ -76,7 +65,6 @@ fun Classes(
         Column(
             modifier = Modifier.fillMaxSize(),
         ) {
-            // Title Section with 113.dp padding from left
             Column(
                 modifier = Modifier
                     .padding(start = 113.dp, top = 14.dp)
@@ -94,22 +82,23 @@ fun Classes(
                 Spacer(modifier = Modifier.height(14.dp))
             }
 
-            // Student List aligned with the title's start (113.dp)
+            val sortedStudents = remember(students) { students.sortedBy { it.firstName } }
+
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(start = 113.dp)  // Same padding as title
+                    .padding(start = 113.dp)
                     .padding(top = 14.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
-                items(students.sortedBy { it.firstName }) { student ->
+                items(sortedStudents, key = { it.studentId ?: 0 }) { student ->
                     StudentInfoCard(
                         studentData = student,
                         onSignInToggle = {
-                            viewModel.updateStudentAttendance(it, currentSignInStatus = !it.signedIn, classId = thisClass?.classId)
+                            attendanceViewModel.updateStudentAttendance(it, currentSignInStatus = !it.signedIn, classId = thisClass?.classId)
                         },
                         onAbsentClick = { },
-                        onEditClick = { }
+                        onEditClick = { familyId -> onEditFamily(familyId) }
                     )
                 }
             }

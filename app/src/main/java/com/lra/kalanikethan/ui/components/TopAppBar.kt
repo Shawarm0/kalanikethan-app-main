@@ -27,6 +27,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,8 +38,9 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.lra.kalanikethan.data.models.sessionPermissions
+import com.lra.kalanikethan.data.session.SessionManager
 import com.lra.kalanikethan.ui.theme.Background
+import com.lra.kalanikethan.ui.theme.BorderColor
 import com.lra.kalanikethan.util.bottomBorder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -67,6 +70,7 @@ fun TopAppBar(
     onAccountSelected: () -> Unit,
     selectedScreen: String
 ) {
+    val currentUser by SessionManager.currentUser.collectAsState()
     val configuration = LocalConfiguration.current
     val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
     val title = title.replaceFirstChar { it.uppercaseChar() }.replace("_", " ")
@@ -75,7 +79,7 @@ fun TopAppBar(
             .fillMaxWidth()
             .background(color = Background)
             .windowInsetsPadding(WindowInsets.statusBars)
-            .bottomBorder(1.dp, Color(0xFFE5E8EB))
+            .bottomBorder(1.dp, BorderColor)
             .height(56.dp) // Optional: standard top bar height
     ) {
         // Left and right content using Row with space-between
@@ -108,7 +112,7 @@ fun TopAppBar(
                     }
                     if (!isPortrait) {
                         Text(
-                            sessionPermissions.value.first_name,
+                            currentUser.first_name,
                             style = MaterialTheme.typography.displaySmall,
                             fontSize = 13.sp,
                             color = Color.Black

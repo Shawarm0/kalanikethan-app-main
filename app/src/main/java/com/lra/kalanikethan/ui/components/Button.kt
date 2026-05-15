@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import com.lra.kalanikethan.ui.theme.AccentColor
 import com.lra.kalanikethan.ui.theme.ButtonColor
 import com.lra.kalanikethan.ui.theme.UnselectedButtonText
+import com.lra.kalanikethan.ui.theme.UnselectedChipBackground
 
 
 /**
@@ -113,7 +114,7 @@ fun SelectionButton(
     Box (
         modifier = Modifier
         .clip(RoundedCornerShape(20.dp))
-        .background(color = if(state) AccentColor else Color(0xFFE7EEF5))
+        .background(color = if(state) AccentColor else UnselectedChipBackground)
         .height(36.dp)
         .width(width)
         .wrapContentSize(Alignment.Center)

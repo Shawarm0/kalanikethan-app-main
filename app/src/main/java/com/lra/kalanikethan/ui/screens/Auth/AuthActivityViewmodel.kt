@@ -11,10 +11,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lra.kalanikethan.MainActivity
 import com.lra.kalanikethan.data.models.User
-import com.lra.kalanikethan.data.models.authCompleted
-import com.lra.kalanikethan.data.models.sessionPermissions
+import com.lra.kalanikethan.data.session.SessionManager
 import com.lra.kalanikethan.data.remote.SupabaseClientProvider.auth
 import com.lra.kalanikethan.data.remote.SupabaseClientProvider.client
+import com.lra.kalanikethan.util.Tables
 import io.github.jan.supabase.auth.SignOutScope
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.postgrest.from
@@ -75,7 +75,7 @@ class AuthActivityViewmodel : ViewModel() {
                 Log.i("Auth - Viewmodel", "Retrieving user data from employees table")
 
                 // Fetch employee details from the database
-                val newUser: User = client.from("employees")
+                val newUser: User = client.from(Tables.EMPLOYEES)
                     .select(columns = Columns.list("first_name, last_name, manager, uid")) {
                         filter {
                             User::uid eq userInfo.id
@@ -85,13 +85,12 @@ class AuthActivityViewmodel : ViewModel() {
 
                 // Update current and session user data
                 currentUser.value = newUser
-                sessionPermissions.value = newUser
+                SessionManager.setUser(newUser)
 
                 // Navigate to main screen
                 val intent = Intent(context, MainActivity::class.java)
                 context.startActivity(intent)
                 (context as Activity).finish()
-                authCompleted = true
 
                 Log.i("Auth - Viewmodel", "User data retrieved: ${newUser.first_name} ${newUser.last_name}, Manager: ${newUser.manager}")
 
@@ -113,8 +112,7 @@ class AuthActivityViewmodel : ViewModel() {
         viewModelScope.launch {
             try {
                 auth.signOut(SignOutScope.GLOBAL)
-                authCompleted = false
-                sessionPermissions.value = User("None", "None", false, "")
+                SessionManager.clearUser()
                 Log.i("Auth - Viewmodel", "User signed out successfully")
             } catch (e: Exception) {
                 Log.e("Auth - Viewmodel", "Error during sign out: $e")

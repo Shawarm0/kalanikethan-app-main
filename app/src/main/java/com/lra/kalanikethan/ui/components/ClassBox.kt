@@ -1,8 +1,5 @@
 package com.lra.kalanikethan.ui.components
 
-import android.os.Build
-import androidx.annotation.RequiresApi
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -36,12 +33,7 @@ import androidx.compose.ui.unit.sp
 import com.lra.kalanikethan.data.models.Class
 import com.lra.kalanikethan.ui.theme.ButtonColor
 import com.lra.kalanikethan.ui.theme.PrimaryLightColor
-import com.lra.kalanikethan.util.bottomBorder
-import com.lra.kalanikethan.util.convertLongToTime
-import com.lra.kalanikethan.util.isCurrentTimeWithinRange
 
-@RequiresApi(Build.VERSION_CODES.O)
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ClassBox(
     modifier: Modifier = Modifier.height(277.dp).width(404.dp),
@@ -50,13 +42,6 @@ fun ClassBox(
     onClassClick: (Class) -> Unit = {},
     onEditClick: (Class) -> Unit = {},
 ) {
-    val darkTheme = false
-
-    // Convert Long timestamps to formatted time strings
-    val startTime = classData.startTime // You'll need the extension function we discussed
-    val endTime = classData.endTime
-    val istime = false
-
     Box(
         modifier = modifier
             .shadow(
@@ -66,11 +51,7 @@ fun ClassBox(
                 spotColor = Color.Black.copy(alpha = 0.1f)
             )
             .clip(RoundedCornerShape(12.dp))
-            .background(color = if (darkTheme) Color.Black else Color.White)
-            .then(
-                if (istime) Modifier.bottomBorder(3.dp, PrimaryLightColor)
-                else Modifier
-            )
+            .background(color = Color.White)
     ) {
         Column(
             modifier = Modifier
@@ -90,7 +71,7 @@ fun ClassBox(
                 ) {
                     Text(
                         text = classData.teacherName,
-                        color = if (darkTheme) Color.White else Color.Black,
+                        color = Color.Black,
                         style = MaterialTheme.typography.titleLarge,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -119,31 +100,17 @@ fun ClassBox(
                 }
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    text = "$startTime - $endTime",
-                    color = if (darkTheme) Color.LightGray else Color(0xFF3D4D5C),
+                    text = "${classData.startTime} - ${classData.endTime}",
+                    color = Color(0xFF3D4D5C),
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
                     text = classData.type,
-                    color = if (darkTheme) Color.LightGray else Color(0xFF3D4D5C),
+                    color = Color(0xFF3D4D5C),
                     style = MaterialTheme.typography.titleSmall
                 )
             }
-        }
-
-        if (istime) {
-            Text(
-                text = "ONGOING",
-                color = Color(0xFF3D4D5C),
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Light
-                ),
-                modifier = Modifier
-                    .padding(12.dp)
-                    .align(Alignment.BottomStart)
-            )
         }
 
         Button(

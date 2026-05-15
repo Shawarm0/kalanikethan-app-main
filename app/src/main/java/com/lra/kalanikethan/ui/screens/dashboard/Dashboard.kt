@@ -1,4 +1,4 @@
-package com.lra.kalanikethan.ui.screens.dashBoardViewModel
+package com.lra.kalanikethan.ui.screens.dashboard
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,51 +29,39 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.lra.kalanikethan.Screen
-import com.lra.kalanikethan.StudentsViewModel
+import com.lra.kalanikethan.navigation.Screen
+import com.lra.kalanikethan.viewmodel.ClassManagementViewModel
 import com.lra.kalanikethan.ui.components.ClassBox
+import com.lra.kalanikethan.util.Timing
 import com.lra.kalanikethan.util.isManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-/**
- * Composable function that displays a dashboard of classes for the current day.
- *
- * Shows a horizontal list of class boxes that can be clicked to navigate to class details
- * or edited (for managers). Features a dynamically sized title with matching divider.
- *
- * @param viewModel The [DashBoardViewModel] that provides class data
- * @param navController The [NavHostController] for navigation between screens
- * @param selectedIconChange Callback function to update the selected icon in the navigation
- */
 @Composable
 fun Dashboard(
-    viewModel: StudentsViewModel,
+    classViewModel: ClassManagementViewModel,
     navController: NavHostController,
     selectedIconChange: (ImageVector) -> Unit = {}
 ) {
-    val classes = viewModel.allClasses.collectAsState(emptyList())
+    val classes = classViewModel.allClasses.collectAsState()
     var textWidth by remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
     val scope = rememberCoroutineScope()
 
-    Column( // This is the Title
+    Column(
         modifier = Modifier
             .wrapContentSize().padding(start = 53.dp, top = 14.dp).fillMaxSize(),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
-        // Capture the width of the Text
         Text(
             "Classes Today",
             style = MaterialTheme.typography.displayLarge,
             modifier = Modifier.onGloballyPositioned { coordinates ->
-                // Convert width to dp
                 textWidth = with(density) { coordinates.size.width.toDp() }
             }
         )
         Spacer(modifier = Modifier.height(10.dp))
-        // HorizontalDivider with dynamic width equal to the Text width
         HorizontalDivider(modifier = Modifier.width(textWidth))
         Spacer(modifier = Modifier.height(33.dp))
         LazyRow(
@@ -81,24 +69,24 @@ fun Dashboard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start,
         ) {
-            items(classes.value) {thisClass ->
+            items(classes.value) { thisClass ->
                 ClassBox(
                     classData = thisClass,
                     isManager = isManager(),
                     onEditClick = { thisClass ->
-                        viewModel.thisClass.value = thisClass
-                        viewModel.resetPendingUpdates()
+                        classViewModel.thisClass.value = thisClass
+                        classViewModel.resetPendingUpdates()
                         selectedIconChange(Screen.EditClass.filledIcon)
                         navController.navigate(Screen.EditClass.route)
                     },
                     onClassClick = { thisClass ->
-                        viewModel.thisClass.value = thisClass
+                        classViewModel.thisClass.value = thisClass
                         selectedIconChange(Screen.Class.filledIcon)
                         navController.navigate(Screen.Class.route)
                         scope.launch {
-                            viewModel.isLoading.value = true
-                            delay(500)
-                            viewModel.isLoading.value = false
+                            classViewModel.isLoading.value = true
+                            delay(Timing.LOADING_INDICATOR_MS)
+                            classViewModel.isLoading.value = false
                         }
                     },
                 )
@@ -107,4 +95,3 @@ fun Dashboard(
         }
     }
 }
-

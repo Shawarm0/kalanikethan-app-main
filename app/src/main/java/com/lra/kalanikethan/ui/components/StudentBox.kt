@@ -49,7 +49,10 @@ import com.lra.kalanikethan.ui.theme.ErrorColor
 import com.lra.kalanikethan.ui.theme.LightBoxBackground
 import com.lra.kalanikethan.ui.theme.PrimaryLightColor
 import com.lra.kalanikethan.ui.theme.SuccessColor
+import com.lra.kalanikethan.ui.theme.SwitchUncheckedThumb
+import com.lra.kalanikethan.ui.theme.SwitchUncheckedTrack
 import com.lra.kalanikethan.ui.theme.UnselectedButtonText
+import com.lra.kalanikethan.ui.theme.UnselectedChipBackground
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format
 import kotlinx.datetime.format.char
@@ -75,7 +78,8 @@ fun StudentBox(
     deleteStudent: () -> Unit = {},
     viewHistory: Boolean = false,
     editable: Boolean = false,
-    deleteIfCancelledOnFirstEdit: Boolean = false
+    deleteIfCancelledOnFirstEdit: Boolean = false,
+    title: String = "Student Details"
 ){
     // For the text boxes
     val bringIntoViewRequester = remember { BringIntoViewRequester() }
@@ -89,7 +93,12 @@ fun StudentBox(
 
     val formatter = LocalDate.Format { day(); char('/'); monthNumber(); char('/') ; year() }
 
-    val birthdate = remember {mutableStateOf(currentData.birthdate.format(formatter))}
+    val birthdate = remember {
+        mutableStateOf(
+            if (currentData.birthdate.toString() == "2000-01-01") ""
+            else currentData.birthdate.format(formatter)
+        )
+    }
 
     val dateError = remember { mutableStateOf(false) }
     val firstNameError = remember { mutableStateOf(false) }
@@ -120,7 +129,7 @@ fun StudentBox(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ){
-                Text("Student Details", style = MaterialTheme.typography.titleLarge)
+                Text(title, style = MaterialTheme.typography.titleLarge)
                 if(editableState){
                     Button("Delete", Icons.Default.Delete, color = ErrorColor, onClick = { deleteStudent() })
                 }
@@ -159,7 +168,7 @@ fun StudentBox(
 
                     SimpleDecoratedTextField(
                         placeholder = "DD/MM/YYYY",
-                        text = if (tempData.birthdate.toString() == "2000-01-01") "" else tempData.birthdate.format(formatter),
+                        text = birthdate.value,
                         onValueChange = {
                             birthdate.value = it
                         },
@@ -209,9 +218,9 @@ fun StudentBox(
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = Color.White,
                                 checkedTrackColor = PrimaryLightColor,
-                                uncheckedThumbColor = Color(0xFF79747E),
-                                uncheckedTrackColor = Color(0xFFe7e0ec),
-                                uncheckedBorderColor = Color(0xFF79747E)
+                                uncheckedThumbColor = SwitchUncheckedThumb,
+                                uncheckedTrackColor = SwitchUncheckedTrack,
+                                uncheckedBorderColor = SwitchUncheckedThumb
                             ),
                             thumbContent = if (tempData.canWalkAlone) {
                                 {
@@ -324,7 +333,7 @@ fun InfoBox(
 ){
     Box(modifier = modifier
         .clip(RoundedCornerShape(8.dp))
-        .background(color = Color(0xFFE7EEF5))
+        .background(color = UnselectedChipBackground)
         .height(30.dp)
         .padding(horizontal = 10.dp)
         .wrapContentWidth(),
@@ -349,7 +358,7 @@ fun StudentBoxPreview() {
                 familyId = "",
                 firstName = "John",
                 lastName = "Doe",
-                birthdate = TODO(),
+                birthdate = kotlinx.datetime.LocalDate(2000, 1, 1),
                 canWalkAlone = true,
                 dance = true,
                 singing = false,

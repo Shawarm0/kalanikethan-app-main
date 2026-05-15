@@ -3,8 +3,8 @@ package com.lra.kalanikethan.data.remote
 import android.util.Log
 import com.lra.kalanikethan.BuildConfig
 import com.lra.kalanikethan.data.models.User
-import com.lra.kalanikethan.data.models.authCompleted
-import com.lra.kalanikethan.data.models.sessionPermissions
+import com.lra.kalanikethan.data.session.SessionManager
+import com.lra.kalanikethan.util.Tables
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
@@ -30,7 +30,7 @@ object SupabaseClientProvider {
      * Initialized Supabase client with installed modules and HTTP engine.
      */
     val client: SupabaseClient = createSupabaseClient(
-        supabaseUrl = "https://kfzzlelvlekrkduhgksy.supabase.co",
+        supabaseUrl = BuildConfig.SUPABASE_URL,
         supabaseKey = API_KEY,
     ) {
         install(Postgrest)
@@ -58,7 +58,7 @@ object SupabaseClientProvider {
     suspend fun isUserStillValid(): Boolean {
         return try {
             val user = client.auth.currentUserOrNull()?.id ?: return false
-            val result = client.from("employees")
+            val result = client.from(Tables.EMPLOYEES)
                 .select() {
                     filter {
                         User::uid eq user
@@ -73,8 +73,7 @@ object SupabaseClientProvider {
             } else {
 
                 try {
-                    sessionPermissions.value = result.decodeSingle<User>()
-                    authCompleted = true
+                    SessionManager.setUser(result.decodeSingle<User>())
                 } catch (e: Exception) {
                     Log.i("Auth - SupabaseClientProvider", "Error decoding single user: $e")
                 }

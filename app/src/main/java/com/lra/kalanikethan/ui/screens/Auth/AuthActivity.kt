@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,8 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lra.kalanikethan.data.models.User
-import com.lra.kalanikethan.data.models.authCompleted
-import com.lra.kalanikethan.data.models.sessionPermissions
+import com.lra.kalanikethan.data.session.SessionManager
 import com.lra.kalanikethan.data.remote.SupabaseClientProvider.client
 import com.lra.kalanikethan.ui.components.Button
 import com.lra.kalanikethan.ui.components.SimpleDecoratedTextField
@@ -91,7 +91,7 @@ class AuthActivity : ComponentActivity() {
 fun AuthMain(model: AuthActivityViewmodel) {
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
-    val loggedin = authCompleted
+    val loggedIn by SessionManager.authCompleted.collectAsState()
     val context = LocalContext.current
 
     Column(
@@ -99,22 +99,20 @@ fun AuthMain(model: AuthActivityViewmodel) {
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (!loggedin) {
+        if (!loggedIn) {
             SignedOut(
                 email,
                 password,
-                model = model, // Pass the ViewModel
+                model = model,
                 onLogin = {
                     model.loginUser(email.value, password.value, context)
                 }
             )
         } else {
             LoggedIn(
-                sessionPermissions,
-                model = model, // Pass the ViewModel
+                model = model,
                 onSignOut = {
                     model.signOutUser(context)
-                    authCompleted = false
                 }
             )
         }
@@ -133,10 +131,10 @@ fun AuthMain(model: AuthActivityViewmodel) {
  */
 @Composable
 fun LoggedIn(
-    sessionPermissions: MutableState<User>,
-    model: AuthActivityViewmodel, // Pass the ViewModel
+    model: AuthActivityViewmodel,
     onSignOut: () -> Unit = {}
 ) {
+    val currentUser by SessionManager.currentUser.collectAsState()
 
     if (model.loading) {
         Column(
@@ -161,7 +159,7 @@ fun LoggedIn(
             ) {
 
                 Text(
-                    text = "Account Name: ${sessionPermissions.value.first_name} ${sessionPermissions.value.last_name}",
+                    text = "Account Name: ${currentUser.first_name} ${currentUser.last_name}",
                     style = infoTextStyle()
                 )
                 Text(
@@ -169,7 +167,7 @@ fun LoggedIn(
                     style = infoTextStyle()
                 )
                 Text(
-                    text = "Manager: ${sessionPermissions.value.manager}",
+                    text = "Manager: ${currentUser.manager}",
                     style = infoTextStyle()
                 )
 

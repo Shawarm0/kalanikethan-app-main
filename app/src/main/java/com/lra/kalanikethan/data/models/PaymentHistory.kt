@@ -6,10 +6,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PaymentHistory(
-    var payment_id : Int? = null,
+    val payment_id : Int? = null,
     val family_payment_id : String,
-    var paid : Boolean,
+    val paid : Boolean,
     @Serializable(with = LocalDateSerializer::class)
-    var due_date : LocalDate,
-    var amount : Float
+    val due_date : LocalDate,
+    val amount : Float
 )

@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lra.kalanikethan.ui.theme.AccentColor
 import com.lra.kalanikethan.ui.theme.UnselectedButtonText
-import io.github.jan.supabase.realtime.Column
+import com.lra.kalanikethan.ui.theme.UnselectedChipBackground
 
 @Composable
 fun ClassStudentComposable(
@@ -70,7 +70,7 @@ fun ClassStudentDisplay(
     name: String = "Student Name",
 ) {
     Box(
-        modifier = modifier.clip(RoundedCornerShape(8.dp)).background(color = Color(0xFFE7EEF5)),
+        modifier = modifier.clip(RoundedCornerShape(8.dp)).background(color = UnselectedChipBackground),
         contentAlignment = Alignment.Center
     ) {
         Row(

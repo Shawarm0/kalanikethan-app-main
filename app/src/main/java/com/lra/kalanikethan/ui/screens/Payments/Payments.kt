@@ -13,7 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.lra.kalanikethan.Screen
+import com.lra.kalanikethan.navigation.Screen
 import com.lra.kalanikethan.ui.components.PaymentComponent
 import com.lra.kalanikethan.ui.screens.Add.PaymentData
 import kotlinx.datetime.TimeZone

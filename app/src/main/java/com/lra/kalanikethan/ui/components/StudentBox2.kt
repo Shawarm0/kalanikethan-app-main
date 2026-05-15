@@ -42,6 +42,8 @@ import com.lra.kalanikethan.ui.theme.ErrorColor
 import com.lra.kalanikethan.ui.theme.LightBoxBackground
 import com.lra.kalanikethan.ui.theme.PrimaryLightColor
 import com.lra.kalanikethan.ui.theme.SuccessColor
+import com.lra.kalanikethan.ui.theme.SwitchUncheckedThumb
+import com.lra.kalanikethan.ui.theme.SwitchUncheckedTrack
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format
 import kotlinx.datetime.format.char
@@ -58,6 +60,7 @@ fun StudentBox2(
     onMusicChange: (Boolean) -> Unit = {},
     onWalkAloneChange: (Boolean) -> Unit = {},
     deleteStudent: () -> Unit = {},
+    onConfirm: () -> Unit = {},
     dateInvalid : Boolean = false,
     index : Int? = null
 ){
@@ -65,7 +68,12 @@ fun StudentBox2(
 
     val formatter = LocalDate.Format { day(); char('/'); monthNumber(); char('/') ; year() }
 
-    val birthdate = remember {mutableStateOf(currentData.birthdate.format(formatter))}
+    val birthdate = remember {
+        mutableStateOf(
+            if (currentData.birthdate.toString() == "2000-01-01") ""
+            else currentData.birthdate.format(formatter)
+        )
+    }
 
     Box(modifier = Modifier
         .shadow(
@@ -122,7 +130,7 @@ fun StudentBox2(
 
                     SimpleDecoratedTextField(
                         placeholder = "DD/MM/YYYY",
-                        text = if (currentData.birthdate.toString() == "2000-01-01") "" else currentData.birthdate.format(formatter),
+                        text = birthdate.value,
                         onValueChange = {
                             birthdate.value = it
                             onBirthDateChange(it)
@@ -178,9 +186,9 @@ fun StudentBox2(
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = Color.White,
                                 checkedTrackColor = PrimaryLightColor,
-                                uncheckedThumbColor = Color(0xFF79747E),
-                                uncheckedTrackColor = Color(0xFFe7e0ec),
-                                uncheckedBorderColor = Color(0xFF79747E)
+                                uncheckedThumbColor = SwitchUncheckedThumb,
+                                uncheckedTrackColor = SwitchUncheckedTrack,
+                                uncheckedBorderColor = SwitchUncheckedThumb
                             ),
                             thumbContent = if (currentData.canWalkAlone) {
                                 {
@@ -195,6 +203,7 @@ fun StudentBox2(
                             }
                         )
                     }
+                    Button("Confirm", Icons.Default.Check, onClick = { onConfirm() }, color = SuccessColor)
                 }
         }
     }

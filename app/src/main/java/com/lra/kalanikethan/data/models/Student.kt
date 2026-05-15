@@ -11,7 +11,7 @@ import java.time.LocalDate
 @Serializable
 data class Student(
     @SerialName("student_id") val studentId: Int? = null,
-    @SerialName("family_id") var familyId: String,
+    @SerialName("family_id") val familyId: String,
     @SerialName("first_name") val firstName: String,
     @SerialName("last_name") val lastName: String,
     @Serializable(with = LocalDateSerializer::class)
